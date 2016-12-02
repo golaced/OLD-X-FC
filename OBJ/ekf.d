@@ -1,0 +1,14 @@
+..\obj\ekf.o: ..\HARDWARE\IIC\EKF.c
+..\obj\ekf.o: ..\HARDWARE\IIC\EKF.h
+..\obj\ekf.o: ..\HARDWARE\IIC\Matrix.h
+..\obj\ekf.o: e:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\arm_math.h
+..\obj\ekf.o: e:\Keil_v5\ARM\PACK\ARM\CMSIS\4.1.1\CMSIS\Include\core_cm4.h
+..\obj\ekf.o: e:\Keil_v5\ARM\ARMCC\bin\..\include\stdint.h
+..\obj\ekf.o: ..\CORE\core_cmInstr.h
+..\obj\ekf.o: ..\CORE\core_cmFunc.h
+..\obj\ekf.o: ..\CORE\core_cm4_simd.h
+..\obj\ekf.o: e:\Keil_v5\ARM\ARMCC\bin\..\include\string.h
+..\obj\ekf.o: ..\HARDWARE\IIC\math.h
+..\obj\ekf.o: ..\HARDWARE\IIC\FastMath.h
+..\obj\ekf.o: ..\HARDWARE\IIC\Double.h
+..\obj\ekf.o: ..\HARDWARE\IIC\Quaternion.h
