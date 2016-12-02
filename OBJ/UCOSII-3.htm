@@ -3,7 +3,7 @@
 <title>Static Call Graph - [..\OBJ\UCOSII-3.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image ..\OBJ\UCOSII-3.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060183: Last Updated: Fri Dec 02 09:19:44 2016
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060183: Last Updated: Fri Dec 02 11:38:47 2016
 <BR><P>
 <H3>Maximum Stack Usage =       1992 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -3714,7 +3714,7 @@ Global Symbols
 
 <P><STRONG><a name="[3be]"></a>XYZ_STRUCT_COPY</STRONG> (Thumb, 40 bytes, Stack size 16 bytes, hml_sample.o(.text), UNUSED)
 
-<P><STRONG><a name="[1f0]"></a>ANO_AK8975_CalOffset_Mag</STRONG> (Thumb, 940 bytes, Stack size 32 bytes, hml_sample.o(.text))
+<P><STRONG><a name="[1f0]"></a>ANO_AK8975_CalOffset_Mag</STRONG> (Thumb, 888 bytes, Stack size 32 bytes, hml_sample.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 160<LI>Call Chain = ANO_AK8975_CalOffset_Mag &rArr; WRITE_PARM &rArr; W25QXX_Write &rArr; W25QXX_Write_NoCheck &rArr; W25QXX_Write_Page &rArr; W25QXX_Wait_Busy &rArr; W25QXX_ReadSR &rArr; SPI1_ReadWriteByte
 </UL>
 <BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_Cycle_T
@@ -3726,13 +3726,13 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[1f3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ANO_AK8975_Read_Mag_Data
 </UL>
 
-<P><STRONG><a name="[1f2]"></a>HMC58X3_newValues</STRONG> (Thumb, 242 bytes, Stack size 20 bytes, hml_sample.o(.text))
+<P><STRONG><a name="[1f2]"></a>HMC58X3_newValues</STRONG> (Thumb, 220 bytes, Stack size 20 bytes, hml_sample.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = HMC58X3_newValues
 </UL>
 <BR>[Called By]<UL><LI><a href="#[1f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HMC58X3_getRaw
 </UL>
 
-<P><STRONG><a name="[1f1]"></a>HMC58X3_getRaw</STRONG> (Thumb, 120 bytes, Stack size 32 bytes, hml_sample.o(.text))
+<P><STRONG><a name="[1f1]"></a>HMC58X3_getRaw</STRONG> (Thumb, 126 bytes, Stack size 32 bytes, hml_sample.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 136 + Unknown Stack Size
 <LI>Call Chain = HMC58X3_getRaw &rArr; IICreadBytes &rArr; IIC_Read_Byte &rArr; IIC_NAck &rArr; Delay_us &rArr; delay_us &rArr; OSSchedUnlock &rArr; OS_Sched
 </UL>
@@ -3794,7 +3794,7 @@ Global Symbols
 <LI><a href="#[1fa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HMC58X3_setGain
 </UL>
 
-<P><STRONG><a name="[3c0]"></a>HMC58X3_getlastValues</STRONG> (Thumb, 22 bytes, Stack size 0 bytes, hml_sample.o(.text), UNUSED)
+<P><STRONG><a name="[3c0]"></a>HMC58X3_getlastValues</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, hml_sample.o(.text), UNUSED)
 
 <P><STRONG><a name="[1f9]"></a>HMC58X3_mgetValues</STRONG> (Thumb, 136 bytes, Stack size 24 bytes, hml_sample.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[1f1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HMC58X3_getRaw
@@ -3809,7 +3809,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HMC5883L_SetUp
 </UL>
 
-<P><STRONG><a name="[1fb]"></a>HMC58X3_setMode</STRONG> (Thumb, 102 bytes, Stack size 8 bytes, hml_sample.o(.text))
+<P><STRONG><a name="[1fb]"></a>HMC58X3_setMode</STRONG> (Thumb, 28 bytes, Stack size 8 bytes, hml_sample.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 144 + Unknown Stack Size
 <LI>Call Chain = HMC58X3_setMode &rArr; HMC58X3_writeReg &rArr; IICwriteByte &rArr; IICwriteBytes &rArr; IIC_Send_Byte &rArr; Delay_us &rArr; delay_us &rArr; OSSchedUnlock &rArr; OS_Sched
 </UL>
@@ -3820,7 +3820,7 @@ Global Symbols
 <LI><a href="#[1fc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HMC58X3_init
 </UL>
 
-<P><STRONG><a name="[1fc]"></a>HMC58X3_init</STRONG> (Thumb, 38 bytes, Stack size 8 bytes, hml_sample.o(.text))
+<P><STRONG><a name="[1fc]"></a>HMC58X3_init</STRONG> (Thumb, 110 bytes, Stack size 8 bytes, hml_sample.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 152 + Unknown Stack Size
 <LI>Call Chain = HMC58X3_init &rArr; HMC58X3_setMode &rArr; HMC58X3_writeReg &rArr; IICwriteByte &rArr; IICwriteBytes &rArr; IIC_Send_Byte &rArr; Delay_us &rArr; delay_us &rArr; OSSchedUnlock &rArr; OS_Sched
 </UL>
@@ -4948,7 +4948,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CTRL_2
 </UL>
 
-<P><STRONG><a name="[c5]"></a>IMUupdate</STRONG> (Thumb, 4934 bytes, Stack size 216 bytes, imu1.o(.text))
+<P><STRONG><a name="[c5]"></a>IMUupdate</STRONG> (Thumb, 5068 bytes, Stack size 216 bytes, imu1.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 640<LI>Call Chain = IMUupdate &rArr; kf_oldx_yaw &rArr; __aeabi_dmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[1b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Moving_Median
@@ -4979,7 +4979,7 @@ Global Symbols
 <LI><a href="#[26f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MadgwickAHRSupdateIMU
 </UL>
 
-<P><STRONG><a name="[26f]"></a>MadgwickAHRSupdateIMU</STRONG> (Thumb, 1004 bytes, Stack size 76 bytes, imu1.o(.text))
+<P><STRONG><a name="[26f]"></a>MadgwickAHRSupdateIMU</STRONG> (Thumb, 1006 bytes, Stack size 76 bytes, imu1.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = MadgwickAHRSupdateIMU
 </UL>
 <BR>[Calls]<UL><LI><a href="#[270]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;invSqrt
@@ -4987,7 +4987,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MadgwickAHRSupdate
 </UL>
 
-<P><STRONG><a name="[c7]"></a>MadgwickAHRSupdate</STRONG> (Thumb, 630 bytes, Stack size 136 bytes, imu1.o(.text))
+<P><STRONG><a name="[c7]"></a>MadgwickAHRSupdate</STRONG> (Thumb, 662 bytes, Stack size 136 bytes, imu1.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 296<LI>Call Chain = MadgwickAHRSupdate &rArr; __hardfp_atan2 &rArr; atan &rArr; __hardfp_atan &rArr; __kernel_poly &rArr; __aeabi_dmul
 </UL>
 <BR>[Calls]<UL><LI><a href="#[26f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MadgwickAHRSupdateIMU
@@ -5001,13 +5001,13 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ekf_task
 </UL>
 
-<P><STRONG><a name="[272]"></a>MahonyAHRSupdateIMU</STRONG> (Thumb, 818 bytes, Stack size 28 bytes, imu1.o(.text), UNUSED)
+<P><STRONG><a name="[272]"></a>MahonyAHRSupdateIMU</STRONG> (Thumb, 788 bytes, Stack size 28 bytes, imu1.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[270]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;invSqrt
 </UL>
 <BR>[Called By]<UL><LI><a href="#[273]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MahonyAHRSupdate
 </UL>
 
-<P><STRONG><a name="[273]"></a>MahonyAHRSupdate</STRONG> (Thumb, 2618 bytes, Stack size 240 bytes, imu1.o(.text), UNUSED)
+<P><STRONG><a name="[273]"></a>MahonyAHRSupdate</STRONG> (Thumb, 2624 bytes, Stack size 240 bytes, imu1.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[272]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MahonyAHRSupdateIMU
 <LI><a href="#[270]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;invSqrt
 <LI><a href="#[24d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fast_atan2

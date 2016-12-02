@@ -70,6 +70,7 @@ double P_kf_yaw[4]={1,0,0,1};
 double X_kf_yaw[2]={0,0};
 float k_kf_z=1.428;
 u8 yaw_cross;
+u8 dis_angle_lock=0;
 void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, float az,float hx,float hy,float hz,float *rol,float *pit,float *yaw) 
 {		
 	float ref_err_lpf_hz;
@@ -109,9 +110,13 @@ void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, fl
 	
 	mag_norm = my_sqrt(mag_sim_3d.x * mag_sim_3d.x + mag_sim_3d.y *mag_sim_3d.y);
 	
-	if( mag_sim_3d.x != 0 && mag_sim_3d.y != 0 && mag_sim_3d.z != 0 && mag_norm != 0 && fabs(Pit_fc)<16 && fabs(Rol_fc)<16)
+	if(dis_angle_lock||(mag_sim_3d.x != 0 && mag_sim_3d.y != 0 && mag_sim_3d.z != 0 && mag_norm != 0 && fabs(Pit_fc)<12 && fabs(Rol_fc)<12))
 	{
+		#if !IMU_HML_ADD_500
 		yaw_mag_view[1] = fast_atan2( ( mag_sim_3d.y/mag_norm ) , ( mag_sim_3d.x/mag_norm) ) *57.3f;
+		#else
+		yaw_mag_view[1] = fast_atan2( -( mag_sim_3d.x/mag_norm ) , ( mag_sim_3d.y/mag_norm) ) *57.3f;
+		#endif
 		
 	}
 	else
@@ -130,13 +135,13 @@ void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, fl
 		calMagX = magTmp2[0] * cos(euler[1]) + magTmp2[2] * cos(euler[1]); //倾斜补偿磁力计的Y轴分量
 			//calMagY = mz * sin(sita) + my * cos(sita); //倾斜补偿磁力计的Y轴分量
  // calMagX = mx * cos(fi) + my * sin(fi) * sin(sita) - mz * sin(fi) * cos(sita); //倾斜补偿磁力计的X轴分量
-	if( fabs(Pit_fc)<16 && fabs(Rol_fc)<16)
+	if(dis_angle_lock||( fabs(Pit_fc)<12 && fabs(Rol_fc)<12))
 	//yaw_mag_view[0] =atan(calMagY/(calMagX+0.00001))* RAD_DEG;// fast_atan2(calMagY, calMagX) * RAD_DEG; //计算Yaw (-PI < Roll < PI) 并将弧度转化成角度
 	yaw_mag_view[0] =fast_atan2(calMagY, calMagX) * RAD_DEG; 
 	else
 	yaw_mag_view[0]=X_kf_yaw[0];
 	
-	
+	#if IMU_HML_ADD_500
 		magTmp2[0]=hx;
 		magTmp2[1]=hy;
 		magTmp2[2]=hz;
@@ -144,19 +149,25 @@ void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, fl
 		euler[0]=Rol_fc/RAD_DEG  ;
     calMagY = magTmp2[0] * cos(euler[1]) + magTmp2[1] * sin(euler[1])* sin(euler[0])+magTmp2[2] * sin(euler[1]) * cos(euler[0]); 
     calMagX = magTmp2[1] * cos(euler[0]) + magTmp2[2] * sin(euler[0]);
-    yaw_mag_view[4]=fast_atan2(calMagX,calMagY)* RAD_DEG;
-
+	if( dis_angle_lock||(fabs(Pit_fc)<12 && fabs(Rol_fc)<12))
+    yaw_mag_view[4]=To_180_degrees(fast_atan2(calMagX,calMagY)* RAD_DEG +180);
+	else
+	yaw_mag_view[4]=X_kf_yaw[0];
+  #endif
 	
 	
 	float tempy;
 	
-	#if IMU_HML_ADD_500
+	#if !IMU_HML_ADD_500
 	if(yaw_mag_view[0]*yaw_mag_view[1]>0)
 	tempy=yaw_mag_view[0]/2+yaw_mag_view[1]/2;
 	else
 	#endif	
 	tempy=yaw_mag_view[1];	
-	yaw_mag_view[3]=Moving_Median( 18,8,tempy);	
+	#if IMU_HML_ADD_500
+	tempy=yaw_mag_view[4];
+	#endif	
+	yaw_mag_view[3]=Moving_Median( 18,15,tempy);	
 	
 	
 	double Z_yaw[2]={ yaw_mag_view[3] , 0 };

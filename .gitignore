@@ -1,4 +1,8 @@
-*.o
-*.d
-*.crf
-*.dep
+.o
+.d
+.crf
+.dep
+.hex
+.axf
+.map
+.htm

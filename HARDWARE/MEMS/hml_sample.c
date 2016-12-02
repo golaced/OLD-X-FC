@@ -45,7 +45,7 @@ void ANO_AK8975_Read_Mag_Data(void)
 	ak8975_fc.Mag_Adc.z= IIR_I_Filter(mag_temp[2], InPut_IIR_hml[2], OutPut_IIR_hml[2], b_IIR_hml, IIR_ORDER+1, a_IIR_hml, IIR_ORDER+1);	
 	#if IMU_HML_ADD_500
 	else
-	ak8975_fc.Mag_Adc.z= IIR_I_Filter(mag_temp[2]-500, InPut_IIR_hml[2], OutPut_IIR_hml[2], b_IIR_hml, IIR_ORDER+1, a_IIR_hml, IIR_ORDER+1);
+	ak8975_fc.Mag_Adc.z= IIR_I_Filter(mag_temp[2]-440, InPut_IIR_hml[2], OutPut_IIR_hml[2], b_IIR_hml, IIR_ORDER+1, a_IIR_hml, IIR_ORDER+1);
 	#endif
 	if(hml_fix){
 	ak8975_fc.Mag_Val.x = (ak8975_fc.Mag_Adc.x - ak8975_fc.Mag_Offset.x)*ak8975_fc.Mag_Gain.x ;
@@ -106,13 +106,14 @@ static u8 state_cal_hml;
 				MagSum.y = MagMAX.y - MagMIN.y;
 				MagSum.z = MagMAX.z - MagMIN.z;
 //-----------------CAL by matlab				
-				ak8975_fc.Mag_Offset.x=173;
-				ak8975_fc.Mag_Offset.y=-177;
-				ak8975_fc.Mag_Offset.z=-63;
-				MagSum.x=232;
-				MagSum.y=225;
-				MagSum.z=170;
-				
+				#if IMU_HML_ADD_500
+//				ak8975_fc.Mag_Offset.x=173;
+//				ak8975_fc.Mag_Offset.y=-177;
+//				ak8975_fc.Mag_Offset.z=-63;
+//				MagSum.x=232;
+//				MagSum.y=225;
+//				MagSum.z=170;
+				#endif
 				float temp_max=MagSum.x ;
 				if( MagSum.y>temp_max)
 					temp_max=MagSum.y;
