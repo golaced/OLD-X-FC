@@ -341,42 +341,42 @@ void MS561101BA_getPressure(void)
 *函数原型:		void MS5611BA_Routing(void)
 *功　　能:	    MS5611BA 的运行程序 ，需要定期调用 以更新气压值和温度值。 
 *******************************************************************************/
-void MS5611_Thread(void) 
-{
-	switch(Now_doing)
-	{ //查询状态 看看我们现在 该做些什么？
-		case SCTemperature:  //启动温度转换
-			MS561101BA_startConversion(MS561101BA_D2 + MS5611Temp_OSR);
-			Current_delay = MS5611_Delay_us[MS5611Temp_OSR] ;//转换时间
-			Start_Convert_Time = micros(); //计时开始
-			Now_doing = CTemperatureing;//下一个状态
-			break;
-		case CTemperatureing:  //正在转换中 
-			if((micros()-Start_Convert_Time) > Current_delay)
-			{ //延时时间到了吗？
-				MS561101BA_GetTemperature(); //取温度	
-				Now_doing = SCPressure;	
-			}
-			break;
-		case SCPressure: //启动气压转换
-			MS561101BA_startConversion(MS561101BA_D1 + MS5611Press_OSR);
-			Current_delay = MS5611_Delay_us[MS5611Press_OSR];//转换时间
-			Start_Convert_Time = micros();//计时开始
-			Now_doing = SCPressureing;//下一个状态
-			break;
-		case SCPressureing:	 //正在转换气压值
-			if((micros()-Start_Convert_Time) > Current_delay)
-			{ //延时时间到了吗？
-				MS561101BA_getPressure();   //更新 计算	
-				Baro_ALT_Updated = 0xff; 	//高度更新 完成。
-				Now_doing = SCTemperature;  //从头再来
-			}
-			break;
-		default: 
-			Now_doing = SCTemperature;
-			break;
-	}
-}
+//void MS5611_Thread(void) 
+//{
+//	switch(Now_doing)
+//	{ //查询状态 看看我们现在 该做些什么？
+//		case SCTemperature:  //启动温度转换
+//			MS561101BA_startConversion(MS561101BA_D2 + MS5611Temp_OSR);
+//			Current_delay = MS5611_Delay_us[MS5611Temp_OSR] ;//转换时间
+//			Start_Convert_Time = micros(); //计时开始
+//			Now_doing = CTemperatureing;//下一个状态
+//			break;
+//		case CTemperatureing:  //正在转换中 
+//			if((micros()-Start_Convert_Time) > Current_delay)
+//			{ //延时时间到了吗？
+//				MS561101BA_GetTemperature(); //取温度	
+//				Now_doing = SCPressure;	
+//			}
+//			break;
+//		case SCPressure: //启动气压转换
+//			MS561101BA_startConversion(MS561101BA_D1 + MS5611Press_OSR);
+//			Current_delay = MS5611_Delay_us[MS5611Press_OSR];//转换时间
+//			Start_Convert_Time = micros();//计时开始
+//			Now_doing = SCPressureing;//下一个状态
+//			break;
+//		case SCPressureing:	 //正在转换气压值
+//			if((micros()-Start_Convert_Time) > Current_delay)
+//			{ //延时时间到了吗？
+//				MS561101BA_getPressure();   //更新 计算	
+//				Baro_ALT_Updated = 0xff; 	//高度更新 完成。
+//				Now_doing = SCTemperature;  //从头再来
+//			}
+//			break;
+//		default: 
+//			Now_doing = SCTemperature;
+//			break;
+//	}
+//}
 
 
 void MS5611_ThreadNew(void) 

@@ -21,7 +21,7 @@ void tmr3_callback(OS_TMR *ptmr,void *p_arg);
 #define EKF_TASK_PRIO       			  3 //EKF
 #define OUTER_TASK_PRIO       			4 //外环
 #define ROS_TASK_PRIO       			  5 //DJI
-#define IDENT_TASK_PRIO       			  6 //DJI
+#define IDENT_TASK_PRIO       		  6 //IDENT
 
 #define POS_TASK_PRIO       			  14 //位置
 #define BARO_TASK_PRIO       			  15 //气压计采集与UKF
@@ -67,7 +67,7 @@ void ros_task(void *pdata);
 
 //-----------------------IDENT解算线程
 //设置任务堆栈大小
-#define IDENT_STK_SIZE  					64*8*2
+#define IDENT_STK_SIZE  					64*2
 //任务堆栈	
 extern OS_STK IDENT_TASK_STK[IDENT_STK_SIZE];
 //任务函数
@@ -102,7 +102,7 @@ void ekf_task(void *pdata);
 
 //------------------------POS控制线程
 //设置任务堆栈大小
-#define POS_STK_SIZE  					64*4*8
+#define POS_STK_SIZE  					64*8
 //任务堆栈	
 extern OS_STK POS_TASK_STK[POS_STK_SIZE];
 //任务函数

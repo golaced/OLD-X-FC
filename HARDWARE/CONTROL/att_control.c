@@ -620,7 +620,7 @@ if(0){//mode.en_fuzzy_angle_pid){//mode.en_eso){
 	//else
 
 	if(mode.att_ident1)
-	All_Out(CERoll,CEPitch,CEYaw);	
+	;//All_Out(CERoll,CEPitch,CEYaw);	
 	else
 	All_Out(ctrl_1.out.x,ctrl_1.out.y,ctrl_1.out.z);
 

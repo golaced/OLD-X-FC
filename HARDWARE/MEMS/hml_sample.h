@@ -55,18 +55,10 @@ void HMC5883L_Save_Calib(void);
 void HMC_FIX_TEST(void);
 void HMC_FIX(u8 state);
 extern void HMC58X3_getRaw(int16_t *x,int16_t *y,int16_t *z) ;
-u8 matrix_Q_sample(u8 state1);
-extern  float matrix_Q[6][3] ;
-extern  double matrix_M[4][7];
-extern void PP(void);
-extern int SOR(void);
-extern void OO(float R,u8 state);
-extern void HMC_CAL_COMPARE(void);
-extern void HMC_CAL_HML(void);
 
 
 
-#define CALIBRATING_MAG_CYCLES              15  //校准时间持续20s
+#define CALIBRATING_MAG_CYCLES              20  //校准时间持续20s
 
 #define AK8975_ADDRESS         0x0c	// 0x18
 

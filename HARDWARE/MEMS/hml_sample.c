@@ -5,8 +5,9 @@
 #include "../HARDWARE/DRIVER/iic1.h"
 #include "../HARDWARE/DRIVER/iic.h"
 #include "../HARDWARE/MATH/my_math.h"
+#include "../HARDWARE/MEMS/hml_cal.h"
 ak8975_t ak8975 = { {0,0,0},{124,-449,369},{1,0.532,0.486},{0,0,0} };
-ak8975_t ak8975_fc = { {0,0,0},{124,-449,369},{1,0.532,0.486},{0,0,0} };
+ak8975_t ak8975_fc = { {0,0,0},{232,-221,-119},{1.17,1.339,1},{0,0,0} };
 
 bool ANO_AK8975_Run(void)
 {
@@ -45,7 +46,7 @@ void ANO_AK8975_Read_Mag_Data(void)
 	ak8975_fc.Mag_Adc.z= IIR_I_Filter(mag_temp[2], InPut_IIR_hml[2], OutPut_IIR_hml[2], b_IIR_hml, IIR_ORDER+1, a_IIR_hml, IIR_ORDER+1);	
 	#if IMU_HML_ADD_500
 	else
-	ak8975_fc.Mag_Adc.z= IIR_I_Filter(mag_temp[2]-440, InPut_IIR_hml[2], OutPut_IIR_hml[2], b_IIR_hml, IIR_ORDER+1, a_IIR_hml, IIR_ORDER+1);
+	ak8975_fc.Mag_Adc.z= IIR_I_Filter(mag_temp[2]-500, InPut_IIR_hml[2], OutPut_IIR_hml[2], b_IIR_hml, IIR_ORDER+1, a_IIR_hml, IIR_ORDER+1);
 	#endif
 	if(hml_fix){
 	ak8975_fc.Mag_Val.x = (ak8975_fc.Mag_Adc.x - ak8975_fc.Mag_Offset.x)*ak8975_fc.Mag_Gain.x ;
@@ -73,14 +74,24 @@ u8 Mag_CALIBRATED = 0,Mag_CALIBRATED_R=0;;
 //磁力计中点矫正
 #define MAX_HML_CAL 500
 void ANO_AK8975_CalOffset_Mag(void)
-{
+{ static u8 cal_init;
 	static xyz_f_t	MagMAX = { -100 , -100 , -100 }, MagMIN = { 100 , 100 , 100 }, MagSum;
 	static uint16_t cnt_m=0;
 	static u8 hml_cal_temp=0;
-static u8 state_cal_hml;
- float t_h=Get_Cycle_T(GET_T_HML_CAL)+0.0001;	
+  static u8 state_cal_hml;
+  float t_h=Get_Cycle_T(GET_T_HML_CAL)+0.0001;	
+	
+	
+	HML_SAMPLE(ak8975_fc.Mag_CALIBRATED,ak8975_fc.Mag_Adc.x,ak8975_fc.Mag_Adc.y,ak8975_fc.Mag_Adc.z,Pit_fc ,Rol_fc,mpu6050.Gyro_deg.x,mpu6050.Gyro_deg.y,mpu6050.Gyro_deg.z,t_h);
 	if(ak8975_fc.Mag_CALIBRATED)
 	{	
+		
+		if(!cal_init)
+		{
+		cal_init=1;
+		MagMAX.x=MagMAX.y=MagMAX.z=-100;MagMIN.x=MagMIN.y=MagMIN.z=100;
+		}
+		
 		#if USE_CYCLE_HML_CAL
 		if(ABS(ak8975_fc.Mag_Adc.x)<MAX_HML_CAL&&ABS(ak8975_fc.Mag_Adc.y)<MAX_HML_CAL&&ABS(ak8975_fc.Mag_Adc.z)<MAX_HML_CAL)
 		    HMC_CAL_HML();
@@ -88,6 +99,9 @@ static u8 state_cal_hml;
 		#else
 		if(ABS(ak8975_fc.Mag_Adc.x)<MAX_HML_CAL&&ABS(ak8975_fc.Mag_Adc.y)<MAX_HML_CAL&&ABS(ak8975_fc.Mag_Adc.z)<MAX_HML_CAL)
 		{
+			
+			
+			
 			MagMAX.x = MAX(ak8975_fc.Mag_Adc.x, MagMAX.x);
 			MagMAX.y = MAX(ak8975_fc.Mag_Adc.y, MagMAX.y);
 			MagMAX.z = MAX(ak8975_fc.Mag_Adc.z, MagMAX.z);
@@ -98,6 +112,8 @@ static u8 state_cal_hml;
 			
 			if(cnt_m ++>= CALIBRATING_MAG_CYCLES/(t_h))
 			{
+				
+				cal_init=0;
 				ak8975_fc.Mag_Offset.x = (int16_t)((MagMAX.x + MagMIN.x) * 0.5f);
 				ak8975_fc.Mag_Offset.y = (int16_t)((MagMAX.y + MagMIN.y) * 0.5f);
 				ak8975_fc.Mag_Offset.z = (int16_t)((MagMAX.z + MagMIN.z) * 0.5f);
@@ -124,7 +140,7 @@ static u8 state_cal_hml;
 				ak8975_fc.Mag_Gain.y =  temp_max/MagSum.y ;
 				ak8975_fc.Mag_Gain.z =  temp_max/MagSum.z ;
 				
-		  	WRITE_PARM();//Param_SaveMagOffset(&ak8975_fc.Mag_Offset);
+		  	//WRITE_PARM();//Param_SaveMagOffset(&ak8975_fc.Mag_Offset);
 				cnt_m = 0;
 				ak8975_fc.Mag_CALIBRATED = 0;
 			}

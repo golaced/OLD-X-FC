@@ -62,7 +62,8 @@
 
 #define USE_RC_GROUND 1  //使用NRF-G模块
 
-#define IMU_HML_ADD_500 1
+#define IMU_HML_ADD_500 1//新的磁力融合
+#define USE_BLE_FOR_APP 1//直接使用FC蓝牙与APP通信
 //===============================系统时钟宏定义==========
 #define A_X 0
 #define A_Y 1

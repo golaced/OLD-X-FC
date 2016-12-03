@@ -88,6 +88,9 @@ void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, fl
 	X_kf_yaw[0]=yaw_mag_view[3];
 	X_kf_yaw[1]=0;
 	}
+	
+	
+	#if !IMU_HML_ADD_500
 	mag_norm_tmp = 20 *(6.28f *half_T);	
 	
 	mag_norm_xyz = my_sqrt(hx * hx + hy * hy + hz * hz);
@@ -112,18 +115,15 @@ void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, fl
 	
 	if(dis_angle_lock||(mag_sim_3d.x != 0 && mag_sim_3d.y != 0 && mag_sim_3d.z != 0 && mag_norm != 0 && fabs(Pit_fc)<12 && fabs(Rol_fc)<12))
 	{
-		#if !IMU_HML_ADD_500
-		yaw_mag_view[1] = fast_atan2( ( mag_sim_3d.y/mag_norm ) , ( mag_sim_3d.x/mag_norm) ) *57.3f;
-		#else
-		yaw_mag_view[1] = fast_atan2( -( mag_sim_3d.x/mag_norm ) , ( mag_sim_3d.y/mag_norm) ) *57.3f;
-		#endif
 		
+		yaw_mag_view[1] = fast_atan2( ( mag_sim_3d.y/mag_norm ) , ( mag_sim_3d.x/mag_norm) ) *57.3f;	
 	}
 	else
 		yaw_mag_view[1]=X_kf_yaw[0];
 	
-	
+	#endif
 	  float calMagY,calMagX,magTmp2[3],euler[3];
+	#if !IMU_HML_ADD_500
 	magTmp2[0]=test_flag1[0]*hx;
 	magTmp2[1]=test_flag1[1]*hy;
 	magTmp2[2]=test_flag1[2]*hz;
@@ -140,6 +140,7 @@ void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, fl
 	yaw_mag_view[0] =fast_atan2(calMagY, calMagX) * RAD_DEG; 
 	else
 	yaw_mag_view[0]=X_kf_yaw[0];
+	#endif
 	
 	#if IMU_HML_ADD_500
 		magTmp2[0]=hx;
@@ -150,7 +151,7 @@ void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, fl
     calMagY = magTmp2[0] * cos(euler[1]) + magTmp2[1] * sin(euler[1])* sin(euler[0])+magTmp2[2] * sin(euler[1]) * cos(euler[0]); 
     calMagX = magTmp2[1] * cos(euler[0]) + magTmp2[2] * sin(euler[0]);
 	if( dis_angle_lock||(fabs(Pit_fc)<12 && fabs(Rol_fc)<12))
-    yaw_mag_view[4]=To_180_degrees(fast_atan2(calMagX,calMagY)* RAD_DEG +180);
+  yaw_mag_view[4]=To_180_degrees(fast_atan2(calMagX,calMagY)* RAD_DEG +180);
 	else
 	yaw_mag_view[4]=X_kf_yaw[0];
   #endif
@@ -163,9 +164,8 @@ void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, fl
 	tempy=yaw_mag_view[0]/2+yaw_mag_view[1]/2;
 	else
 	#endif	
-	tempy=yaw_mag_view[1];	
 	#if IMU_HML_ADD_500
-	tempy=yaw_mag_view[4];
+	tempy=yaw_mag_view[4];///2+yaw_mag_view[0]/2;
 	#endif	
 	yaw_mag_view[3]=Moving_Median( 18,15,tempy);	
 	
@@ -174,21 +174,14 @@ void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, fl
 	if(yaw_mag_view[3]*X_kf_yaw[0]<0&&!(fabs(yaw_mag_view[3])<90))
 	{Z_yaw[0]=X_kf_yaw[0];yaw_cross=1;}
 	else
-		yaw_cross=0;
+	yaw_cross=0;
 	kf_oldx_yaw( X_kf_yaw,  P_kf_yaw,  Z_yaw,  -gz*k_kf_z, gh_yaw,  ga_yaw,  gw_yaw,  half_T*2);
-	static float tempy_r;
-	
-//		X_kf_yaw[0]=yaw_mag_view[0];
-	//if(yaw_mag_view[3]*tempy_r<0)
-	//X_kf_yaw[0]=-X_kf_yaw[0];
-	tempy_r=yaw_mag_view[3];
-	
+
 	yaw_kf=Moving_Median( 19,5,X_kf_yaw[0]);
-//		euler_view[1]=euler[1]=PitchR;//*= RAD_DEG; //将弧度转化为角度
-//		euler_view[0]=euler[0]=RollR;// *= RAD_DEG; //将弧度转化为角度
-	
 	//=============================================================================
+	#if !IMU_HML_ADD_500
 	yaw_mag=yaw_mag_view[3] ;
+
 	// 计算等效重力向量//十分重要
 	if(mode.en_imu_ekf==0){
 	reference_vr_fc[0]=reference_v_fc.x = 2*(ref_q[1]*ref_q[3] - ref_q[0]*ref_q[2]);
@@ -287,6 +280,7 @@ void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, fl
 	if(!mode.yaw_sel)
 	*yaw = fast_atan2(2*(-ref_q[1]*ref_q[2] - ref_q[0]*ref_q[3]), 2*(ref_q[0]*ref_q[0] + ref_q[1]*ref_q[1]) - 1) *57.3f  ;//
 	else
+	#endif
 	*yaw =yaw_kf;	
 }
 

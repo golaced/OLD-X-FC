@@ -12,9 +12,10 @@ void Usart2_Send(unsigned char *DataToSend ,u8 data_num);
 void Uart5_Init(u32 br_num);
 void Uart5_IRQ(void);
 void Uart5_Send(unsigned char *DataToSend ,u8 data_num);
-
+void APP_LINK(void);
 typedef struct PID_STA{u16 OP,OI,OD,IP,II,ID,YP,YI,YD;}PID_STA;
 extern PID_STA HPID,SPID,FIX_PID,NAV_PID;
+extern PID_STA HPID_app,SPID_app,FIX_PID_app,NAV_PID_app;
 extern u32 imu_loss_cnt;
 extern float POS_UKF_X,POS_UKF_Y,VEL_UKF_X,VEL_UKF_Y;
 typedef struct int16_rcget{

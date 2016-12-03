@@ -32,7 +32,7 @@ void oldx_avoid(void)
 	DIS_IN_TEST[i]=DIS_IN[i];
 	}
 	
-	OLD_X_AVOID(DIS_IN_TEST, A, A_dead,max_try, &x_mid, &y_mid, &r_mid);
+	//OLD_X_AVOID(DIS_IN_TEST, A, A_dead,max_try, &x_mid, &y_mid, &r_mid);
   avoid_trace[0]=my_deathzoom((int)x_mid,TRC_DEAD)*flt_avoid+(1-flt_avoid)*avoid_trace[0];
 	avoid_trace[1]=my_deathzoom((int)y_mid,TRC_DEAD)*flt_avoid+(1-flt_avoid)*avoid_trace[1];
 	avoid_trace[2]=my_deathzoom((int)r_mid,TRC_DEAD)*flt_avoid+(1-flt_avoid)*avoid_trace[2];

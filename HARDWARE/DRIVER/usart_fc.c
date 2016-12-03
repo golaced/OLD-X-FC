@@ -82,6 +82,7 @@ RESULT color;
 float dt_flow_rx;
 u16 data_rate_gol_link;
 PID_STA HPID,SPID,FIX_PID,NAV_PID;
+PID_STA HPID_app,SPID_app,FIX_PID_app,NAV_PID_app;
 struct _PID_SET pid;
 RC_GETDATA Rc_Get;
 RC_GETDATA Rc_Get_PWM;
@@ -784,193 +785,8 @@ while(USART_GetFlagStatus(UART5, USART_FLAG_TXE) == RESET);
 USART_SendData(UART5, data_num); ;//USART1, ch); 
 
 }
-void UsartSend_DJI_LINK(uint8_t ch)
-{
 
 
-	while(USART_GetFlagStatus(UART5, USART_FLAG_TXE) == RESET);
-USART_SendData(UART5, ch); 
-}
-
-static void Send_Data_DJI_LINK(u8 *dataToSend , u8 length)
-{
-u16 i;
-  for(i=0;i<length;i++)
-     UsartSend_DJI_LINK(dataToSend[i]);
-}
-
-
-u16 DJI_RC[4]={1500,1500,1000,1500};
-u16 DJI_RC_TEMP[4]={1500,1500,1000,1500};
-void Send_DJI(void)
-{u8 i;	u8 sum = 0;
-	u8 data_to_send[50];
-	u8 _cnt=0;
-	vs16 _temp;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0xAF;
-	data_to_send[_cnt++]=0x01;//功能字
-	data_to_send[_cnt++]=0;//数据量
-	_temp = DJI_RC[0];//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = DJI_RC[1];//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = DJI_RC[2];//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = DJI_RC[3];//(CH_filter[YAWr]+1500);//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = mode.use_dji;//(CH_filter[YAWr]+1500);//ultra_distance;
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = mode.dji_mode;//1 z 0 GPS
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = KEY_SEL[3]<<3|KEY_SEL[2]<<2|KEY_SEL[1]<<1|KEY_SEL[0];//1 z 0 GPS
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = KEY[7]<<7|KEY[6]<<6|KEY[5]<<5|KEY[4]<<4|KEY[3]<<3|KEY[2]<<2|KEY[1]<<1|KEY[0];//1 z 0 GPS
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = motor_out[0];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-  _temp = motor_out[1];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = motor_out[2];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = motor_out[3];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	
-	data_to_send[3] = _cnt-4;
-
-	for( i=0;i<_cnt;i++)
-		sum += data_to_send[i];
-	data_to_send[_cnt++] = sum;
-	
-	Send_Data_DJI_LINK(data_to_send, _cnt);
-}
-
-void Send_DJI2(void)
-{u8 i;	u8 sum = 0;
-	u8 data_to_send[50];
-	u8 _cnt=0;
-	vs16 _temp;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0xAF;
-	data_to_send[_cnt++]=0x02;//功能字
-	data_to_send[_cnt++]=0;//数据量
-	_temp = SPID.OP;//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-  _temp = SPID.OI;//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = SPID.OD;//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	
-	_temp = SPID.IP;//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = SPID.II;//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = SPID.ID;//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	
-	_temp = SPID.YP;//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = SPID.YI;//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = SPID.YD;//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-		_temp = motor_out[0];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-  _temp = motor_out[1];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = motor_out[2];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = motor_out[3];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	data_to_send[3] = _cnt-4;
-
-	for( i=0;i<_cnt;i++)
-		sum += data_to_send[i];
-	data_to_send[_cnt++] = sum;
-	
-	Send_Data_DJI_LINK(data_to_send, _cnt);
-}
-u16 OFF_YAW_DJ=50;
-u8 state_v_test=13;
-void Send_DJI3(void)
-{u8 i;	u8 sum = 0;
-	u8 data_to_send[50];
-	u8 _cnt=0;
-	vs16 _temp;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0xAF;
-	data_to_send[_cnt++]=0x03;//功能字
-	data_to_send[_cnt++]=0;//数据量
-	_temp = Yaw_DJ+OFF_YAW_DJ;//PWM_dj[1];//Pitch*10;//(CH_filter[YAWr]+1500);//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = Pitch_DJ;//PWM_dj[0];//Roll *10;//(CH_filter[YAWr]+1500);//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = Roll  *10;//(CH_filter[YAWr]+1500);//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	
-	_temp = ALT_POS_SONAR2*1000;//(CH_filter[YAWr]+1500);//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = ALT_POS_BMP*1000;//(CH_filter[YAWr]+1500);//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = ALT_VEL_BMP*1000;//(CH_filter[YAWr]+1500);//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-		_temp = motor_out[0];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-  _temp = motor_out[1];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = motor_out[2];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = motor_out[3];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = Rc_Get.AUX1;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = Rc_Get.AUX2;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-		_temp = state_v;
-	//	_temp = state_v_test;
-	data_to_send[_cnt++]=BYTE0(_temp);
-	
-	data_to_send[3] = _cnt-4;
-
-	for( i=0;i<_cnt;i++)
-		sum += data_to_send[i];
-	data_to_send[_cnt++] = sum;
-	
-	Send_Data_DJI_LINK(data_to_send, _cnt);
-}
 
 void UsartSend_UP_LINK(uint8_t ch)
 {
@@ -1002,11 +818,11 @@ void Usart1_Init(u32 br_num)//-------UPload_board1
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA,ENABLE);	
 	
 //	//串口中断优先级
-//	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority =2;
-//	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
-//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-//	NVIC_Init(&NVIC_InitStructure);	
+	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority =2;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);	
 
 	
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART1);
@@ -1080,11 +896,514 @@ void Usart1_Init(u32 br_num)//-------UPload_board1
 	
 	
 }
-u8 BLE_RX_BUF[50];
+#include "../HARDWARE/DRIVER/rc_mine.h"
+int DEBUG[35];
+void UsartSend_APP(uint8_t ch)
+{
+	while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
+USART_SendData(USART1, ch); 
+}
+
+static void Send_Data_APP(u8 *dataToSend , u8 length)
+{
+u16 i;
+  for(i=0;i<length;i++)
+     UsartSend_APP(dataToSend[i]);
+}
+
+
+void Send_Status(void)
+{u8 i;	u8 sum = 0,_temp3;	vs32 _temp2 = 0;	vs16 _temp;u8 data_to_send[50];
+	u8 _cnt=0;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0x01;
+	data_to_send[_cnt++]=0;
+
+	_temp = (int)(Pit_fc*100);
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = (int)(Rol_fc*100);
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = (int)(Yaw_fc*100);
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+  _temp3=fly_ready;
+	data_to_send[_cnt++]=_temp3;
+	_temp3=NS;//1;//is_RC_PIN;
+	data_to_send[_cnt++]=_temp3;
+  _temp3=EN_FIX_GPSF;
+	data_to_send[_cnt++]=_temp3;
+	_temp3=EN_FIX_LOCKWF;
+	data_to_send[_cnt++]=_temp3;
+	_temp3=EN_CONTROL_IMUF;
+	data_to_send[_cnt++]=_temp3;
+	_temp3=EN_FIX_INSF;
+	data_to_send[_cnt++]=_temp3;
+	_temp3=EN_FIX_HIGHF;
+	data_to_send[_cnt++]=_temp3;
+ 
+	
+	
+	
+	data_to_send[3] = _cnt-4;
+	for( i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	data_to_send[_cnt++]=sum;
+	
+	Send_Data_APP(data_to_send, _cnt);
+}
+
+
+void Send_GPS(void)
+{u8 i;	u8 sum = 0;u8 data_to_send[50];
+	u8 _cnt=0;
+		vs32 _temp;	u8 _temp4=0;	float _temp2 =0;	vs16 _temp3=0;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0x04;
+	data_to_send[_cnt++]=0;
+
+	//_temp = (vs32)(GPS_W*1000000);
+  data_to_send[_cnt++]=BYTE3(_temp);
+	data_to_send[_cnt++]=BYTE2(_temp);
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	//_temp = (vs32)(GPS_J*1000000);
+  data_to_send[_cnt++]=BYTE3(_temp);
+	data_to_send[_cnt++]=BYTE2(_temp);
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+   //hight
+	_temp=(vs32)(ALT_POS_SONAR2*100);
+	data_to_send[_cnt++]=BYTE3(_temp);
+	data_to_send[_cnt++]=BYTE2(_temp);
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp2=0;
+	data_to_send[_cnt++]=BYTE3(_temp2);
+	data_to_send[_cnt++]=BYTE2(_temp2);
+	data_to_send[_cnt++]=BYTE1(_temp2);
+	data_to_send[_cnt++]=BYTE0(_temp2);
+
+	data_to_send[_cnt++]=BYTE1(_temp3);
+	data_to_send[_cnt++]=BYTE0(_temp3);
+	 _temp3=0;
+	data_to_send[_cnt++]=BYTE1(_temp3);
+	data_to_send[_cnt++]=BYTE0(_temp3);
+
+	data_to_send[_cnt++]=BYTE0(_temp4);
+	_temp4=0;
+	data_to_send[_cnt++]=BYTE0(_temp4);
+	
+	data_to_send[3] = _cnt-4;
+	
+
+	for( i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	data_to_send[_cnt++]=sum;
+	
+	Send_Data_APP(data_to_send, _cnt);
+}
+
+void Send_BAT(void)
+{u8 i;	u8 sum = 0;u8 data_to_send[50];
+	u8 _cnt=0;
+		vs32 _temp;	u8 _temp4=0;	float _temp2 =0;	vs16 _temp3=0;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0x05;
+	data_to_send[_cnt++]=0;
+
+	//_temp3 = (int)(bat_fly*5);
+	data_to_send[_cnt++]=BYTE1(_temp3);
+	data_to_send[_cnt++]=BYTE0(_temp3);
+	//_temp3 = (int)(Rc_Get.AUX5);
+	data_to_send[_cnt++]=BYTE1(_temp3);
+	data_to_send[_cnt++]=BYTE0(_temp3);
+	//_temp3 = (int)(bat_fly);
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	
+	data_to_send[3] = _cnt-4;
+	
+
+	for( i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	data_to_send[_cnt++]=sum;
+	
+	Send_Data_APP(data_to_send, _cnt);
+}
+
+
+
+
+void Send_PID1(void)
+{u8 i;	u8 sum = 0;u8 data_to_send[50];
+	u8 _cnt=0;
+	vs16 _temp;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0x06;
+	data_to_send[_cnt++]=0;
+	_temp = SPID.OP;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.OI;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.OD;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.IP;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.II;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.ID;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.YP;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.YI;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.YD;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	data_to_send[3] = _cnt-4;
+
+	for( i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	data_to_send[_cnt++] = sum;
+	
+	Send_Data_APP(data_to_send, _cnt);
+}
+
+
+void Send_PID2(void)
+{u8 i;	u8 sum = 0;u8 data_to_send[50];
+	u8 _cnt=0;
+	vs16 _temp;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0x07;
+	data_to_send[_cnt++]=0;
+	_temp = HPID.OP;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = HPID.OI;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = HPID.OD;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	//_temp = fix_pit;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	//_temp = fix_rol;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	data_to_send[3] = _cnt-4;
+
+	for( i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	data_to_send[_cnt++] = sum;
+	
+	Send_Data_APP(data_to_send, _cnt);
+}
+
+void Send_Senser(void)
+{u8 i;	u8 sum = 0;u8 data_to_send[50];
+	u8 _cnt=0;
+	vs16 _temp;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0x08;
+	data_to_send[_cnt++]=0;
+	_temp = mpu6050_fc.Acc_I16.x;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = mpu6050_fc.Acc_I16.y;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = mpu6050_fc.Acc_I16.z;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = mpu6050_fc.Gyro_I16.x;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = mpu6050_fc.Gyro_I16.y;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = mpu6050_fc.Gyro_I16.z;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = ak8975_fc.Mag_Val.x;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = ak8975_fc.Mag_Val.y;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = ak8975_fc.Mag_Val.z;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = thr_test;	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = motor[0];	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = motor[1];	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = motor[2];	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = motor[3];	
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	data_to_send[3] = _cnt-4;
+
+	for( i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	data_to_send[_cnt++] = sum;
+	
+	Send_Data_APP(data_to_send, _cnt);
+}
+
+
+void Send_GPS_Ublox(void)
+{u8 i;	u8 sum = 0;u8 data_to_send[50];
+	u8 _cnt=0;
+	vs16 _temp;
+	vs32 _temp32;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0x09;//功能字
+	data_to_send[_cnt++]=0;//数据量
+	_temp32 =  imu_nav.gps.J;
+	data_to_send[_cnt++]=BYTE3(_temp32);
+	data_to_send[_cnt++]=BYTE2(_temp32);
+	data_to_send[_cnt++]=BYTE1(_temp32);
+	data_to_send[_cnt++]=BYTE0(_temp32);
+	_temp32 =  imu_nav.gps.W;
+	data_to_send[_cnt++]=BYTE3(_temp32);
+	data_to_send[_cnt++]=BYTE2(_temp32);
+	data_to_send[_cnt++]=BYTE1(_temp32);
+	data_to_send[_cnt++]=BYTE0(_temp32);
+	_temp =imu_nav.gps.gps_mode;
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp =imu_nav.gps.star_num;
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp32 =  imu_nav.gps.X_O;
+	data_to_send[_cnt++]=BYTE3(_temp32);
+	data_to_send[_cnt++]=BYTE2(_temp32);
+	data_to_send[_cnt++]=BYTE1(_temp32);
+	data_to_send[_cnt++]=BYTE0(_temp32);
+	_temp32 =  imu_nav.gps.Y_O;
+	data_to_send[_cnt++]=BYTE3(_temp32);
+	data_to_send[_cnt++]=BYTE2(_temp32);
+	data_to_send[_cnt++]=BYTE1(_temp32);
+	data_to_send[_cnt++]=BYTE0(_temp32);
+	_temp32 =  imu_nav.gps.X_UKF;
+	data_to_send[_cnt++]=BYTE3(_temp32);
+	data_to_send[_cnt++]=BYTE2(_temp32);
+	data_to_send[_cnt++]=BYTE1(_temp32);
+	data_to_send[_cnt++]=BYTE0(_temp32);
+	_temp32 =  imu_nav.gps.Y_UKF;
+	data_to_send[_cnt++]=BYTE3(_temp32);
+	data_to_send[_cnt++]=BYTE2(_temp32);
+	data_to_send[_cnt++]=BYTE1(_temp32);
+	data_to_send[_cnt++]=BYTE0(_temp32);
+	
+	
+
+	
+	data_to_send[3] = _cnt-4;
+
+	for( i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	data_to_send[_cnt++] = sum;
+	
+	Send_Data_APP(data_to_send, _cnt);
+}
+
+void Send_DEBUG1(void)
+{u8 i;	u8 sum = 0,_temp3;	vs32 _temp2 = 0;	vs16 _temp;u8 data_to_send[50];
+	u8 _cnt=0;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=30;
+	data_to_send[_cnt++]=0;
+  for(i=1;i<=14;i++){
+	_temp = DEBUG[i];
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+ }
+	
+	data_to_send[3] = _cnt-4;
+	
+
+	for( i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	data_to_send[_cnt++]=sum;
+	
+	Send_Data_APP(data_to_send, _cnt);
+}
+
+void APP_LINK(void)
+{ static u8 flag1=0;
+	static u8 cnt = 0;
+	switch(cnt)
+	{
+		case 1: 
+			Send_Status();
+			break;
+		case 2:
+			if(flag1)
+		  Send_BAT();
+			else
+			Send_PID1();
+			break;
+		case 3:			
+			if(flag1)
+		  Send_DEBUG1();
+			else
+			Send_PID2();
+		break;
+		case 4:
+			if(flag1)
+		  Send_GPS();
+			else
+			Send_Senser();
+			cnt = 0;
+		  if(flag1)
+				flag1=0;
+			else
+				flag1=1;
+			break;
+		default:cnt = 0;break;		
+	}
+	cnt++;	
+}
+
+
+u8 lock_tx;
+ void Data_app(u8 *data_buf,u8 num)
+{
+	vs16 rc_value_temp;
+	u8 sum = 0;
+	u8 i;
+	for( i=0;i<(num-1);i++)
+		sum += *(data_buf+i);
+	if(!(sum==*(data_buf+num-1)))		return;		//判断sum
+	if(!(*(data_buf)==0xAA && *(data_buf+1)==0xAF))		return;		//判断帧头
+		if(*(data_buf+2)==0xAD)								//判断功能字,=0x8a,为遥控数据
+	{
+	
+	}
+	if(*(data_buf+2)==0X01)								//CMD1
+	{
+		if(*(data_buf+4)==0Xa0)//上锁
+			lock_tx = 1;
+		else if(*(data_buf+4)==0Xa1)//解锁
+			lock_tx = 0;
+		else if(*(data_buf+4)==0Xa2)//写入设置
+			up_load_set = 1;
+		else if(*(data_buf+4)==0Xa3)//---写入PID
+		{
+				SPID.OP=SPID_app.OP;
+			  SPID.OI=SPID_app.OI;
+				SPID.OD=SPID_app.OD;
+				SPID.IP=SPID_app.IP;
+				SPID.II=SPID_app.II;
+				SPID.ID=SPID_app.ID;
+				SPID.YP=SPID_app.YP;
+				SPID.YI=SPID_app.YI;
+				SPID.YD=SPID_app.YD;
+				HPID.OP=HPID_app.OP;
+			  HPID.OI=HPID_app.OI;
+				HPID.OD=HPID_app.OD;
+		
+			  up_load_pid = 1;
+		
+			}
+			else if(*(data_buf+4)==0Xa4)//---磁力开始校准
+				i=0;
+			else if(*(data_buf+4)==0Xa5)//---磁力关闭校准
+				i=0;
+			else if(*(data_buf+4)==0Xa6)//---IMU校准
+				i=0;
+		
+  }
+		if(*(data_buf+2)==0X03)								//CMD1
+	{
+		(EN_TX_GX)=*(data_buf+4);
+		(EN_TX_AX)=*(data_buf+5);
+		(EN_TX_HM)=*(data_buf+6);
+		(EN_TX_YRP)=*(data_buf+7);
+		(EN_TX_GPS)=*(data_buf+8);
+		(EN_TX_HIGH)=*(data_buf+9);
+
+		(EN_FIX_GPS)=*(data_buf+10);
+		(EN_FIX_LOCKW)=*(data_buf+11);
+		(EN_CONTROL_IMU)=*(data_buf+12);
+		(EN_FIX_INS)=*(data_buf+13);
+		(EN_FIX_HIGH)=*(data_buf+14);
+  }
+	if(*(data_buf+2)==0x10)								//PID1
+	{
+			SPID_app.OP = (float)((vs16)(*(data_buf+4)<<8)|*(data_buf+5));
+			SPID_app.OI = (float)((vs16)(*(data_buf+6)<<8)|*(data_buf+7));
+			SPID_app.OD = (float)((vs16)(*(data_buf+8)<<8)|*(data_buf+9));
+			SPID_app.IP = (float)((vs16)(*(data_buf+10)<<8)|*(data_buf+11));
+			SPID_app.II = (float)((vs16)(*(data_buf+12)<<8)|*(data_buf+13));
+			SPID_app.ID = (float)((vs16)(*(data_buf+14)<<8)|*(data_buf+15));
+			SPID_app.YP = (float)((vs16)(*(data_buf+16)<<8)|*(data_buf+17));
+			SPID_app.YI = (float)((vs16)(*(data_buf+18)<<8)|*(data_buf+19));
+			SPID_app.YD = (float)((vs16)(*(data_buf+20)<<8)|*(data_buf+21));
+		}
+			if(*(data_buf+2)==0x11)								//PID2
+	{
+			HPID_app.OP = (float)((vs16)(*(data_buf+4)<<8)|*(data_buf+5));
+			HPID_app.OI = (float)((vs16)(*(data_buf+6)<<8)|*(data_buf+7));
+			HPID_app.OD = (float)((vs16)(*(data_buf+8)<<8)|*(data_buf+9));
+		}
+	if(*(data_buf+2)==0XAF)
+	{
+		if(*(data_buf+4)==0XA1&&*(data_buf+5)==0X03)
+		{
+		//	GYRO_OFFSET_OK = 0;
+		//	ACC_OFFSET_OK = 0;
+		}
+		if(*(data_buf+4)==0XA2&&*(data_buf+5)==0X01)
+		{
+		//	Send_PID = 1;
+		}
+	}
+}
+ 
+
+
+u8 Rx_Buf_app[256];	//串口接收缓存
+u8 RxBuffer_app[50];
+u8 RxState_app = 0;
+u8 RxBufferNum_app = 0;
+u8 RxBufferCnt_app = 0;
+u8 RxLen_app = 0;
+static u8 _data_len_app = 0,_data_cnt_app = 0;
+
 void USART1_IRQHandler(void)
 { OSIntEnter(); 
 	u8 com_data;
-	static u16 _cnt;
 	if(USART1->SR & USART_SR_ORE)//ORE中断
 	{
 		com_data = USART1->DR;
@@ -1096,7 +1415,44 @@ void USART1_IRQHandler(void)
 		USART_ClearITPendingBit(USART1,USART_IT_RXNE);//清除中断标志
 
 		com_data = USART1->DR;
-	  BLE_RX_BUF[_cnt++]=com_data;
+	 		if(RxState_app==0&&com_data==0xAA)
+		{
+			RxState_app=1;
+			RxBuffer_app[0]=com_data;
+		}
+		else if(RxState_app==1&&com_data==0xAF)
+		{
+			RxState_app=2;
+			RxBuffer_app[1]=com_data;
+		}
+		else if(RxState_app==2&&com_data>0&&com_data<0XF1)
+		{
+			RxState_app=3;
+			RxBuffer_app[2]=com_data;
+		}
+		else if(RxState_app==3&&com_data<50)
+		{
+			RxState_app = 4;
+			RxBuffer_app[3]=com_data;
+			_data_len_app = com_data;
+			_data_cnt_app = 0;
+		}
+		else if(RxState_app==4&&_data_len_app>0)
+		{
+			_data_len_app--;
+			RxBuffer_app[4+_data_cnt_app++]=com_data;
+			if(_data_len_app==0)
+				RxState_app = 5;
+		}
+		else if(RxState_app==5)
+		{
+			RxState_app = 0;
+			RxBuffer_app[4+_data_cnt_app]=com_data;
+			Data_app(RxBuffer_app,_data_cnt_app+5);
+		}
+		else
+			RxState_app = 0;
+	
 	}
 	//发送（进入移位）中断
 	if( USART_GetITStatus(USART1,USART_IT_TXE ) )
@@ -1157,9 +1513,7 @@ void Data_Receive_Anl4(u8 *data_buf,u8 num)
 }
 
 
-u8 TxBuffer4[256];
-u8 TxCounter4=0;
-u8 count4=0; 
+
 
 u8 Rx_Buf4[256];	//串口接收缓存
 u8 RxBuffer4[50];
@@ -1224,12 +1578,7 @@ void UART4_IRQHandler(void)
 	//发送（进入移位）中断
 	if( USART_GetITStatus(UART4,USART_IT_TXE ) )
 	{
-				
-		UART4->DR = TxBuffer4[TxCounter++]; //写DR清除中断标志          
-		if(TxCounter5 == count5)
-		{
-			UART4->CR1 &= ~USART_CR1_TXEIE;		//关闭TXE（发送中断）中断
-		}
+
 		USART_ClearITPendingBit(UART4,USART_IT_TXE);
 	}
 
@@ -1293,12 +1642,6 @@ void Usart4_Init(u32 br_num)//-------SD_board
   USART_ITConfig(UART4, USART_IT_RXNE, ENABLE);
 	//使能USART2
 	USART_Cmd(UART4, ENABLE); 
-//	//使能发送（进入移位）中断
-//	if(!(USART2->CR1 & USART_CR1_TXEIE))
-//	{
-//		USART_ITConfig(USART2, USART_IT_TXE, ENABLE); 
-//	}
-
 
 }
 
@@ -1323,7 +1666,7 @@ while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
 USART_SendData(USART1, DataToSend); 
 
 }
-
+/*
 void UART2_ReportMotion(int16_t ax,int16_t ay,int16_t az,int16_t gx,int16_t gy,int16_t gz,
 					int16_t hx,int16_t hy,int16_t hz)
 {
@@ -1479,7 +1822,7 @@ void UART2_ReportIMU(int16_t yaw,int16_t pitch,int16_t roll
 	UART2_Put_Char(temp%256);
 	UART2_Put_Char(0xaa);
 }
-
+*/
 
 
 //------------------------------------------------------GOL_LINK_SD----------------------------------------------------
@@ -1579,14 +1922,7 @@ void Send_ATT_PID_SD(void)
 	_temp = except_A.z*10;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	
-	
-	
-	
-	
-	
-	
-	
+
 	
 	data_to_send[3] = _cnt-4;
 
@@ -1780,11 +2116,6 @@ void Send_SLAM_SD(void)
 	data_to_send[_cnt++]=BYTE0(_temp);
 	
 	
-	
-
-	
-	
-	
 	data_to_send[3] = _cnt-4;
 
 	for( i=0;i<_cnt;i++)
@@ -1851,43 +2182,6 @@ void Send_GPS_SD(void)
 	Send_Data_SD(data_to_send, _cnt);
 }
 
-//void SD_LINK_TASK(void)
-//{
-//static u8 cnt[4];
-//static u8 flag;
-//if(cnt[0]++>1)
-//{cnt[0]=0;
-//Send_ATT_PID_SD();
-//}
-//if(cnt[1]++>0)
-//{cnt[1]=0;
-////	if(flag)
-////	{flag=0;
-//	Send_IMU_SD();
-////}
-////	else{flag=1;
-////	Send_MODE_SD();
-////	}
-//}
-//if(cnt[2]++>2)
-//{cnt[2]=0;
-//	//Send_FLOW_PID_SD();
-//	Send_FLOW_USE_SD();
-//}
-//if(cnt[3]++>2)
-//{cnt[3]=0;
-//	//Send_ALT_PID_SD();
-//	Send_GPS_SD();//Send_SLAM_SD();
-//}
-
-//}
-
-/*
-#define SEND_IMU 0
-#define SEND_FLOW 1
-#define SEND_GPS 2
-#define SEND_ALT 3
-*/
 void SD_LINK_TASK2(u8 sel)
 {
 static u8 cnt[4];
@@ -1961,19 +2255,11 @@ void Usart3_Init(u32 br_num)//-------PXY
   USART_Cmd(USART3, ENABLE);  //使能串口1 
 	
 	USART_ClearFlag(USART3, USART_FLAG_TC);
-	
 
 	//使能USART2接收中断
 	USART_ITConfig(USART3, USART_IT_RXNE, ENABLE);
 	//使能USART2
 	USART_Cmd(USART3, ENABLE); 
-//	//使能发送（进入移位）中断
-//	if(!(USART2->CR1 & USART_CR1_TXEIE))
-//	{
-//		USART_ITConfig(USART2, USART_IT_TXE, ENABLE); 
-//	}
-
-
 }
 
 float rate_gps_board;
@@ -2032,212 +2318,6 @@ float rate_gps_board;
 	}			
 }
 
-//----------------------pxy
-Pixy_Color Pixy;//结构体定义
-unsigned char Raw_Data[20];//原始数据大包，为解串准备
-u16 counter;//计数用
-
-char USART1_Flag=0 ;
-int USART1_FAIL = 0;	//通信失败标志、帧头错误置高
-int USART1_Half_OK=0;
-unsigned char Pixy_Data[20];
-u32 MianJi=0;
-double Zero_Width=0;//零度时的宽
-double Zero_Height=0;//零度时的高
-double Zero_MianJi=0;//零度时的面积=零度时的高*零度时的宽
-double Distance=0;
-double angle=0;
-int Ten_to_Octal(u32 ten_data,u32 octal_data)
-{
-    int i,j; 
-    int tmp;	
-	  octal_data=0;
-    for(i=1;;i++) 
-    {
-//        tmp=ten_data%8;           /*依次获得转换为八进制时的各位数（个、十、百位。。。。）*/
-			  tmp=ten_data&7;  //相当于tmp=ten_data%8;    位操作速度大于求余                
-        for(j=1;j<=i;j++) tmp*=10;
-        tmp/=10;
-        octal_data+=tmp;               /*存储转换好的十进制数*/
-        ten_data/=8;
-        if(ten_data==0)   break;           /*若最后一位不满8，则结束循环*/
-    }
-		return octal_data;
-}
-void Rand_to_Zero(s16 data_width,s16 data_height,s16 data_angle)
-{ 
-	 if(data_angle)
-	 {
-		 if(data_angle<0)  data_angle=-data_angle;
-     if(data_angle==45 || data_angle==46) data_angle=44;//45°角度无法计算出来（分母为0），则用44°代替。    		 
-//		 if(data_angle-90>0) data_angle=data_angle-90;//90-180°之间均按减去90°来计算。 
-		 if(data_angle>90) 
-		 {
-			  data_angle=180-data_angle;//90-180°之间均按180°减去来计算
-			  if(data_angle==45 || data_angle==46) data_angle=44;
-		 }
-		 //45°±5°范围内的摄像头返回的宽和高度稍微变一点数据对公式算出来的值能产生较大影响，所以考虑更改摄像头返回的值，让长和宽值接近
-		 if(ABS(data_angle-45)<=8)
-		 {
-        if(data_width > data_height) 
-				{				
-					 if((data_width-data_height)%2==0)  data_width-=(data_width-data_height)/2;//差值为偶数  a%(2^n)=a&(2^n-1)
-					 else  data_width-=(data_width-data_height+1)>>1;//奇数
-        }
-        else 
-        {				
-					 if((data_height - data_width)%2==0)  data_height=data_height-(data_height - data_width)/2;//差值为偶数 
-					 else  data_height=data_height-(data_height - data_width+1)/2;//奇数
-        }					
-     }	 
-		 angle = (((double)data_angle)/180) *3.141592654;		 
-     //零度时的数据一定不能用整形，要不然算的数据有大偏差		 
-		 Zero_Height = (data_height * cos(angle) -  data_width *sin(angle))/(cos(angle*2)) ;
-		 Zero_Width  = (data_height - Zero_Height * cos(angle))/sin(angle) ; 
-		 Zero_MianJi = Zero_Height * Zero_Width;	 
-	 }
-	 else  
-	 {
-		 Zero_Height=data_height;
-		 Zero_Width=data_width;
-		 Zero_MianJi=MianJi;
-	 }
-}
-void Blocks_Distance(double Data_MianJi)
-{
-//	  Distance=1.2*100000/Data_MianJi - 2.6*10000000/Data_MianJi/Data_MianJi + 30.0 ;
-  	Distance=2.87*10000000000/(Data_MianJi*Data_MianJi*Data_MianJi) - 1.08*100000000/(Data_MianJi*Data_MianJi) + 1.78*100000/Data_MianJi + 22.8 ;
-Distance=LIMIT(Distance,0,500);
-}
-
-void Blocks_Receive_Data(void)
-{
-//    int i; 	
-		
-//		++j;
-	   /*  单一色 1个：帧头为55 aa 55 aa
-				 单一色 2个：面积大的先发，帧头为55 aa 55 aa  ，下一个帧头为55 aa
-				 CC模式 1个：帧头为55 aa 56 aa
-				 CC模式+单一模式 各1个：先发单一模式，帧头为55 aa 55 aa，后发CC模式，帧头为56 aa
-				 CC模式 2个：帧头为55 aa 56 aa (此情况不准，两个标记会产生结合，角度几乎不对)			  
-		 */
-	  /*******************若为CC模式，1个，包头为55 aa 56 aa ,18个数据**************************/
-//	  switch(USART1_Half_OK)
-//	  {
-//			case 0x03:
-//			  {
-	if(USART1_Half_OK==0x03){
-				  Pixy.Pixy_Sig    = Ten_to_Octal(Pixy_Data[6] + Pixy_Data[7]*256,Pixy.Pixy_Sig);
-					Pixy.Pixy_PosX   = Pixy_Data[8]  + Pixy_Data[9]*256;
-					Pixy.Pixy_PosY   = Pixy_Data[10] + Pixy_Data[11]*256;
-					Pixy.Pixy_Width  = Pixy_Data[12] + Pixy_Data[13]*256;
-					Pixy.Pixy_Height = Pixy_Data[14] + Pixy_Data[15]*256;
-          //求角度时，若角度为正，返回数据为0x？？ 0x00
-				  if(Pixy_Data[17]==0x00)      Pixy.Pixy_Angle = Pixy_Data[16] + Pixy_Data[17]*256;
-				  //求角度时，若角度为负，返回数据为0x？？ 0xFF
-				  //即求出0x？？对应的十进制 - 0xFF对应的十进制数(255) = 负的角度
-				  else if(Pixy_Data[17]==0xFF) Pixy.Pixy_Angle = (int)Pixy_Data[16] - 255;}
-	else if(USART1_Half_OK==0x01||USART1_Half_OK==0x02)
-	{
-	  Pixy.Pixy_Sig    = Pixy_Data[6]  + Pixy_Data[7]*256;
-					Pixy.Pixy_PosX   = Pixy_Data[8]  + Pixy_Data[9]*256;
-					Pixy.Pixy_PosY   = Pixy_Data[10] + Pixy_Data[11]*256;
-					Pixy.Pixy_Width  = Pixy_Data[12] + Pixy_Data[13]*256;
-					Pixy.Pixy_Height = Pixy_Data[14] + Pixy_Data[15]*256;	
-	
-	}
-//			  }break;
-//			
-//			case 0x01:
-//				{
-//				  Pixy.Pixy_Sig    = Pixy_Data[6]  + Pixy_Data[7]*256;
-//					Pixy.Pixy_PosX   = Pixy_Data[8]  + Pixy_Data[9]*256;
-//					Pixy.Pixy_PosY   = Pixy_Data[10] + Pixy_Data[11]*256;
-//					Pixy.Pixy_Width  = Pixy_Data[12] + Pixy_Data[13]*256;
-//					Pixy.Pixy_Height = Pixy_Data[14] + Pixy_Data[15]*256;	
-//		    }break;
-//				
-//			case 0x02:
-//			  {
-//				  Pixy.Pixy_Sig    = Pixy_Data[4]  + Pixy_Data[5]*256;
-//					Pixy.Pixy_PosX   = Pixy_Data[6]  + Pixy_Data[7]*256;
-//					Pixy.Pixy_PosY   = Pixy_Data[8]  + Pixy_Data[9]*256;
-//					Pixy.Pixy_Width  = Pixy_Data[10] + Pixy_Data[11]*256;
-//					Pixy.Pixy_Height = Pixy_Data[12] + Pixy_Data[13]*256;	
-//			  }break;
-//			
-//			case 0x04:
-//			  {
-//				  Pixy.Pixy_Sig    = Ten_to_Octal(Pixy_Data[4] + Pixy_Data[5]*256,Pixy.Pixy_Sig);
-//					Pixy.Pixy_PosX   = Pixy_Data[6]  + Pixy_Data[7]*256;
-//					Pixy.Pixy_PosY   = Pixy_Data[8]  + Pixy_Data[9]*256;
-//					Pixy.Pixy_Width  = Pixy_Data[10] + Pixy_Data[11]*256;
-//					Pixy.Pixy_Height = Pixy_Data[12] + Pixy_Data[13]*256;
-//          //求角度时，若角度为正，返回数据为0x？？ 0x00
-//				  if(Pixy_Data[15]==0x00)      Pixy.Pixy_Angle = Pixy_Data[14] + Pixy_Data[15]*256;
-//				  //求角度时，若角度为负，返回数据为0x？？ 0xFF
-//				  //即求出0x？？对应的十进制 - 0xFF对应的十进制数(255) = 负的角度
-//				  else if(Pixy_Data[15]==0xFF) Pixy.Pixy_Angle = (int)Pixy_Data[14] - 255;		
-//			   }break;
-//			default:break;
-//		}	
-		MianJi=Pixy.Pixy_Width * Pixy.Pixy_Height;
-   // if(USART1_Half_OK==3 || USART1_Half_OK==4) 
-  //  {			
-			Rand_to_Zero(Pixy.Pixy_Width,Pixy.Pixy_Height,Pixy.Pixy_Angle);
-			Blocks_Distance(Zero_MianJi);
-			//Control_Car();
-			//LCD_Pixy();
-		//}
-		//USART1_Half_OK=0; 
-}
-
-void data_get_pxy(char data)
-{
-u8 i;
-Raw_Data[counter] = data;
-			if(counter==0 && Raw_Data[0]!=0x55 && Raw_Data[0]!=0x56)	 USART1_FAIL = 1;//通信失败
-			if(USART1_FAIL==0)//通信成功
-			{
-					counter++;
-				  if(counter>=14)
-					{
-						if(Raw_Data[0]==0x55 && Raw_Data[1]==0xAA && Raw_Data[2]==0x55 && Raw_Data[3]==0xAA)       USART1_Half_OK=0x01;//正常码模式，帧头为55 aa 55 aa
-						else if(Raw_Data[0]==0x55 && Raw_Data[1]==0xAA && Raw_Data[2]!=0x55 && Raw_Data[2]!=0x56)  USART1_Half_OK=0x02;//正常码模式，帧头为55 aa
-						else if(Raw_Data[0]==0x55 && Raw_Data[1]==0xAA && Raw_Data[2]==0x56 && Raw_Data[3]==0xAA)  USART1_Half_OK=0x03;//cc模式，帧头为55 aa 56 aa
-						else if(Raw_Data[0]==0x56 && Raw_Data[1]==0xAA)  USART1_Half_OK=0x04;//正常码模式+CC模式，帧头56 aa
-						if(USART1_Half_OK!=0)
-						{
-							 if((USART1_Half_OK==0x01 && counter==16)||(USART1_Half_OK==0x02 && counter==14)||(USART1_Half_OK==0x03 && counter==18)||(USART1_Half_OK==0x04 && counter==16))  
-							 {
-									for(i=0;i<counter;i++)  Pixy_Data[i]=Raw_Data[i];
-									USART1_Flag=1;
-////							USART1_Half_OK=0;
-									counter=0;
-							 }						 
-						}
-				 }
-			}
-			else
-			{
-				USART1_FAIL=0;
-				counter=0;
-			}
-			
-//					   if(USART1_Flag)
-//			 {	 
-////				  pixy_per_time=Time3_counter;
-////				  LCD_Write_string("Time:",0,7);
-////				  LCD_Display_int(pixy_per_time,7,7);
-////				  Time3_counter=0;
-//  				Blocks_Receive_Data();
-//			    USART1_Flag=0;
-//				 // Camera_counter++;	
-//          				 
-//			 }
-}
-
-
 u8 Rx_Buf3[256];	//串口接收缓存
 u8 RxBuffer3[50];
 u8 RxState3 = 0;
@@ -2260,8 +2340,7 @@ void USART3_IRQHandler(void)
 		USART_ClearITPendingBit(USART3,USART_IT_RXNE);//清除中断标志
 
 		com_data = USART3->DR;
-		data_get_pxy(com_data);
-		
+
 				if(RxState3==0&&com_data==0xAA)
 		{
 			RxState3=1;
@@ -2305,12 +2384,6 @@ void USART3_IRQHandler(void)
 	if( USART_GetITStatus(USART3,USART_IT_TXE ) )
 	{
 				
-		USART3->DR = TxBuffer[TxCounter++]; //写DR清除中断标志          
-		if(TxCounter == count)
-		{
-			USART3->CR1 &= ~USART_CR1_TXEIE;		//关闭TXE（发送中断）中断
-		}
-
 		USART_ClearITPendingBit(USART3,USART_IT_TXE);
 	}
  OSIntExit();        

@@ -662,6 +662,11 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\MEMS\ultrasonic.c</FilePath>
             </File>
+            <File>
+              <FileName>hml_cal.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\MEMS\hml_cal.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -686,11 +691,6 @@
               <FileName>height_ctrl.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\CONTROL\height_ctrl.c</FilePath>
-            </File>
-            <File>
-              <FileName>neuron_pid.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\CONTROL\neuron_pid.c</FilePath>
             </File>
             <File>
               <FileName>visual_contol.c</FileName>
@@ -766,53 +766,6 @@
         </Group>
         <Group>
           <GroupName>SYS_IDENT</GroupName>
-          <Files>
-            <File>
-              <FileName>CFFRELS.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SYS_IDENT\CFFRELS.c</FilePath>
-            </File>
-            <File>
-              <FileName>LibMatrix.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SYS_IDENT\LibMatrix.c</FilePath>
-            </File>
-            <File>
-              <FileName>LibMyMath.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SYS_IDENT\LibMyMath.c</FilePath>
-            </File>
-            <File>
-              <FileName>PPCFFRELS.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SYS_IDENT\PPCFFRELS.c</FilePath>
-            </File>
-            <File>
-              <FileName>RELS.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SYS_IDENT\RELS.c</FilePath>
-            </File>
-            <File>
-              <FileName>ident.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SYS_IDENT\ident.c</FilePath>
-            </File>
-            <File>
-              <FileName>STC_PP.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SYS_IDENT\STC_PP.c</FilePath>
-            </File>
-            <File>
-              <FileName>STC_PP_PID.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SYS_IDENT\STC_PP_PID.c</FilePath>
-            </File>
-            <File>
-              <FileName>ControlFGR.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\SYS_IDENT\ControlFGR.c</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>AVOID</GroupName>
@@ -821,11 +774,6 @@
               <FileName>sonar_avoid.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\CONTROL\sonar_avoid.c</FilePath>
-            </File>
-            <File>
-              <FileName>F407_FC_8.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\HARDWARE\AVOID\F407_FC_8.lib</FilePath>
             </File>
           </Files>
         </Group>

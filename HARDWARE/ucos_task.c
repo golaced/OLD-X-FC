@@ -178,7 +178,7 @@ void pos_task(void *pdata)
 	circle_control(0.01*5);//图像目标跟踪 未使用
  }
 	if(cnt2++>0.01*10&&mode.en_sonar_avoid){cnt2=0;
-		oldx_avoid();  //避障 未使用
+		;//oldx_avoid();  //避障 未使用
 	}
 	delay_ms(F_POS);
 	}
@@ -225,10 +225,10 @@ void nrf_task(void *pdata)
 		//mode.trig_h_spd=KEY[4];
 	 
     mode.flow_f_use_ukfm=1;//KEY[7];
-		mode.baro_f_use_ukfm=1;//
+		//mode.baro_f_use_ukfm=1;//
 		mode.en_eso_h_in=1;
 	  mode.flow_d_acc=KEY[7];//光流速度环加速度D
-		mode.baro_lock=KEY[6];//气压侧飞锁定
+		//mode.baro_lock=KEY[6];//气压侧飞锁定
 		mode.yaw_sel=!KEY[3];
 		//mode.att_ident1=KEY[4];
 		//if(Rc_Get_PWM.AUX1>1500)
@@ -303,7 +303,7 @@ void ident_task(void *pdata)//IDNET TASK
  	while(1)
 	{
 		if(mode.att_ident1)
-		ident();	//未使用
+		;//ident();	//未使用
 		delay_ms(10);
   }
 }	
@@ -348,7 +348,10 @@ void uart_task(void *pdata)
 							}					
 							
 				//BLE UPLOAD《----------------------蓝牙调试
-				if(cnt[2]++>1){cnt[2]=0;			
+				if(cnt[2]++>1){cnt[2]=0;
+					#if USE_BLE_FOR_APP
+						APP_LINK();
+					#endif
 					if(DMA_GetFlagStatus(DMA2_Stream7,DMA_FLAG_TCIF7)!=RESET)//等待DMA2_Steam7传输完成
 							{ 	DMA_ClearFlag(DMA2_Stream7,DMA_FLAG_TCIF7);//清除DMA2_Steam7传输完成标志
 									#if !BLE_BAD
@@ -398,12 +401,12 @@ void uart_task(void *pdata)
 											0,-ALT_VEL_BMP*100,0,  
 											Yaw*10,0,0,
 											(int16_t)(yaw_mag_view[0]*10.0),(int16_t)(yaw_mag_view[1]*10.0),(int16_t)(yaw_mag_view[2]*10),0/10,0,0/10,0*0);break;	
-											case 3://NEURON PID
-											data_per_uart1(
-											0,ctrl_2.out.y*10,0,
-											0,neuron_pid_outter[PITr].u*10,0,  
-											0,neuron_pid_outter[ROLr].u*10,0,
-											(int16_t)(thr_in_view*10.0),(int16_t)(thr_use*10.0),(int16_t)(ALT_POS_SONAR2*1000),0/10,0,0/10,0*0);break;	
+//											case 3://NEURON PID
+//											data_per_uart1(
+//											0,ctrl_2.out.y*10,0,
+//											0,neuron_pid_outter[PITr].u*10,0,  
+//											0,neuron_pid_outter[ROLr].u*10,0,
+//											(int16_t)(thr_in_view*10.0),(int16_t)(thr_use*10.0),(int16_t)(ALT_POS_SONAR2*1000),0/10,0,0/10,0*0);break;	
 											case 4://ESO PID OUT
 											data_per_uart1(
 											0,ctrl_2.out.y*10,0,
@@ -464,12 +467,12 @@ void uart_task(void *pdata)
 											0,0,ALT_POS_SONAR2*1000,  
 											0,ultra_ctrl_out_use,ultra_speed,
 											(int16_t)(fRPY[2]*10.0),(int16_t)(eso_att_inner_c[THRr].v1*10.0),(int16_t)(0*10),0/10,0,0/10,0*0);break;
-											case 15://DJI_RC
-											data_per_uart1(
-											0,DJI_RC[1],DJI_RC[0],
-											0,inner_loop_time_time*10000,DJI_RC[2],  
-											0,0,DJI_RC[3],
-											(int16_t)(fRPY[2]*10.0),(int16_t)(eso_att_inner_c[THRr].v1*10.0),(int16_t)(0*10),0/10,0,0/10,0*0);break;
+//											case 15://DJI_RC
+//											data_per_uart1(
+//											0,DJI_RC[1],DJI_RC[0],
+//											0,inner_loop_time_time*10000,DJI_RC[2],  
+//											0,0,DJI_RC[3],
+//											(int16_t)(fRPY[2]*10.0),(int16_t)(eso_att_inner_c[THRr].v1*10.0),(int16_t)(0*10),0/10,0,0/10,0*0);break;
 											case 16://SONAR
 											data_per_uart1(
 											0,0,ultra_distance,
@@ -577,26 +580,6 @@ void uart_task(void *pdata)
 					#endif
 							}		
 				
-//----------pxy   未使用
-//					if(USART1_Flag)
-//					{	 
-//					Blocks_Receive_Data();
-//					USART1_Flag=0;
-//					}		
-
-//----------------未使用
-					static u8 flag_dji=0;
-					if(mode.use_dji ){
-					if(flag_dji==0){
-					flag_dji=1;
-					Send_DJI();	}
-					else if(flag_dji==1){
-					flag_dji=2;
-					Send_DJI2();}			
-					else{
-					flag_dji=0;
-					Send_DJI3();}}
-					
 			delay_ms(5);  
 			}
 }	

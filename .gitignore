@@ -1,8 +1,9 @@
-.o
-.d
-.crf
-.dep
-.hex
-.axf
-.map
-.htm
+*.o
+*.d
+*.crf
+*.dep
+*.hex
+*.axf
+*.map
+*.htm
+OBJ/

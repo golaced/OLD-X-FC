@@ -37,4 +37,27 @@ extern u8 height_ctrl_mode,height_ctrl_mode_use ;
 extern u16 RX_CH[CH_NUM],RX_CH_PWM[CH_NUM];
 extern int RX_CH_FIX[4],RX_CH_FIX_PWM[4];
 
+
+extern u8 is_lock;
+extern u8 tx_lock;
+extern u8 EN_FIX_GPSF;
+extern u8 EN_FIX_LOCKWF;
+extern u8 EN_CONTROL_IMUF;
+extern u8 EN_FIX_INSF;
+extern u8 EN_FIX_HIGHF;
+
+extern u8 EN_FIX_GPS;
+extern u8 EN_FIX_LOCKW;
+extern u8 EN_CONTROL_IMU;
+extern u8 EN_FIX_INS;
+extern u8 EN_FIX_HIGH;
+extern u8 EN_TX_GX;
+extern u8 EN_TX_AX;
+extern u8 EN_TX_HM;
+extern u8 EN_TX_YRP;
+extern u8 EN_TX_GPS;
+extern u8 EN_TX_HIGH;
+extern u8	(up_load_set);
+extern u8	(up_load_pid);
+extern u16 yaw_sb;
 #endif

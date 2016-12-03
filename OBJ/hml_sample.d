@@ -94,3 +94,4 @@
 ..\obj\hml_sample.o: ..\CORE\../HARDWARE/../HARDWARE/DRIVER/pwm_out.h
 ..\obj\hml_sample.o: ..\CORE\../HARDWARE/define.h
 ..\obj\hml_sample.o: ..\CORE\../HARDWARE/DRIVER/iic.h
+..\obj\hml_sample.o: ..\CORE\../HARDWARE/MEMS/hml_cal.h
