@@ -920,10 +920,10 @@ void Send_Status(void)
 	data_to_send[_cnt++]=0x01;
 	data_to_send[_cnt++]=0;
 
-	_temp = (int)(Pit_fc*100);
+	_temp = (int)(Rol_fc*100);
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = (int)(Rol_fc*100);
+	_temp = (int)(Pit_fc*100);
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
 	_temp = (int)(Yaw_fc*100);
@@ -960,23 +960,25 @@ void Send_GPS(void)
 {u8 i;	u8 sum = 0;u8 data_to_send[50];
 	u8 _cnt=0;
 		vs32 _temp;	u8 _temp4=0;	float _temp2 =0;	vs16 _temp3=0;
+	double GPS_W,GPS_J;
 	data_to_send[_cnt++]=0xAA;
 	data_to_send[_cnt++]=0xAA;
 	data_to_send[_cnt++]=0x04;
 	data_to_send[_cnt++]=0;
-
-	//_temp = (vs32)(GPS_W*1000000);
+  GPS_W=32.12345678;
+	GPS_J=123.12345678;
+	_temp = (vs32)(GPS_W*1000000);
   data_to_send[_cnt++]=BYTE3(_temp);
 	data_to_send[_cnt++]=BYTE2(_temp);
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	//_temp = (vs32)(GPS_J*1000000);
+	_temp = (vs32)(GPS_J*1000000);
   data_to_send[_cnt++]=BYTE3(_temp);
 	data_to_send[_cnt++]=BYTE2(_temp);
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
    //hight
-	_temp=(vs32)(ALT_POS_SONAR2*100);
+	_temp=(vs32)(LIMIT(ALT_POS_SONAR2*100,0,5*100));
 	data_to_send[_cnt++]=BYTE3(_temp);
 	data_to_send[_cnt++]=BYTE2(_temp);
 	data_to_send[_cnt++]=BYTE1(_temp);
@@ -1128,22 +1130,22 @@ void Send_Senser(void)
 	data_to_send[_cnt++]=0xAA;
 	data_to_send[_cnt++]=0x08;
 	data_to_send[_cnt++]=0;
-	_temp = mpu6050_fc.Acc_I16.x;
+	_temp = mpu6050_fc.Acc.x;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = mpu6050_fc.Acc_I16.y;
+	_temp = mpu6050_fc.Acc.y;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = mpu6050_fc.Acc_I16.z;	
+	_temp = mpu6050_fc.Acc.z;	
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = mpu6050_fc.Gyro_I16.x;	
+	_temp = mpu6050_fc.Gyro.x;	
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = mpu6050_fc.Gyro_I16.y;	
+	_temp = mpu6050_fc.Gyro.y;	
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = mpu6050_fc.Gyro_I16.z;	
+	_temp = mpu6050_fc.Gyro.z;	
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
 	_temp = ak8975_fc.Mag_Val.x;	
@@ -1155,7 +1157,7 @@ void Send_Senser(void)
 	_temp = ak8975_fc.Mag_Val.z;	
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = thr_test;	
+	_temp = thr_test*(500/630.);	
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
 	_temp = motor[0];	
@@ -1185,16 +1187,19 @@ void Send_GPS_Ublox(void)
 	u8 _cnt=0;
 	vs16 _temp;
 	vs32 _temp32;
+		double GPS_W,GPS_J;
+  GPS_W=32.12345678;
+	GPS_J=123.12345678;
 	data_to_send[_cnt++]=0xAA;
 	data_to_send[_cnt++]=0xAA;
 	data_to_send[_cnt++]=0x09;//功能字
 	data_to_send[_cnt++]=0;//数据量
-	_temp32 =  imu_nav.gps.J;
+	_temp32 =  GPS_J*10000000;//imu_nav.gps.J;
 	data_to_send[_cnt++]=BYTE3(_temp32);
 	data_to_send[_cnt++]=BYTE2(_temp32);
 	data_to_send[_cnt++]=BYTE1(_temp32);
 	data_to_send[_cnt++]=BYTE0(_temp32);
-	_temp32 =  imu_nav.gps.W;
+	_temp32 =  GPS_W*10000000;//imu_nav.gps.W;
 	data_to_send[_cnt++]=BYTE3(_temp32);
 	data_to_send[_cnt++]=BYTE2(_temp32);
 	data_to_send[_cnt++]=BYTE1(_temp32);
@@ -1243,6 +1248,9 @@ void Send_DEBUG1(void)
 	data_to_send[_cnt++]=0xAA;
 	data_to_send[_cnt++]=30;
 	data_to_send[_cnt++]=0;
+	for(i=1;i<=14;i++)
+	DEBUG[i]=BLE_DEBUG[i]*10;
+
   for(i=1;i<=14;i++){
 	_temp = DEBUG[i];
 	data_to_send[_cnt++]=BYTE1(_temp);
@@ -1268,21 +1276,22 @@ void APP_LINK(void)
 			Send_Status();
 			break;
 		case 2:
+			Send_DEBUG1();
 			if(flag1)
-		  Send_BAT();
+		  Send_PID2();//Send_BAT();
 			else
 			Send_PID1();
 			break;
 		case 3:			
-			if(flag1)
-		  Send_DEBUG1();
-			else
-			Send_PID2();
+			//if(flag1)
+		  Send_GPS();//
+			//else
+			Send_GPS_Ublox();
 		break;
 		case 4:
-			if(flag1)
-		  Send_GPS();
-			else
+			//if(flag1)
+		 // Send_GPS();
+			//else
 			Send_Senser();
 			cnt = 0;
 		  if(flag1)
@@ -1292,10 +1301,13 @@ void APP_LINK(void)
 			break;
 		default:cnt = 0;break;		
 	}
+	if(app_connect_fc)
 	cnt++;	
+	else
+	cnt=1;	
 }
-
-
+u32 app_connect_fc_loss;
+u8 app_connect_fc=1;
 u8 lock_tx;
  void Data_app(u8 *data_buf,u8 num)
 {
@@ -1306,6 +1318,7 @@ u8 lock_tx;
 		sum += *(data_buf+i);
 	if(!(sum==*(data_buf+num-1)))		return;		//判断sum
 	if(!(*(data_buf)==0xAA && *(data_buf+1)==0xAF))		return;		//判断帧头
+	
 		if(*(data_buf+2)==0xAD)								//判断功能字,=0x8a,为遥控数据
 	{
 	
@@ -1337,12 +1350,18 @@ u8 lock_tx;
 		
 			}
 			else if(*(data_buf+4)==0Xa4)//---磁力开始校准
-				i=0;
+				ak8975_fc.Mag_CALIBRATED=1;//=0;
 			else if(*(data_buf+4)==0Xa5)//---磁力关闭校准
 				i=0;
 			else if(*(data_buf+4)==0Xa6)//---IMU校准
-				i=0;
-		
+			{mpu6050_fc.Acc_CALIBRATE=1;
+			  mpu6050_fc.Gyro_CALIBRATE=1;}
+			else if(*(data_buf+4)==0XFF)//APP heart beat
+			{
+			app_connect_fc=1;
+			app_connect_fc_loss=0;
+			}
+			
   }
 		if(*(data_buf+2)==0X03)								//CMD1
 	{

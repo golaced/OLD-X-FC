@@ -246,7 +246,7 @@ float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 //	  eso_in->beta1=300;//1/(3*pow(eso_in->h0,2));
 //    eso_in->beta2=1000;//2/(64*pow(eso_in->h0,2));	
 			eso_in->beta0=1/(eso_in->h0);
-   	  eso_in->beta1=1/(3*pow(eso_in->h0,2));
+   	  eso_in->beta1=1/(30*pow(eso_in->h0,2));
       eso_in->beta2=1000;//2/(64*pow(eso_in->h0,2));	
 		#endif
  //-------------·´À¡----------------
@@ -292,7 +292,7 @@ float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 	#if ESO_PARA_USE_REAL_TIME
 	    eso_in->h0=T;
 			eso_in->beta0=1/(eso_in->h0+0.000001);
-   	  eso_in->beta1=1/(3*pow(eso_in->h0,2)+0.000001);
+   	  eso_in->beta1=1/(30*pow(eso_in->h0,2)+0.000001);
 	#endif
 		if(mode.att_pid_tune&&mode.en_pid_sb_set){
 	eso_in->KD=0.001*SPID.OD*4;
@@ -491,7 +491,7 @@ float HIGH_CONTROL_SPD_ESO(ESO *eso_in,float v,float y,float u,float T,float MAX
 //	  eso_in->beta1=300;//1/(3*pow(eso_in->h0,2));
 //    eso_in->beta2=1000;//2/(64*pow(eso_in->h0,2));	
 			eso_in->beta0=1/(eso_in->h0);
-   	  eso_in->beta1=1/(3*pow(eso_in->h0,2));
+   	  eso_in->beta1=1/(30*pow(eso_in->h0,2));
       eso_in->beta2=1000;//2/(64*pow(eso_in->h0,2));	
  //-------------·´À¡----------------
 	eso_in->out_mode=1;	
@@ -514,7 +514,7 @@ float HIGH_CONTROL_SPD_ESO(ESO *eso_in,float v,float y,float u,float T,float MAX
 	 #if ESO_PARA_USE_REAL_TIME
 	    eso_in->h0=T;
   		eso_in->beta0=1/(eso_in->h0+0.000001);
-   	  eso_in->beta1=1/(3*pow(eso_in->h0,2)+0.000001);
+   	  eso_in->beta1=1/(30*pow(eso_in->h0,2)+0.000001);
 	 #endif
 	eso_in->KP=wz_speed_pid.kp;
 	if(SPID.YD!=0&&SPID.YD!=800&&(KEY[0]==1&&KEY[1]==1))eso_in->b0=SPID.YD;

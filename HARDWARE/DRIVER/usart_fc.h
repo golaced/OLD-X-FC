@@ -16,8 +16,10 @@ void APP_LINK(void);
 typedef struct PID_STA{u16 OP,OI,OD,IP,II,ID,YP,YI,YD;}PID_STA;
 extern PID_STA HPID,SPID,FIX_PID,NAV_PID;
 extern PID_STA HPID_app,SPID_app,FIX_PID_app,NAV_PID_app;
-extern u32 imu_loss_cnt;
+extern u32 imu_loss_cnt,app_connect_fc_loss;
 extern float POS_UKF_X,POS_UKF_Y,VEL_UKF_X,VEL_UKF_Y;
+extern u8 app_connect_fc;
+
 typedef struct int16_rcget{
 				int16_t ROLL;
 				int16_t PITCH;

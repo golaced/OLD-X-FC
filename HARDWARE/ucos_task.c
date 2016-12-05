@@ -348,10 +348,11 @@ void uart_task(void *pdata)
 							}					
 							
 				//BLE UPLOAD《----------------------蓝牙调试
-				if(cnt[2]++>1){cnt[2]=0;
-					#if USE_BLE_FOR_APP
-						APP_LINK();
+					#if USE_BLE_FOR_APP			  
+					APP_LINK();
 					#endif
+				if(cnt[2]++>1){cnt[2]=0;
+			
 					if(DMA_GetFlagStatus(DMA2_Stream7,DMA_FLAG_TCIF7)!=RESET)//等待DMA2_Steam7传输完成
 							{ 	DMA_ClearFlag(DMA2_Stream7,DMA_FLAG_TCIF7);//清除DMA2_Steam7传输完成标志
 									#if !BLE_BAD
@@ -601,6 +602,10 @@ void error_task(void *pdata)
    att_ero_check();
    hight_ero_check();
 	}
+	
+	if(app_connect_fc_loss++>4/0.5)
+	app_connect_fc=0;
+	
 	
 	if(circle.lose_cnt++>4/0.5)
 	circle.connect=0;
