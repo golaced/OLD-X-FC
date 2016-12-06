@@ -40,5 +40,4 @@ void TIM3_Int_Init(u16 arr,u16 psc);
 #define GET_T_OUTTER_C 11
 #define GET_T_HIGH_CONTROL 12
 #define GET_T_HML_CAL 13
-#define GET_T_TICK 14
 #endif

@@ -6,7 +6,7 @@
 #include "os_cpu.h"
 #include "os_cfg.h"
 
-extern u8 UART_UP_LOAD_SEL;
+
 extern OS_TMR   * tmr1;			//软件定时器1
 extern OS_TMR   * tmr2;			//软件定时器2
 extern OS_TMR   * tmr3;			//软件定时器3
