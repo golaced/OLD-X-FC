@@ -203,6 +203,9 @@ void nrf_task(void *pdata)
     #else
     mode.en_sonar_avoid=KEY_SEL[0];		 
     #endif
+		if(force_sd_save) 
+		mode.en_sd_save=1;	
+		else
 		mode.en_sd_save=KEY_SEL[1];
 		mode.en_pid_sb_set=KEY_SEL[2];//使能PID设置	
 //-------------------------------------------------	
@@ -310,11 +313,11 @@ void ident_task(void *pdata)//IDNET TASK
 
 //=======================串口 任务函数===========================
 OS_STK  UART_TASK_STK[UART_STK_SIZE];
-u8 UART_UP_LOAD_SEL=25;//<------------------------------上传数据选择
+u8 UART_UP_LOAD_SEL=26;//<------------------------------上传数据选择
 u8 force_flow_ble_debug;
-u8 state_test=2;
+u8 state_test=26;
 void uart_task(void *pdata)
-{	static u8 cnt[4];					 		
+{	static u8 cnt[5];					 		
  	while(1)
 	{
 				//To  Odroid 图像模块
@@ -348,11 +351,14 @@ void uart_task(void *pdata)
 							}					
 							
 				//BLE UPLOAD《----------------------蓝牙调试
-					#if USE_BLE_FOR_APP			  
-					APP_LINK();
-					#endif
+					
+						if(cnt[4]++>0){cnt[4]=0;		
+						#if USE_BLE_FOR_APP			  
+						APP_LINK();
+						#endif
+						}
 				if(cnt[2]++>1){cnt[2]=0;
-			
+					
 					if(DMA_GetFlagStatus(DMA2_Stream7,DMA_FLAG_TCIF7)!=RESET)//等待DMA2_Steam7传输完成
 							{ 	DMA_ClearFlag(DMA2_Stream7,DMA_FLAG_TCIF7);//清除DMA2_Steam7传输完成标志
 									#if !BLE_BAD
@@ -534,6 +540,12 @@ void uart_task(void *pdata)
 											yaw_mag_view[3]*10,0,0,
 											X_kf_yaw[0]*10,yaw_kf*10,0,
 											(int16_t)(Yaw_fc*10),(int16_t)(Pitch*10.0),(int16_t)(Roll*10.0),thr_test,0,0/10,0);break;
+											case 26://GPS Test 
+											data_per_uart1(
+											POS_UKF_X*100,POS_UKF_Y*100,0,
+											VEL_UKF_X*100,VEL_UKF_Y*100,0,
+											gpsx_o.posslnum,Yaw,0,
+											(int16_t)(Yaw_fc*10),(int16_t)(Pitch*10.0),(int16_t)(Roll*10.0),thr_test,0,0/10,0);break;
 											
 											default:break;
 											}
@@ -567,7 +579,7 @@ void uart_task(void *pdata)
 							data_per_uart4(SEND_FLOW);
 							break;
 							case 3:sd_sel=4;
-							data_per_uart4(SEND_PID);
+							data_per_uart4(SEND_GPS);
 							break;
 							case 4:sd_sel=0;
 							data_per_uart4(SEND_DEBUG);

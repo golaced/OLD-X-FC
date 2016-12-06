@@ -80,6 +80,7 @@ void Usart2_Init(u32 br_num)//--GOL-link
 }
 RESULT color;
 float dt_flow_rx;
+nmea_msg gpsx_o,gpsx_f; 											//GPS信息
 u16 data_rate_gol_link;
 PID_STA HPID,SPID,FIX_PID,NAV_PID;
 PID_STA HPID_app,SPID_app,FIX_PID_app,NAV_PID_app;
@@ -257,6 +258,17 @@ int k_scale_pix;
 		DIS_IN[19]=(int16_t)(*(data_buf+43)<<8)|*(data_buf+44);
     
 	}			
+	else if(*(data_buf+2)==0x14)//GPS
+  {
+	float temp = Get_Cycle_T(GET_T_TICK);		
+	gpsx_o.longitude=(float)((int32_t)((*(data_buf+4)<<24)|(*(data_buf+5)<<16)|(*(data_buf+6)<<8)|*(data_buf+7)))/10000000.;
+	gpsx_o.latitude=(float)((int32_t)((*(data_buf+8)<<24)|(*(data_buf+9)<<16)|(*(data_buf+10)<<8)|*(data_buf+11)))/10000000.;	
+	gpsx_o.spd=(float)((int16_t)(*(data_buf+12)<<8)|*(data_buf+13))/100.;	
+	gpsx_o.angle=(float)((int16_t)(*(data_buf+14)<<8)|*(data_buf+15))/10.;		
+	gpsx_o.gpssta=*(data_buf+16);
+	gpsx_o.posslnum=*(data_buf+17);
+	gpsx_o.svnum=*(data_buf+18);
+	}
 }
  
 
@@ -414,7 +426,7 @@ void Send_IMU_TO_FLOW(void)
 	_temp = (vs16)(ak8975.Mag_Val.z);//mode.save_video;//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp =  Rc_Get_PWM.THROTTLE>1250||(mode.use_dji&&(Rc_Get.THROTTLE>1050));//
+	_temp =  force_sd_save||Rc_Get_PWM.THROTTLE>1250||(mode.use_dji&&(Rc_Get.THROTTLE>1050));//
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);	
 //	_temp =  mode.save_video;
@@ -573,6 +585,64 @@ void Send_FLOW_MODE(void)
 	Send_Data_GOL_LINK(data_to_send, _cnt);
 }
 
+void Send_PID_TO_IMU(void)
+{u8 i;	u8 sum = 0;
+	u8 data_to_send[50];
+	u8 _cnt=0;
+	vs16 _temp;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAF;
+	data_to_send[_cnt++]=0x82;//功能字
+	data_to_send[_cnt++]=0;//数据量
+
+	
+	_temp=SPID.OP;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp=SPID.OI;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp=SPID.OD;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp=SPID.IP;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp=SPID.II;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp=SPID.ID;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp=SPID.YP;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp=SPID.YI;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp=SPID.YD;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp=HPID.OP;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp=HPID.OI;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp=HPID.OD;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	
+	data_to_send[3] = _cnt-4;
+
+	for( i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	data_to_send[_cnt++] = sum;
+	
+	Send_Data_GOL_LINK(data_to_send, _cnt);
+}
+
 
 void GOL_LINK_TASK(void)
 {
@@ -582,6 +652,11 @@ if(cnt[1]++>1)
 {cnt[1]=0;
 	
 	Send_IMU_TO_FLOW2();
+}
+if(cnt[2]++>10)
+{cnt[2]=0;
+	
+	Send_PID_TO_IMU();
 }
 }
 
@@ -1194,19 +1269,19 @@ void Send_GPS_Ublox(void)
 	data_to_send[_cnt++]=0xAA;
 	data_to_send[_cnt++]=0x09;//功能字
 	data_to_send[_cnt++]=0;//数据量
-	_temp32 =  GPS_J*10000000;//imu_nav.gps.J;
+	_temp32 =  gpsx_o.longitude*10000000;//imu_nav.gps.J;
 	data_to_send[_cnt++]=BYTE3(_temp32);
 	data_to_send[_cnt++]=BYTE2(_temp32);
 	data_to_send[_cnt++]=BYTE1(_temp32);
 	data_to_send[_cnt++]=BYTE0(_temp32);
-	_temp32 =  GPS_W*10000000;//imu_nav.gps.W;
+	_temp32 =  gpsx_o.latitude*10000000;//u_nav.gps.W;
 	data_to_send[_cnt++]=BYTE3(_temp32);
 	data_to_send[_cnt++]=BYTE2(_temp32);
 	data_to_send[_cnt++]=BYTE1(_temp32);
 	data_to_send[_cnt++]=BYTE0(_temp32);
-	_temp =imu_nav.gps.gps_mode;
+	_temp =			gpsx_o.gpssta;//imu_nav.gps.gps_mode;
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp =imu_nav.gps.star_num;
+	_temp =     gpsx_o.posslnum;//   imu_nav.gps.star_num;
 	data_to_send[_cnt++]=BYTE0(_temp);
 	_temp32 =  imu_nav.gps.X_O;
 	data_to_send[_cnt++]=BYTE3(_temp32);
@@ -1308,7 +1383,8 @@ void APP_LINK(void)
 }
 u32 app_connect_fc_loss;
 u8 app_connect_fc=1;
-u8 lock_tx;
+u8 lock_tx,force_sd_save;
+u8 DEBUG_SEL;
  void Data_app(u8 *data_buf,u8 num)
 {
 	vs16 rc_value_temp;
@@ -1358,11 +1434,33 @@ u8 lock_tx;
 			  mpu6050_fc.Gyro_CALIBRATE=1;}
 			else if(*(data_buf+4)==0XFF)//APP heart beat
 			{
+			 //DEBUG_SEL=*(data_buf+5);	
 			app_connect_fc=1;
 			app_connect_fc_loss=0;
 			}
+			else if(*(data_buf+4)==0Xa7)//en SD_DEBUG
+			force_sd_save = 1;
+			else if(*(data_buf+4)==0Xa8)//dis SD_DEBUG
+			force_sd_save = 0;
 			
   }
+	if(*(data_buf+2)==0X02)								//CMD1
+	{
+	
+			 DEBUG_SEL=*(data_buf+4);	
+		  if(DEBUG_SEL!=99)
+				UART_UP_LOAD_SEL=DEBUG_SEL;
+			app_connect_fc=1;
+			app_connect_fc_loss=0;
+					
+  }
+	if(*(data_buf+2)==0Xff)								//APP heart beat
+	{
+//		
+//		 DEBUG_SEL=*(data_buf+4);	
+//			app_connect_fc=1;
+//			app_connect_fc_loss=0;
+	}	
 		if(*(data_buf+2)==0X03)								//CMD1
 	{
 		(EN_TX_GX)=*(data_buf+4);
@@ -1377,6 +1475,7 @@ u8 lock_tx;
 		(EN_CONTROL_IMU)=*(data_buf+12);
 		(EN_FIX_INS)=*(data_buf+13);
 		(EN_FIX_HIGH)=*(data_buf+14);
+		
   }
 	if(*(data_buf+2)==0x10)								//PID1
 	{
@@ -2878,7 +2977,7 @@ void data_per_uart4(u8 sel)
 	u8 i;	u8 sum = 0;
 	u8 _cnt=0;
 	vs16 _temp;
-
+  vs32 _temp1;
 
 switch(sel){
 	case SEND_ALT:
@@ -3118,6 +3217,42 @@ switch(sel){
 	SendBuff4[_cnt++]=BYTE1(_temp);
 	SendBuff4[_cnt++]=BYTE0(_temp);
 	_temp=HPID.OD;//filter
+	SendBuff4[_cnt++]=BYTE1(_temp);
+	SendBuff4[_cnt++]=BYTE0(_temp);
+	
+	SendBuff4[3] = _cnt-4;
+	for( i=0;i<_cnt;i++)
+	sum += SendBuff4[i];
+	SendBuff4[_cnt++] = sum;
+	break;
+	case SEND_GPS:
+	SendBuff4[_cnt++]=0xAA;
+	SendBuff4[_cnt++]=0xAF;
+	SendBuff4[_cnt++]=0x09;//功能字
+	SendBuff4[_cnt++]=0;//数据量
+	_temp1 = (vs32)( gpsx_o.longitude*10000000);//ultra_distance;
+	SendBuff4[_cnt++]=BYTE3(_temp1);
+	SendBuff4[_cnt++]=BYTE2(_temp1);
+	SendBuff4[_cnt++]=BYTE1(_temp1);
+	SendBuff4[_cnt++]=BYTE0(_temp1);
+	_temp1 = (vs32)( gpsx_o.latitude*10000000);//ultra_distance;
+	SendBuff4[_cnt++]=BYTE3(_temp1);
+	SendBuff4[_cnt++]=BYTE2(_temp1);
+	SendBuff4[_cnt++]=BYTE1(_temp1);
+	SendBuff4[_cnt++]=BYTE0(_temp1);
+	_temp = (vs16)( gpsx_o.spd*100);//ultra_distance;
+	SendBuff4[_cnt++]=BYTE1(_temp);
+	SendBuff4[_cnt++]=BYTE0(_temp);
+	_temp = (vs16)( gpsx_o.angle*10);//ultra_distance;
+	SendBuff4[_cnt++]=BYTE1(_temp);
+	SendBuff4[_cnt++]=BYTE0(_temp);
+	_temp = (vs16)( gpsx_o.gpssta);//ultra_distance;
+	SendBuff4[_cnt++]=BYTE0(_temp);
+	_temp = (vs16)( gpsx_o.posslnum);//ultra_distance;
+	SendBuff4[_cnt++]=BYTE0(_temp);
+	_temp = (vs16)( gpsx_o.svnum);//ultra_distance;
+	SendBuff4[_cnt++]=BYTE0(_temp);	
+	_temp = (vs16)( Yaw*10);//ultra_distance;
 	SendBuff4[_cnt++]=BYTE1(_temp);
 	SendBuff4[_cnt++]=BYTE0(_temp);
 	
