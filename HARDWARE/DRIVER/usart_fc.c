@@ -573,6 +573,64 @@ void Send_FLOW_MODE(void)
 	Send_Data_GOL_LINK(data_to_send, _cnt);
 }
 
+void Send_PID(void)
+{u8 i;	u8 sum = 0;
+	u8 data_to_send[50];
+	u8 _cnt=0;
+	vs16 _temp;
+	data_to_send[_cnt++]=0xAA;
+	data_to_send[_cnt++]=0xAF;
+	data_to_send[_cnt++]=0x82;//功能字
+	data_to_send[_cnt++]=0;//数据量
+	
+	_temp = SPID.OP;//ultra_distance;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.OI;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.OD;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	_temp = SPID.IP;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.II;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.ID;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	_temp = SPID.YP;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.YI;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = SPID.YD;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	_temp = HPID.OP;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = HPID.OI;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	_temp = HPID.OD;
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	data_to_send[3] = _cnt-4;
+
+	for( i=0;i<_cnt;i++)
+		sum += data_to_send[i];
+	data_to_send[_cnt++] = sum;
+	
+	Send_Data_GOL_LINK(data_to_send, _cnt);
+}  
+
 
 void GOL_LINK_TASK(void)
 {
@@ -582,6 +640,10 @@ if(cnt[1]++>1)
 {cnt[1]=0;
 	
 	Send_IMU_TO_FLOW2();
+}
+if(cnt[2]++>20)
+{cnt[2]=0;
+Send_PID();
 }
 }
 

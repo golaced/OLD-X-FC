@@ -18,21 +18,6 @@ ctrl_t ctrl_2_fuzzy;
 
 float dj_angle,dj_angle_offset[3]={-2,3,9},dj_angle_set;
 #define MAX_FIX_ANGLE_DJ 13
-void DJ_offset_save(void)
-{
-//static u8 moder;
-
-//if(mode.en_dj_cal)
-//{
-//dj_angle_offset[0]=(float)(Rc_Get.AUX1-500)/1000.*MAX_FIX_ANGLE_DJ*2;
-//dj_angle_offset[1]=(float)(Rc_Get.AUX2-500)/1000.*MAX_FIX_ANGLE_DJ*2;
-//dj_angle_offset[2]=(float)(Rc_Get.AUX3-500)/1000.*MAX_FIX_ANGLE_DJ*4;
-//}
-//else if(mode.en_dj_cal==0&&moder==1)
-//	WRITE_PARM();
-//moder=mode.en_dj_cal;
-}
-
 
 
 void Ctrl_Para_Init()		//设置默认参数
@@ -60,7 +45,7 @@ int flag_eso=1;
 //--------------------1   -  0
 //float off_temp[2]={(-3.24-(-4.6)),(1.57-(2.56)) };
 float off_temp[2]={0 };
-float off_yaw=0;
+float off_yaw=0;//遥控 航向偏执
 void CTRL_2(float T)//角度环
 { float px,py,ix,iy,d;
 	static xyz_f_t acc_no_g;
@@ -72,7 +57,7 @@ void CTRL_2(float T)//角度环
   float cos1,sin1;
 	float temp,temp_yaw;
 	static u8 no_head;
-/*   head  |    1 PIT y-    AUX2
+/*   head  |    1 PIT y    AUX2
 	         | 
 	         _____  0 ROL x+   AUX1
 	
@@ -82,43 +67,14 @@ void CTRL_2(float T)//角度环
 //=========================== 期望角度 ========================================
 	 except_A_SB_lft[PITr] =  my_deathzoom_2(MAX_CTRL_ANGLE  *( my_deathzoom( (CH_filter[PITr]) ,30 )/500.0f ),1);  
 	 except_A_SB_lft[ROLr] =  my_deathzoom_2(MAX_CTRL_ANGLE  *( my_deathzoom( (CH_filter[ROLr]) ,30 )/500.0f ),1);  
-	
+	 except_A_SB[PITr]  += scale_lf_sb *T*3.14f * ( except_A_SB_lft[PITr] - except_A_SB[PITr] );//fix by gol 2015.11.8
 	 except_A_SB[ROLr]  += scale_lf_sb *T *3.14f * ( except_A_SB_lft[ROLr] - except_A_SB[ROLr] );
 //---------------------------NAV_angle------------------------------------	
-if(!mode.dj_lock)	{
+
 	if(mode.flow_hold_position>0//&&((fabs(except_A_SB[PITr])<3.5)&&(fabs(except_A_SB[ROLr])<3.5))
 			&&NAV_BOARD_CONNECT==1)//add by gol 2015.10.22
 			{
-				if(mode.en_circle_control){
-				if(circle.check){	
-					if(ALT_POS_SONAR2>0.2){
-					nav_angle_lft[PITr]=my_deathzoom_2(nav_circle[PITr],0.1);//  -nav_ukf_g[PIT];//nav[PIT];
-					nav_angle_lft[ROLr]=my_deathzoom_2(nav_circle[ROLr],0.1);// nav_ukf_g[ROL];//nav[ROL];	
-					}
-					else
-					{
-					nav_angle_lft[PITr]=LIMIT(my_deathzoom_2(nav_circle[PITr],0.1),-3,3);//  -nav_ukf_g[PIT];//nav[PIT];
-					nav_angle_lft[ROLr]=LIMIT(my_deathzoom_2(nav_circle[ROLr],0.1),-3,3);// nav_ukf_g[ROL];//nav[ROL];	
-					}	
-				}
-				else
-					{if(ALT_POS_SONAR2>0.2){
-					nav_angle_lft[PITr]=my_deathzoom_2(nav[PITr],0.1);//  -nav_ukf_g[PIT];//nav[PIT];
-					nav_angle_lft[ROLr]=my_deathzoom_2(nav[ROLr],0.1);// nav_ukf_g[ROL];//nav[ROL];	
-					}
-					else if(ALT_POS_SONAR2>0.11)
-					{
-					nav_angle_lft[PITr]=LIMIT(my_deathzoom_2(nav[PITr],0.1),-3,3);//  -nav_ukf_g[PIT];//nav[PIT];
-					nav_angle_lft[ROLr]=LIMIT(my_deathzoom_2(nav[ROLr],0.1),-3,3);// nav_ukf_g[ROL];//nav[ROL];	
-					}
-					else
-					{
-					nav_angle_lft[PITr]=0;//LIMIT(-my_deathzoom(nav[PITr],0.5),-3,3);//  -nav_ukf_g[PIT];//nav[PIT];
-					nav_angle_lft[ROLr]=0;//LIMIT(-my_deathzoom(nav[ROLr],0.5),-3,3);// nav_ukf_g[ROL];//nav[ROL];	
-					}
-					}
-				}//---------------
-				else{
+			
 				if(ALT_POS_SONAR2>0.1){
 				nav_angle_lft[PITr]= my_deathzoom_2(nav[PITr],0.1);//  -nav_ukf_g[PIT];//nav[PIT];
 				nav_angle_lft[ROLr]= my_deathzoom_2(nav[ROLr],0.1);// nav_ukf_g[ROL];//nav[ROL];	
@@ -133,56 +89,30 @@ if(!mode.dj_lock)	{
 				nav_angle_lft[PITr]=0;//LIMIT(-my_deathzoom(nav[PITr],0.5),-3,3);//  -nav_ukf_g[PIT];//nav[PIT];
 				nav_angle_lft[ROLr]=0;//LIMIT(-my_deathzoom(nav[ROLr],0.5),-3,3);// nav_ukf_g[ROL];//nav[ROL];	
 				}
-				}
+				
 			}
-}
-else {//DJ mode
-	if(mode.flow_hold_position>0&&
-			((fabs(dj_sb)<2)&&(fabs(except_A_SB[ROLr])<3.5))
-			&&NAV_BOARD_CONNECT==1)//add by gol 2015.10.22
-			{
-			nav_angle_lft[PITr]=nav[PITr];
-			nav_angle_lft[ROLr]=nav[ROLr];	 
-			}
-}
 
-if((mode.rc_control_flow_spd||mode.rc_control_flow_pos)&&mode.flow_hold_position==2&&imu_nav.flow.rate>20){
-nav_angle[PITr] =   nav_angle_lft[PITr];//pid.nav.out.d*nav_angle[PITr]+(1-pid.nav.out.d ) * ( nav_angle_lft[PITr]  );//y
-nav_angle[ROLr] =   nav_angle_lft[ROLr] ;//pid.nav.out.d*nav_angle[ROLr]+(1-pid.nav.out.d ) * ( nav_angle_lft[ROLr]  );//x
-}
-else
-{
-if(fabs(except_A_SB[PITr])<2)//y
-	nav_angle[PITr] = nav_angle_lft[PITr];// pid.nav.out.d*nav_angle[PITr]+(1-pid.nav.out.d ) * ( nav_angle_lft[PITr]  );//y
-else
-	nav_angle[PITr] = 0;
 
-if(fabs(except_A_SB[ROLr])<2)//x
-	nav_angle[ROLr] = nav_angle_lft[ROLr] ;// pid.nav.out.d*nav_angle[ROLr]+(1-pid.nav.out.d ) * ( nav_angle_lft[ROLr]  );//x
-else
-	nav_angle[ROLr] = 0;
-}	
 
-	//-----------------ATT_PROTECTOR----------------------------------------
-	if(fabs(Pitch)>MAX_CTRL_ANGLE*1.5||fabs(Roll)>MAX_CTRL_ANGLE*1.5||ultra_distance<400)
-	dj_angle_set=0;
-	
-	
-	//---------DJ_CONTROL
-	if(mode.dj_lock){
-		dj_sb  += 6 *T *3.14f * ( except_A_SB_lft[PITr] - dj_sb );//fix by gol 2015.11.8
-	
-	  except_A_SB[PITr]  += 6 *T *3.14f * ( dj_angle_set - except_A_SB[PITr] );//fix by gol 2015.11.8
-		if(fabs(Pitch-dj_angle_set)>0.6)
-		dj_angle_set_out+= 10 *T *3.14f * ( LIMIT(Pitch,-SCALE_DJ*MAX_DJ_ANGLE,SCALE_DJ*MAX_DJ_ANGLE) - dj_angle_set_out);//fix by gol 2015.11.8  
-		dj_temp=-dj_sb+dj_angle_set_out-nav_angle[PITr];
+	if((mode.rc_control_flow_spd||mode.rc_control_flow_pos)&&mode.flow_hold_position==2&&imu_nav.flow.rate>20){
+	nav_angle[PITr] =   nav_angle_lft[PITr];//pid.nav.out.d*nav_angle[PITr]+(1-pid.nav.out.d ) * ( nav_angle_lft[PITr]  );//y
+	nav_angle[ROLr] =   nav_angle_lft[ROLr] ;//pid.nav.out.d*nav_angle[ROLr]+(1-pid.nav.out.d ) * ( nav_angle_lft[ROLr]  );//x
 	}
 	else
-	{ 
-		except_A_SB[PITr]  += scale_lf_sb *T*3.14f * ( except_A_SB_lft[PITr] - except_A_SB[PITr] );//fix by gol 2015.11.8
-		dj_angle_set_out=0;dj_temp=0;
-	}
+	{
+	if(fabs(except_A_SB[PITr])<2)//y
+		nav_angle[PITr] = nav_angle_lft[PITr];// pid.nav.out.d*nav_angle[PITr]+(1-pid.nav.out.d ) * ( nav_angle_lft[PITr]  );//y
+	else
+		nav_angle[PITr] = 0;
 
+	if(fabs(except_A_SB[ROLr])<2)//x
+		nav_angle[ROLr] = nav_angle_lft[ROLr] ;// pid.nav.out.d*nav_angle[ROLr]+(1-pid.nav.out.d ) * ( nav_angle_lft[ROLr]  );//x
+	else
+		nav_angle[ROLr] = 0;
+	}	
+
+
+		
   static u8 flow_pos_set_state;
 	static u16 cnt_flow_set_pos;
 	switch(flow_pos_set_state)
@@ -282,32 +212,15 @@ else
 	*/
 	except_AR.x=except_AR.x*cos2+sin2*except_AR.y;
 	except_AR.y=except_AR.y*cos2+sin2*except_AR.x;
-//------------------------angle output	--------------------------------------------
-	
-		//DJ Smooth
-	
-	dj_angle += ( 1 / ( 1 + 1 / ( 6 *3.14f*0.02 ) ) ) *((dj_temp)- dj_angle) ;
-	
-	DJ_offset_save();
-	//DJ Out
-//	Set_DJ(LIMIT(dj_angle,-MAX_DJ_ANGLE,MAX_DJ_ANGLE)+dj_angle_offset[0],
-//	LIMIT(Pitch,-90,90),
-//	-LIMIT(Roll,-90,90)+dj_angle_offset[2],
-//	-LIMIT(dj_angle,-MAX_DJ_ANGLE,MAX_DJ_ANGLE)-dj_angle_offset[1]
-//	);
 
-	//---------END DJ
   if((mode.rc_control_flow_spd||mode.rc_control_flow_pos)&&mode.flow_hold_position>0){
 	except_A.x=limit_mine(nav_angle[ROLr],MAX_CTRL_ANGLE);	
 	except_A.y=limit_mine(nav_angle[PITr],MAX_CTRL_ANGLE);
 	}
 	else
 	{
-	except_A.x=limit_mine(nav_angle[ROLr]+except_AR.x,MAX_CTRL_ANGLE);	
-	if(!mode.dj_lock)
-	except_A.y=limit_mine(nav_angle[PITr]+except_AR.y,MAX_CTRL_ANGLE);	
-	else
-	except_A.y=limit_mine(except_AR.y,MAX_CTRL_ANGLE);
+	except_A.x=limit_mine(except_AR.x+nav_angle[ROLr],MAX_CTRL_ANGLE);	
+	except_A.y=limit_mine(except_AR.y+nav_angle[PITr],MAX_CTRL_ANGLE);
 	}	
 	
 	
@@ -336,19 +249,28 @@ else
 	 ctrl_angle_offset.y=off_temp[1];}	
 	
 	//-----------------------------------ATT PID  TUNING--------------------------
-
+#define TUNING_X 0
 	if(mode.att_pid_tune)
 	{
-	if(KEY_SEL[0])//TRIG
+	if(KEY_SEL[0])//TRIG for tuning
+	#if TUNING_X	
 	except_A.x=-15;
+	#else
+	except_A.y=15;
+	#endif
 	else
+	#if TUNING_X	
   except_A.x=LIMIT(except_A.x,-15,15);	
+	#else
+	except_A.y=LIMIT(except_A.y,-15,15);	
+	#endif
 	cal_ero_outter_px4(); 
   ctrl_2.err.x =  my_deathzoom_2(ero_angle_px4[0],0.0);
 	ctrl_2.err.y =  my_deathzoom_2(ero_angle_px4[1],0.0);
 	ctrl_2.err.z =  my_deathzoom_2(LIMIT(To_180_degrees( ctrl_angle_offset.z + except_A.z - Yaw	 ),-YAW_ERO_MAX,YAW_ERO_MAX),0.5);//*LIMIT(ero_angle_px4[3],0.5,1);
 	}
-	else{	cal_ero_outter_px4(); 
+	else{	
+	cal_ero_outter_px4(); 
   /* 得到角度误差 */
 	if(mode.use_px4_err){
   ctrl_2.err.x =  my_deathzoom_2(ero_angle_px4[0],0.0);
@@ -392,64 +314,12 @@ else
 	else
 		flag_yaw_out=0;
 
-float Cpmin=0.3	;//P cut rate 0.2~0.4
-float M1=5;//angle _dead
-if(mode.hunman_pid)
-{
-if(ctrl_2.err.x<M1)
-px=(1-(1-Cpmin)*exp(-1*fabs(ctrl_2.err.x)))*ctrl_2.PID[PIDROLL].kp;
-else
-px=	ctrl_2.PID[PIDROLL].kp;
-if(
-	((ctrl_2.err.x - ctrl_2.err_old.x)*ctrl_2.err.x)>0
-||((ctrl_2.err.x - ctrl_2.err_old.x)==0&&(ctrl_2.err.x)!=0)
-)
-ix=ctrl_2.PID[PIDROLL].ki;
-else
-ix=0;	
 
+	px=py=ctrl_2.PID[PIDROLL].kp;
+	ix=iy=ctrl_2.PID[PIDROLL].ki;
+	d=ctrl_2.PID[PIDROLL].kd;	
 
-if(ctrl_2.err.y<M1)
-py=(1-(1-Cpmin)*exp(-1*fabs(ctrl_2.err.y)))*ctrl_2.PID[PIDROLL].kp;
-else
-py=	ctrl_2.PID[PIDROLL].kp;
-if(((ctrl_2.err.y - ctrl_2.err_old.y)*ctrl_2.err.y)>0
-||((ctrl_2.err.y - ctrl_2.err_old.y)==0&&(ctrl_2.err.y)!=0))
-iy=ctrl_2.PID[PIDROLL].ki;
-else
-iy=0;	
-
-d=ctrl_2.PID[PIDROLL].kd;
-ix_v=ix;
-ix=iy=ctrl_2.PID[PIDROLL].ki;
-#if PLANE_IS_BIG
-px_v=px=LIMIT(px,0.6,1);
-py=LIMIT(py,0.6,1);
-#else
-px_v=px=LIMIT(px,0.15,0.5);
-py=LIMIT(py,0.15,0.5);
-#endif
-}
-else
-{
-px=py=ctrl_2.PID[PIDROLL].kp;
-ix=iy=ctrl_2.PID[PIDROLL].ki;
-d=ctrl_2.PID[PIDROLL].kd;	
-}	
 //----------------------------------------ESO FORWARD FEEDBACK-------------------------------
-		if(!mode.use_dji){
-	
-	ESO_3N(&eso_att_outter[PITr],except_A.y,Pitch,0,0.01,6); 
-	ESO_3N(&eso_att_outter[ROLr],except_A.x,Roll,0,0.01,6); 
-	ESO_3N(&eso_att_outter[YAWr],except_A.z,Yaw,0,0.01,6);
-if(0){//mode.en_eso){
-	if(SPID.YI!=0)eso_att_outter[PITr].n=eso_att_outter[ROLr].n=eso_att_outter[YAWr].n=SPID.YI;
-  ctrl_2.err.x -=(eso_att_outter[ROLr].disturb)*flag_eso;  
-	ctrl_2.err.y -=(eso_att_outter[PITr].disturb)*flag_eso;    
-	//if(!mode.att_pid_tune)
-	//ctrl_2.err.z -=eso_att_outter[YAWr].disturb;    
-}
-
 	/* 计算角度误差权重 */
 	ctrl_2.err_weight.x = ABS(ctrl_2.err.x)/ANGLE_TO_MAX_AS;
 	ctrl_2.err_weight.y = ABS(ctrl_2.err.y)/ANGLE_TO_MAX_AS;
@@ -467,7 +337,7 @@ if(0){//mode.en_eso){
 	ctrl_2.err_i.x +=ix  *ctrl_2.err.x *T;
 	ctrl_2.err_i.y +=iy  *ctrl_2.err.y *T;
 	ctrl_2.err_i.z += ctrl_2.PID[PIDYAW].ki 	*ctrl_2.err.z *T;
-	/* 角度误差积分分离 *///Thr_Weight=1;
+	/* 角度误差积分分离 */
 	ctrl_2.eliminate_I.x = Thr_Weight *CTRL_2_INT_LIMIT;
 	ctrl_2.eliminate_I.y = Thr_Weight *CTRL_2_INT_LIMIT;
 	ctrl_2.eliminate_I.z = Thr_Weight *CTRL_2_INT_LIMIT;
@@ -479,11 +349,6 @@ if(0){//mode.en_eso){
 	ctrl_2.err.x = LIMIT( ctrl_2.err.x, -90, 90 );
 	ctrl_2.err.y = LIMIT( ctrl_2.err.y, -90, 90 );
 	ctrl_2.err.z = LIMIT( ctrl_2.err.z, -90, 90 );
-	//---------------------NEURO PID------------------------------
-	//NEURON_PID(&neuron_pid_outter[PITr],ctrl_2.err.y ,except_A.y,10, T);
-	//NEURON_PID(&neuron_pid_outter[ROLr],ctrl_2.err.x ,except_A.x,10, T);
-	//NEURON_PID_LQ(&neuron_pid_outter[PITr],ctrl_2.err.y ,except_A.y,10, T);NEURON_PID(&neuron_pid_outter[ROLr],ctrl_2.err.y ,except_A.y,7.5, T);
-	//NEURON_PID_LQ(&neuron_pid_outter[ROLr],ctrl_2.err.x ,except_A.x,10, T);
 	//---------------------SELF DISTURB------------------------------
 	ATT_CONTRL_OUTER_ESO_3(&eso_att_outter_c[PITr],except_A.y,Pit_fc,ctrl_2.out.y,T,20,ctrl_2.err.y);
 	ATT_CONTRL_OUTER_ESO_3(&eso_att_outter_c[ROLr],except_A.x,Rol_fc,ctrl_2.out.x,T,20,ctrl_2.err.x);
@@ -492,12 +357,8 @@ if(0){//mode.en_eso){
 	float x_out,y_out;
 	x_out=px*( ctrl_2.err.x + ctrl_2.err_d.x + ctrl_2.err_i.x );
 	y_out=py*( ctrl_2.err.y + ctrl_2.err_d.y + ctrl_2.err_i.y );
-	w_neuro[0]=1;//LIMIT(AWDF_R(neuron_pid_outter[ROLr].u,x_out),0,0.5);
-	w_neuro[1]=1;//LIMIT(AWDF_P(neuron_pid_outter[PITr].u,y_out),0,0.5);
 //-----------------------------------CONTROL OUT SEL---------------------	
 	if(eso_att_outter_c[PITr].b0!=0){
-	//ctrl_2.out.x= neuron_pid_outter[ROLr].u*w_neuro[0]+(1-w_neuro[0])*x_out;
-	//ctrl_2.out.y=	neuron_pid_outter[PITr].u*w_neuro[1]+(1-w_neuro[1])*y_out;
 	ctrl_2.err_i.x=ctrl_2.err_i.y=ctrl_2.err_i.z=0;
 	ctrl_2.out.x= (eso_att_outter_c[ROLr].u+px  *( ctrl_2.err_d.x ));//*w_neuro[0]+(1-w_neuro[0])*x_out;
 	ctrl_2.out.y=	(eso_att_outter_c[PITr].u+py  *( ctrl_2.err_d.y ));//*w_neuro[1]+(1-w_neuro[1])*y_out;
@@ -512,7 +373,7 @@ if(0){//mode.en_eso){
 	ctrl_2.err_old.x = ctrl_2.err.x;
 	ctrl_2.err_old.y = ctrl_2.err.y;
 	ctrl_2.err_old.z = ctrl_2.err.z;
-}
+
   
 }
 
@@ -556,17 +417,6 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 	ctrl_1.err.y =  ( except_AS.y + mpu6050.Gyro_deg.y ) *(300.0f/MAX_CTRL_ASPEED);  //-y
 	ctrl_1.err.z =  ( except_AS.z + mpu6050.Gyro_deg.z ) *(300.0f/MAX_CTRL_ASPEED);	 //-z
 //----------------------------------ESO-----------------------------		
-//	ESO_2N(&eso_att_inner[PITr],except_AS.y,mpu6050.Gyro_deg.y,0,0.005,50); 
-//	ESO_2N(&eso_att_inner[ROLr],except_AS.x,-mpu6050.Gyro_deg.x,0,0.005,50); 
-//	ESO_2N(&eso_att_inner[YAWr],except_AS.z,mpu6050.Gyro_deg.z,0,0.005,50);
-  
-if(0){//mode.en_fuzzy_angle_pid){//mode.en_eso){
-	if(SPID.YI!=0)eso_att_inner[PITr].n=eso_att_inner[ROLr].n=eso_att_inner[YAWr].n=SPID.YI;
-  ctrl_1.err.x +=eso_att_inner[ROLr].disturb;  
-	ctrl_1.err.y +=eso_att_inner[PITr].disturb;    
-	//if(!mode.att_pid_tune)
-	ctrl_1.err.z +=eso_att_inner[YAWr].disturb;    
-}
 	
 	/* 角速度误差权重 */
 	ctrl_1.err_weight.x = ABS(ctrl_1.err.x)/MAX_CTRL_ASPEED;
@@ -613,7 +463,11 @@ if(0){//mode.en_fuzzy_angle_pid){//mode.en_eso){
 	if(mode.att_pid_tune)
 	{	
 	ctrl_1.out.z=0;
+	#if TUNING_X		
 	ctrl_1.out.y=0;	
+	#else
+	ctrl_1.out.x=0;		
+	#endif
 	}
 	//if(mode.en_h_inf)
 	//All_Out(ctrl_inf_att_out,0,0);	

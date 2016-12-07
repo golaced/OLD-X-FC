@@ -5,9 +5,9 @@
 /*
 W1d =
  
-  100 (z-0.99]
+  100 (z-0.99£©
   ------------
-     (z-1]
+     (z-1£©
  
 Sample time: 0.01 seconds
 Discrete-time zero/pole/gain model.

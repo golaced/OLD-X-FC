@@ -174,17 +174,14 @@ void pos_task(void *pdata)
 	;//GPS_calc_poshold(0.01*2);//光流GPS定点
 	
  }
-	if(cnt1++>5-1){cnt1=0;
-	if(!mode.use_dji)
-	circle_control(0.01*2);//图像目标跟踪 未使用
- }
+	
+ 
 	if(cnt2++>0.01*10&&mode.en_sonar_avoid){cnt2=0;
 		;//oldx_avoid();  //避障 未使用
 	}
 	
   Positon_control(F_POS/1000.);//     光流定点 
 		
-	
 	delay_ms(F_POS);
 	}
 }		
@@ -197,7 +194,6 @@ void nrf_task(void *pdata)
 	u8 i;
  	while(1)
 	{
-		//GET_T_INNER_TIM_USE1 = Get_Cycle_T(GET_T_INNER_TIM_USE); 	
 		 if(cnt_loss_nrf++>1500/50){cnt_loss_nrf=1500/50+1;loss_nrf=1;}
 		 if(imu_loss_cnt++>1500/50){imu_loss_cnt=1500/50+1;NAV_BOARD_CONNECT=0;}
 	
@@ -390,7 +386,7 @@ void uart_task(void *pdata)
 											{
 											case 0://BMP UKF
 											data_per_uart1(
-											baroAlt/10,baroAlt_fc/10,ALT_POS_BMP_UKF_OLDX*100,
+											ALT_POS_SONAR2*100,baroAlt_fc/10,ALT_POS_BMP_UKF_OLDX*100,
 											ALT_VEL_BMP_UKF_OLDX*100,ALT_VEL_BMP_EKF*100,wz_speed/10,
 											0*100,ALT_VEL_BMP_UKF_OLDX*100,0,
 											//-accz_bmp*100,baro_matlab_data[1]/10,0*100,
@@ -407,12 +403,6 @@ void uart_task(void *pdata)
 											0,-ALT_VEL_BMP*100,0,  
 											Yaw*10,0,0,
 											(int16_t)(yaw_mag_view[0]*10.0),(int16_t)(yaw_mag_view[1]*10.0),(int16_t)(yaw_mag_view[2]*10),0/10,0,0/10,0*0);break;	
-//											case 3://NEURON PID
-//											data_per_uart1(
-//											0,ctrl_2.out.y*10,0,
-//											0,neuron_pid_outter[PITr].u*10,0,  
-//											0,neuron_pid_outter[ROLr].u*10,0,
-//											(int16_t)(thr_in_view*10.0),(int16_t)(thr_use*10.0),(int16_t)(ALT_POS_SONAR2*1000),0/10,0,0/10,0*0);break;	
 											case 4://ESO PID OUT
 											data_per_uart1(
 											0,ctrl_2.out.y*10,0,
@@ -473,12 +463,6 @@ void uart_task(void *pdata)
 											0,0,ALT_POS_SONAR2*1000,  
 											0,ultra_ctrl_out_use,ultra_speed,
 											(int16_t)(fRPY[2]*10.0),(int16_t)(eso_att_inner_c[THRr].v1*10.0),(int16_t)(0*10),0/10,0,0/10,0*0);break;
-//											case 15://DJI_RC
-//											data_per_uart1(
-//											0,DJI_RC[1],DJI_RC[0],
-//											0,inner_loop_time_time*10000,DJI_RC[2],  
-//											0,0,DJI_RC[3],
-//											(int16_t)(fRPY[2]*10.0),(int16_t)(eso_att_inner_c[THRr].v1*10.0),(int16_t)(0*10),0/10,0,0/10,0*0);break;
 											case 16://SONAR
 											data_per_uart1(
 											0,0,ultra_distance,
@@ -527,19 +511,18 @@ void uart_task(void *pdata)
 											0,ultra_speed/10,ultra_ctrl_out_use/10,
 											0,0,0,
 											(int16_t)(Yaw*10),(int16_t)(Pitch*10.0),(int16_t)(Roll*10.0),thr_test,0,0/10,0);break;
-											case 25://TRIG PID TUNNING 
-											data_per_uart1(
-											0,0,VEL_UKF_Y*1000,
-											0,0,VEL_UKF_X*1000,
-											0,acc_body[1]*100,0,
-											(int16_t)(Yaw*10),(int16_t)(Pitch*10.0),(int16_t)(Roll*10.0),thr_test,0,0/10,0);break;
 											case 24://TRIG PID TUNNING 
 											data_per_uart1(
 											yaw_mag_view[4]*10,yaw_mag_view[0]*10,yaw_mag_view[1]*10,
 											yaw_mag_view[3]*10,0,0,
 											X_kf_yaw[0]*10,yaw_kf*10,0,
 											(int16_t)(Yaw_fc*10),(int16_t)(Pitch*10.0),(int16_t)(Roll*10.0),thr_test,0,0/10,0);break;
-											
+											case 25://TRIG PID TUNNING 
+											data_per_uart1(
+											0,0,VEL_UKF_Y*1000,
+											0,0,VEL_UKF_X*1000,
+											0,acc_body[1]*100,0,
+											(int16_t)(Yaw*10),(int16_t)(Pitch*10.0),(int16_t)(Roll*10.0),thr_test,0,0/10,0);break;
 											default:break;
 											}
 										}

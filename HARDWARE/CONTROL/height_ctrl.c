@@ -49,45 +49,12 @@ float wz_acc;
 float adrc_out;
 void Ultra_PID_Init()
 {
-		switch(mcuID[0]){
-		case DRONE_330_ID://300
-						 HOLD_THR =450+50; 
-		break;
-		case DRONE_350_ID://450
-						 HOLD_THR =500+50; 
-		break;
-		default: HOLD_THR =450;//《--------------------修改悬停油门  根据不同飞行器动力和重量实验 
-		break;
-		}
+
+		HOLD_THR =450;//《--------------------修改悬停油门  根据不同飞行器动力和重量实验 
 	//-------------------外环PID参数初始化
-	#if defined(ZHOU_550)//-----------------------------------------550----------------------------------	
-	ultra_pid.kp = 1.25;//1 //0.4;//1.8;//1.65;//1.5;   WT
-	ultra_pid.ki = 0.00;//1;//101;//add
-	ultra_pid.kd = 0.0;//0;
-	#elif defined(ZHOU_300)
-		switch(mcuID[0]){
-		case DRONE_330_ID://300
-		ultra_pid.kp = 1.25;
-		ultra_pid.kd = 0.5;
-		ultra_pid.ki = 0.01;
-		/*
-		ultra_pid.kp = 0.6;//1 //0.4;//1.8;//1.65;//1.5;   WT
-		ultra_pid.ki = 0.01;//1;//101;//add
-		ultra_pid.kd = 0.0;//0;*/
-		break;
-		case DRONE_350_ID://450
-		ultra_pid.kp = 0;//0.42;//1 //0.4;//1.8;//1.65;//1.5;   WT
-		ultra_pid.ki = 0;//0.01;//1;//101;//add
-		ultra_pid.kd = 0.0;//0;
-		break;
-		default://<---------------------在这修改
 		ultra_pid.kp = 0.88;
 		ultra_pid.ki = 0.05;		
 		ultra_pid.kd = 1.2;
-		break;
-		}
-
-	#endif
 //------------------安全模式 只有速度环
   ultra_pid_safe.kp = 0;//0.45;//50.0;//1.8;//1.65;//1.5;
 	ultra_pid_safe.ki = 0.0;//1;//add
@@ -97,49 +64,13 @@ void Ultra_PID_Init()
   
 void WZ_Speed_PID_Init()
 {//use
-	#if defined(ZHOU_550)//---------------------------------内环参数初始化-----------------------------	
-	wz_speed_pid.kp = 0.3;//1.25;//0.3;//0.25;//0.5;//0.3; 
-	wz_speed_pid.ki = 0.2;//1.4;//0.08;//0.5; 
-	wz_speed_pid.kd = 1.0;//0.5;//8;//1.5;
-  #elif defined(ZHOU_300)	
-		switch(mcuID[0]){
-		case DRONE_330_ID://300
-		wz_speed_pid.kp = 0.3;//1.25;//0.3;//0.25;//0.5;//0.3; 
-		wz_speed_pid.ki = 0.1;//225;//1.4;//0.08;//0.5; 
-		wz_speed_pid.kd = 1.2;//0.5;//8;//1.5;
-		break;
-		case DRONE_350_ID://450
-		wz_speed_pid.kp = 0.225;//1.25;//0.3;//0.25;//0.5;//0.3; 
-		wz_speed_pid.ki = 0.1;//225;//1.4;//0.08;//0.5; 
-		wz_speed_pid.kd = 1.0;//0.5;//8;//1.5;
-		break;
-		default:	//<----------------------在这修改
 	  wz_speed_pid.kp = 0.35;//1.25;//0.3;//0.25;//0.5;//0.3; 
 		wz_speed_pid.ki = 0.1;//225;//1.4;//0.08;//0.5; 
 		wz_speed_pid.kd = 2.0;//0.5;//8;//1.5;
-		break;
-		}
-
-	#endif
 	//------------------------------安全模式PID初始化
-		switch(mcuID[0]){
-		case DRONE_330_ID://300
-		wz_speed_pid_safe.kp = 0.3;//120.4;//0.5;//0.3; 
-		wz_speed_pid_safe.ki = 0.1;//45.5; 
-		wz_speed_pid_safe.kd = 1.2; 
-		break;
-		case DRONE_350_ID://450
-	  wz_speed_pid_safe.kp = 0.3;//120.4;//0.5;//0.3; 
-		wz_speed_pid_safe.ki = 0.1;//45.5; 
-		wz_speed_pid_safe.kd = 1.4;
-		break;
-		default:	//<----------------------在这修改
 		wz_speed_pid_safe.kp = 0.35;//120.4;//0.5;//0.3; 
 		wz_speed_pid_safe.ki = 0.1;//45.5; 
 		wz_speed_pid_safe.kd = 2.0; 
-		break;
-		}
-
 }
 
 #define BARO_SPEED_NUM 50
@@ -182,33 +113,6 @@ static u16 cnt,cnt1;
 // else
  	height_ctrl_mode_use=height_ctrl_mode;//现在直接通过遥控器切换
 }
-float acc_sonar[2]={0.4,0.1};
-float bmp_speed_ano(float T,float spd_in){//未使用
-	static float lpf_tmp,hc_speed_i,hc_speed_i_2,wz_speed_0,wz_speed_1,wz_speed_2,wz_speed_old,hc_acc_i;
-	float wz_acc_mms22;
-
-		wz_acc_mms22 = (wz_acc/4096.0f) *10000 + hc_acc_i;//9800 *T;
-
-
-	wz_speed_0 += my_deathzoom( (wz_acc_mms22 ) ,50) *T;
-	
-	hc_acc_i += acc_sonar[0] *T *( (wz_speed - wz_speed_old)/T - wz_acc_mms22 );
-	hc_acc_i = LIMIT( hc_acc_i, -500, 500 );	
-	
-	wz_speed_0 += ( 1 / ( 1 + 1 / ( acc_sonar[1] *3.14f *T ) ) ) *( spd_in - wz_speed_0  ) ;
-	
-	wz_speed_1 = wz_speed_0;
-	
-	if( ABS( wz_speed_1 ) < 25 )
-	{
-		wz_speed_1 = 0;
-	}
-	
-	wz_speed_old = wz_speed;
-	
-	return wz_speed = wz_speed_1;
-}
-
 float sonar_spd;
 u8 BARO_HIHG_NUM=1;//10;//30;
 float baro_h_arr[100 + 1];
@@ -251,7 +155,6 @@ void Height_Ctrl(float T,float thr)
 				height_mode_switch();
 	
 	    if( hs_ctrl_cnt++>=(float)(H_INNER-off_inner)/(t_h*1000))//PA
-			//if(hs_ctrl_cnt++>=hs_ctrl_cnt_max[1])//100ms
 			{  //----------------------mode switch----------------------
 				in_timer_high=Get_Cycle_T(GET_T_HIGH_CONTROL_I);hs_ctrl_cnt=0;
 				if(height_mode_reg==1&&height_ctrl_mode_use==2)//SONAR<-BMP
@@ -291,7 +194,6 @@ void Height_Ctrl(float T,float thr)
 				    exp_spd_zv=EXP_Z_SPEED;//调试用
 					
 						Moving_Average( (float)( baro_alt_speed_ano ),baro_speed_arr,BARO_SPEED_NUM, baro_cnt ,&ano_temp ); //单位mm/s
-						baro_speed_ano=bmp_speed_ano(in_timer_high,baro_alt_speed_ano);
 						int ultra_sp_tmp;
 						 #if EN_ATT_CAL_FC
 						 ultra_sp_tmp=Moving_Median(2,mid_usp,my_deathzoom_2((-ALT_VEL_BMP_UKF_OLDX)*1000,25));//my_deathzoom_2(ALT_VEL_BMP*1000,50);//Moving_Median(2,5,my_deathzoom_2(ALT_VEL_BMP*1000,50));	 
@@ -373,37 +275,6 @@ int out;
 	}
 return out;
 }	
-
-float wz_speed1;
-float k_acc_z[2]={0.4,0.3};
-float cal_acc_z(int wz_acc,float h_speed,float T)//匿名飞控计算垂直加速度 未使用
-{ static float wz_acc_mms;
-	static float hc_acc_i,wz_speed_0,wz_speed_1;
-	static float wz_speed_old1;
-  //static float wz_speed1;
-	if(!fly_ready)
-		wz_speed_0=hc_acc_i=0;
-	wz_acc_mms = (wz_acc/4096.0f) *10000 + hc_acc_i;//9800 *T;
-  
-	wz_speed_0 += my_deathzoom( (wz_acc_mms) ,70) *T;
-	
-	hc_acc_i += k_acc_z[0]*T *( (wz_speed1 - wz_speed_old1)/T - wz_acc_mms );
-	hc_acc_i = LIMIT( hc_acc_i, -500, 500 );	
-	
-	wz_speed_0 += ( 1 / ( 1 + 1 / ( k_acc_z[1] *3.14f *T ) ) ) *( h_speed - wz_speed_0  ) ;
-	
-	wz_speed_1 = wz_speed_0;
-	
-	if( ABS( wz_speed_1 ) < 25 )
-	{
-		wz_speed_1 = 0;
-	}
-	
-	wz_speed_old1 = wz_speed1;
-	
-	wz_speed1 = wz_speed_1;
-	return wz_acc_mms;
-}
 ///test 
 float k_d=1;
 float p1=0.4,p2=0.1;//0.35;//0.3;//WT
@@ -419,8 +290,7 @@ float height_thr;
 float wz_acc_mms21;
 static float lpf_tmp,hc_speed_i,hc_speed_i_2,wz_speed_0,wz_speed_1,wz_speed_2,hc_acc_i;
 	wz_acc_mms2 = (wz_acc_ukf/4096.0f) *9800;//-acc_bais*1000;//+ALT_BIAS_BMP*1000 ;
-	wz_acc_mms21 = cal_acc_z(wz_acc_ukf,h_speed,T);
-	//wz_acc_mms2=   -accz_bmp*1000;//修正加速度
+
 	if(!fly_ready)wz_speed_pid_v.err_i=0;
 	height_thr = LIMIT( ALT_HOLD_THR_RANGE_SCALE * thr , 0, HOLD_THR );
 	//height_thr = Thr_down_min_portect(height_thr,T);//add by gol 16.3.28 (WT)
@@ -440,12 +310,10 @@ static float lpf_tmp,hc_speed_i,hc_speed_i_2,wz_speed_0,wz_speed_1,wz_speed_2,hc
 	
 	HIGH_CONTROL_SPD_ESO(&eso_att_inner_c[THRr],exp_z_speed,wz_speed,eso_att_inner_c[THRr].u,T,400);//速度环自抗扰控制
 	
-	if(mode.en_eso_h_in&&!mode.height_safe){
-	
+	if(mode.en_eso_h_in&&!mode.height_safe){//ADRC
 	wz_speed_pid_v.pid_out=thr_lpf + Thr_Weight *LIMIT(wz_speed_pid_use.kp*1 *LIMIT(exp_z_speed,-250,250)+eso_att_inner_c[THRr].u + wz_speed_pid_v.err_d ,-400,400);
 	}
-	else if(mode.en_hinf_height_spd&&!mode.height_safe){//鲁棒控制  未使用
-		
+	else if(mode.en_hinf_height_spd&&!mode.height_safe){//鲁棒控制  未使用	
 	//wz_speed_pid_v.pid_out=thr_lpf + Thr_Weight *LIMIT(wz_speed_pid_use.kp*0.35 *LIMIT(exp_z_speed,-250,250)+ h_inf_height_spd_out((float)exp_z_speed/1000,(float)wz_speed/1000) ,-400,400);
 	}
   else{

@@ -17,8 +17,6 @@ float fst2(float x1,float x2,float w, float h)
 	float d=0;
 	float d0=0;//dead
 	float sy,sa;
-	//float flag_y=0;
-	//float flag_a=0;
 	
 	d=w*h*h;
 	a0=h*x2;
@@ -39,8 +37,6 @@ float fst(float x1,float x2,float w, float h)
 	float fhan=0;
 	float d=0;
 	float d0=0;//dead
-	//float flag_y=0;
-	//float flag_a=0;
 	
 	d=w*h;
 	d0=h*d;
@@ -52,8 +48,6 @@ float fst(float x1,float x2,float w, float h)
 	else
 		a=x2+td_y/h;
 		
-	//if(a>0) flag_a=1;
-	//else 	flag_a=-1;	
 	if (fabs(a)>d)
 		fhan=-w*sign(a);
 	else
@@ -62,12 +56,7 @@ float fst(float x1,float x2,float w, float h)
 }
 float fal(float e,float alfa,float delta)
 {
-	//float flag_e=0.0;
 	float y=0.0;
-	//if(e>0) flag_e=1.0;
-	//if(e<0) flag_e=-1.0;
-	//if(e==0) flag_e=0.0;
-
 	if(fabs(e)>delta) y=pow(fabs(e),alfa)*sign(e);
 	else			  y=e/pow(delta,1.0-alfa);
 	return(y);	
@@ -139,7 +128,7 @@ float ESO_3N(ESO *eso_in,float v,float y,float u,float T,float MAX)             
 	return eso_in->disturb=LIMIT(eso_in->z[2]/eso_in->n,-MAX,MAX);
 }  
 
-float K_ESO_D=0.0;
+
 float ESO_CONTROL(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4)
 {static float e0,e1,e2;
 if(mode.use_px4_err)
@@ -158,22 +147,7 @@ e2=eso_in->v2-eso_in->z[1];
 }
 e0+=eso_in->e;//*T;
 
-	//switch(eso_in->out_mode)
-	{
-//		case 0:eso_in->u=//LIMIT( eso_in->KI*e0, -Thr_Weight *CTRL_2_INT_LIMIT,Thr_Weight *CTRL_2_INT_LIMIT )
-//										eso_in->KP*e1;
-//										//+eso_in->KD*e2;
-//										break;
-//		case 1:
-		eso_in->u=eso_in->KP*fal(e1,eso_in->alfa1,eso_in->tao);//+eso_in->KD*K_ESO_D*fal(e2,eso_in->alfa2,eso_in->tao);//-LIMIT( eso_in->KI*fal(e0,eso_in->alfa0,eso_in->tao), -Thr_Weight *CTRL_2_INT_LIMIT,Thr_Weight *CTRL_2_INT_LIMIT )
-										
-										//+eso_in->KD*e2;
-//										break;
-//	  case 2:eso_in->u=-fst2(e1,eso_in->c*e2,eso_in->r1,eso_in->h1);break;
-//		case 3:eso_in->u=LIMIT( eso_in->KI*e0, -Thr_Weight *CTRL_2_INT_LIMIT,Thr_Weight *CTRL_2_INT_LIMIT )
-//											-fst2(e1,e2,eso_in->r1,eso_in->h1);break;
-	}
-	
+	eso_in->u=eso_in->KP*fal(e1,eso_in->alfa1,eso_in->tao);
 	if(eso_in->b0!=0){
   switch(eso_in->level){
 		case 1:eso_in->disturb_u=eso_in->z[1]/eso_in->b0;break; 
@@ -198,22 +172,7 @@ e2=eso_in->v2-eso_in->z[1];
 }
 e0+=eso_in->e;//*T;
 
-	//switch(eso_in->out_mode)
-	{
-//		case 0:eso_in->u=//LIMIT( eso_in->KI*e0, -Thr_Weight *CTRL_2_INT_LIMIT,Thr_Weight *CTRL_2_INT_LIMIT )
-//										eso_in->KP*e1;
-//										//+eso_in->KD*e2;
-//										break;
-//		case 1:
-		eso_in->u=eso_in->KP*fal(LIMIT(To_180_degrees(e1),-YAW_ERO_MAX,YAW_ERO_MAX),eso_in->alfa1,eso_in->tao);//+eso_in->KD*K_ESO_D*fal(e2,eso_in->alfa2,eso_in->tao);//-LIMIT( eso_in->KI*fal(e0,eso_in->alfa0,eso_in->tao), -Thr_Weight *CTRL_2_INT_LIMIT,Thr_Weight *CTRL_2_INT_LIMIT )
-										
-										//+eso_in->KD*e2;
-//										break;
-//	  case 2:eso_in->u=-fst2(e1,eso_in->c*e2,eso_in->r1,eso_in->h1);break;
-//		case 3:eso_in->u=LIMIT( eso_in->KI*e0, -Thr_Weight *CTRL_2_INT_LIMIT,Thr_Weight *CTRL_2_INT_LIMIT )
-//											-fst2(e1,e2,eso_in->r1,eso_in->h1);break;
-	}
-	
+	eso_in->u=eso_in->KP*fal(LIMIT(To_180_degrees(e1),-YAW_ERO_MAX,YAW_ERO_MAX),eso_in->alfa1,eso_in->tao);
 	if(eso_in->b0!=0){
   switch(eso_in->level){
 		case 1:eso_in->disturb_u=eso_in->z[1]/eso_in->b0;break; 
@@ -223,10 +182,7 @@ e0+=eso_in->e;//*T;
 	}
 return  eso_in->u=LIMIT(eso_in->u+eso_in->integer,-MAX,MAX);
 }
-
-
-
-
+//姿态外环
 float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4)
 { if(!eso_in->init)
 	{
@@ -241,33 +197,18 @@ float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 	  eso_in->beta0=200;
 	  eso_in->beta1=600;//1/(3*pow(eso_in->h0,2));
     eso_in->beta2=2000;//2/(64*pow(eso_in->h0,2));	
-		#else
-//		eso_in->beta0=100;
-//	  eso_in->beta1=300;//1/(3*pow(eso_in->h0,2));
-//    eso_in->beta2=1000;//2/(64*pow(eso_in->h0,2));	
-			eso_in->beta0=1/(eso_in->h0);
-   	  eso_in->beta1=1/(30*pow(eso_in->h0,2));
-      eso_in->beta2=1000;//2/(64*pow(eso_in->h0,2));	
+		#else	
+		eso_in->beta0=1/(eso_in->h0);
+		eso_in->beta1=1/(30*pow(eso_in->h0,2));
+		eso_in->beta2=1000;//2/(64*pow(eso_in->h0,2));	
 		#endif
  //-------------反馈----------------
 	eso_in->out_mode=1;	
-		//-------liner    0
-		switch(eso_in->out_mode){
-			case 0:
-			//eso_in->KP=0.5;//
-			eso_in->KP=ctrl_2.PID[PIDROLL].kp*2;
-			//eso_in->KI=0;//ctrl_2.PID[PIDROLL].ki;	
-			//eso_in->KD=2.2;
-			eso_in->KD=ctrl_2.PID[PIDROLL].kd*4;
-			break;
-			case 1:
-			eso_in->KP=ctrl_2.PID[PIDROLL].kp*2;//ctrl_2.PID[PIDROLL].kp*2;
-    	eso_in->KI=0;//ctrl_2.PID[PIDROLL].ki;	
-	    eso_in->KD=ctrl_2.PID[PIDROLL].kd*4;//ctrl_2.PID[PIDROLL].kd/400;
-			break;
-			
-		}
-		//-------noliner  1
+	//-------liner    0
+	eso_in->KP=ctrl_2.PID[PIDROLL].kp*2;
+	eso_in->KI=0;
+	eso_in->KD=ctrl_2.PID[PIDROLL].kd*4;	
+	//-------noliner  1
 	eso_in->alfa0=0.25;
   eso_in->alfa1=0.75;
 	eso_in->alfa2=1.5;	
@@ -277,17 +218,7 @@ float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 	eso_in->r1=0.5/pow(eso_in->h0,2);
 	eso_in->h1=eso_in->h0*5;
 	//----------模型增益
-			switch(mcuID[0]){
-		case 3145777://300
-						  eso_in->b0=10;		
-		break;
-		case 2818103://450
-						  eso_in->b0=10;//15;		
-		break;
-		default:  eso_in->b0=100;		
-		break;
-		}
-
+	 eso_in->b0=100;		
 	}  
 	#if ESO_PARA_USE_REAL_TIME
 	    eso_in->h0=T;
@@ -311,7 +242,7 @@ float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 	return eso_in->u;
 }
 
-
+//姿态航向
 float ATT_CONTRL_OUTER_ESO_3_Y(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4)//航向
 { if(!eso_in->init)
 	{
@@ -335,21 +266,9 @@ float ATT_CONTRL_OUTER_ESO_3_Y(ESO *eso_in,float v,float y,float u,float T,float
  //-------------反馈----------------
 	eso_in->out_mode=1;	
 		//-------liner    0
-		switch(eso_in->out_mode){
-			case 0:
-			//eso_in->KP=0.5;//
-			eso_in->KP=ctrl_2.PID[PIDYAW].kp*2;
-			//eso_in->KI=0;//ctrl_2.PID[PIDROLL].ki;	
-			//eso_in->KD=2.2;
-			eso_in->KD=ctrl_2.PID[PIDYAW].kd*4;
-			break;
-			case 1:
-			eso_in->KP=ctrl_2.PID[PIDYAW].kp*2;//ctrl_2.PID[PIDROLL].kp*2;
-    	eso_in->KI=0;//ctrl_2.PID[PIDROLL].ki;	
-	    eso_in->KD=ctrl_2.PID[PIDYAW].kd*4;//ctrl_2.PID[PIDROLL].kd/400;
-			break;
-			
-		}
+	eso_in->KP=ctrl_2.PID[PIDYAW].kp*2;
+	eso_in->KI=0;
+	eso_in->KD=ctrl_2.PID[PIDYAW].kd*4;
 		//-------noliner  1
 	eso_in->alfa0=0.25;
   eso_in->alfa1=0.75;
@@ -360,17 +279,7 @@ float ATT_CONTRL_OUTER_ESO_3_Y(ESO *eso_in,float v,float y,float u,float T,float
 	eso_in->r1=0.5/pow(eso_in->h0,2);
 	eso_in->h1=eso_in->h0*5;
 	//----------模型增益
-			switch(mcuID[0]){
-		case 3145777://300
-						  eso_in->b0=10;		
-		break;
-		case 2818103://450
-						  eso_in->b0=10;//15;		
-		break;
-		default:  eso_in->b0=100;		
-		break;
-		}
-
+		eso_in->b0=100;		
 	}
 		if(mode.att_pid_tune&&mode.en_pid_sb_set){
 	eso_in->KD=0.001*SPID.OD*4;
@@ -388,7 +297,7 @@ float ATT_CONTRL_OUTER_ESO_3_Y(ESO *eso_in,float v,float y,float u,float T,float
 	ESO_CONTROL_Y(eso_in,v, y, u, T, MAX,ero_px4);
 	return eso_in->u;
 }
-
+//姿态内环
 float ATT_CONTRL_INNER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float MAX)
 { if(!eso_in->init)
 	{
@@ -406,19 +315,9 @@ float ATT_CONTRL_INNER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
  //-------------反馈----------------
 	eso_in->out_mode=1;	
 		//-------liner    0
-		switch(eso_in->out_mode){
-			case 0:
-			eso_in->KP=ctrl_1.PID[PIDROLL].kp;
-			eso_in->KI=0;//ctrl_2.PID[PIDROLL].ki;	
-			eso_in->KD=ctrl_1.PID[PIDROLL].kd/40;
-			break;
-			case 1:
-			eso_in->KP=ctrl_1.PID[PIDROLL].kp*10;
-    	eso_in->KI=0;//ctrl_2.PID[PIDROLL].ki;	
-	    eso_in->KD=ctrl_1.PID[PIDROLL].kd;
-			break;
-			
-		}
+	eso_in->KP=ctrl_1.PID[PIDROLL].kp*10;
+	eso_in->KI=0;	
+	eso_in->KD=ctrl_1.PID[PIDROLL].kd;
 		//-------noliner  1
 	eso_in->alfa0=0.25;
   eso_in->alfa1=0.75;
@@ -446,6 +345,7 @@ float ATT_CONTRL_INNER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 
 
 //-----------------------------HEIGHT-ESO--------------------------------
+//高度内环
 float ESO_CONTROL_HEIGH(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4)
 {static float e0,e1,e2;
 
@@ -487,12 +387,9 @@ float HIGH_CONTROL_SPD_ESO(ESO *eso_in,float v,float y,float u,float T,float MAX
 	eso_in->r0=4000;//跟踪速度
   eso_in->h0=(float)H_INNER/1000;//滤波因子
  //-------------观测器
-//		eso_in->beta0=100;
-//	  eso_in->beta1=300;//1/(3*pow(eso_in->h0,2));
-//    eso_in->beta2=1000;//2/(64*pow(eso_in->h0,2));	
-			eso_in->beta0=1/(eso_in->h0);
-   	  eso_in->beta1=1/(30*pow(eso_in->h0,2));
-      eso_in->beta2=1000;//2/(64*pow(eso_in->h0,2));	
+	eso_in->beta0=1/(eso_in->h0);
+	eso_in->beta1=1/(30*pow(eso_in->h0,2));
+	eso_in->beta2=1000;	
  //-------------反馈----------------
 	eso_in->out_mode=1;	
 		//-------liner    0
@@ -523,9 +420,3 @@ float HIGH_CONTROL_SPD_ESO(ESO *eso_in,float v,float y,float u,float T,float MAX
 	return eso_in->u;
 }
 
-
-void ESO_BMP_INIT(ESO *eso_in)
-{ 		
-	eso_in->r0=1;//跟踪速度
-  eso_in->h0=0.03;//滤波因子
-}

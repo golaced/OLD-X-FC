@@ -483,19 +483,7 @@ u8 temp;
 						if(SPID.YP!=0)
 						att_tuning_thr_limit=SPID.YP;//  PID调试时油门限制
 						else
-						#if defined(ZHOU_550)
-						att_tuning_thr_limit=450;
-						#elif defined(ZHOU_300)	
-						switch(mcuID[0]){
-						case 3145777://300
 						att_tuning_thr_limit=450;	
-						break;
-						case 2818103://450
-						att_tuning_thr_limit=520;		
-						break;
-						default:att_tuning_thr_limit=450;	
-						break;}
-						#endif
 						}
 	
 						//------------7 6 5 4  |  3 2 1 0  KEY
@@ -517,7 +505,17 @@ u8 temp;
 				//			wz_speed_pid_safe.kd =   0.001*(float)SPID.ID;
 						}
 						else{//定点PID
+							nav_pos_pid.kp=0.001*(float)SPID.OP;//0.2;
+							nav_pos_pid.ki=0.001*(float)SPID.OI;//0.0;
+							nav_pos_pid.kd=0.001*(float)SPID.OD;//0.0;
+							nav_pos_pid.dead=(float)SPID.YI/1000.;//0.02;
 							
+							nav_spd_pid.f_kp=(float)SPID.YP/1000.;
+							nav_spd_pid.kp=0.001*(float)SPID.IP;//0.2;
+							nav_spd_pid.ki=0.001*(float)SPID.II;//0.01;
+							nav_spd_pid.kd=0.001*(float)SPID.ID;//0.05;
+							nav_spd_pid.dead=(float)SPID.YD;//20;
+							//-----------------OLD--------------------
 							pid.nav.out.p= 0.01*(float)SPID.OP;
 							pid.nav.out.i= 0.01*(float)SPID.OI;
 							pid.nav.out.d= 0.001*(float)SPID.OD;

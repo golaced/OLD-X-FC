@@ -10,6 +10,7 @@
       <TargetName>UCOSII-3</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pArmCC>5060183::V5.06 update 2 (build 183)::ARMCC</pArmCC>
       <pCCUsed>5060183::V5.06 update 2 (build 183)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
@@ -588,14 +589,19 @@
           <GroupName>HARDWARE</GroupName>
           <Files>
             <File>
-              <FileName>flash.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\DRIVER\flash.c</FilePath>
-            </File>
-            <File>
               <FileName>iic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\DRIVER\iic.c</FilePath>
+            </File>
+            <File>
+              <FileName>iic1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\DRIVER\iic1.c</FilePath>
+            </File>
+            <File>
+              <FileName>flash.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\DRIVER\flash.c</FilePath>
             </File>
             <File>
               <FileName>dma.c</FileName>
@@ -616,11 +622,6 @@
               <FileName>error.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\error.c</FilePath>
-            </File>
-            <File>
-              <FileName>iic1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\HARDWARE\DRIVER\iic1.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -738,6 +739,11 @@
           <GroupName>FUSHION</GroupName>
           <Files>
             <File>
+              <FileName>kf_oldx_yaw.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\HARDWARE\FUSHION\kf_oldx_yaw.lib</FilePath>
+            </File>
+            <File>
               <FileName>kf_oldx.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\HARDWARE\UKF_BARO\kf_oldx.lib</FilePath>
@@ -756,11 +762,6 @@
               <FileName>alt_kf.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\FUSHION\alt_kf.c</FilePath>
-            </File>
-            <File>
-              <FileName>kf_oldx_yaw.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\HARDWARE\FUSHION\kf_oldx_yaw.lib</FilePath>
             </File>
           </Files>
         </Group>

@@ -504,15 +504,16 @@ void Positon_control(float T)//     光流定点
 		nav_pos_pid.dead=0.02;
 		
 		
+		nav_spd_pid.f_kp=0.2;
 		nav_spd_pid.kp=0.2;
 		nav_spd_pid.ki=0.01;
 		nav_spd_pid.kd=0.05;
 		nav_spd_pid.dead=20;
 	}
 	
-	if(fabs(CH_filter[PITr])>50||ALT_POS_SONAR2<0.35)
+	if(fabs(CH_filter[PITr])>50||ALT_POS_SONAR2<0.35||!fly_ready)
 		 reset_nav_pos(Y);
-	if(fabs(CH_filter[ROLr])>50||ALT_POS_SONAR2<0.35)
+	if(fabs(CH_filter[ROLr])>50||ALT_POS_SONAR2<0.35||!fly_ready)
 		 reset_nav_pos(X);
 	
 			/*
@@ -533,6 +534,7 @@ head  |    1 PIT y-   90d in marker
   float pos[2];
 	int spd[2],acc[2];
 	float a_br[3];	
+	static float acc_flt[2];
 	
 	a_br[0] =(float) mpu6050_fc.Acc.x/4096.;//16438.;
 	a_br[1] =(float) mpu6050_fc.Acc.y/4096.;//16438.;
@@ -540,19 +542,19 @@ head  |    1 PIT y-   90d in marker
 
 	acc_temp[0] = a_br[1]*reference_vr_imd_down[2]  - a_br[2]*reference_vr_imd_down[1] ;
 	acc_temp[1] = a_br[2]*reference_vr_imd_down[0]  - a_br[0]*reference_vr_imd_down[2] ;
-	
-	
-	
+	acc_flt[0] += ( 1 / ( 1 + 1 / ( 20 *3.14f *T ) ) ) *my_deathzoom( (acc_temp[0] - acc_flt[0] ),0);
+	acc_flt[1] += ( 1 / ( 1 + 1 / ( 20 *3.14f *T ) ) ) *my_deathzoom( (acc_temp[1] - acc_flt[1] ),0);
+//输入数据	
 	pos[Y]=POS_UKF_Y;//mm
   pos[X]=POS_UKF_X;//mm
 	
 	spd[Y]=VEL_UKF_Y*1000;//mm
   spd[X]=VEL_UKF_X*1000;//mm
-	acc[Y]=acc_temp[1]*9800;//mm
-  acc[X]=acc_temp[0]*9800;//mm
-	
+	acc[Y]=acc_flt[1]*9800;//mm
+  acc[X]=acc_flt[0]*9800;//mm
+//位置
 	if(cnt[0]++>1){cnt[0]=0;
-	 out_timer_nav=Get_Cycle_T(GET_T_OUT_NAV);
+	out_timer_nav=Get_Cycle_T(GET_T_OUT_NAV);
 	for (i=0;i<2;i++){ 
 		nav_pos_ctrl[i].now=pos[i];
 		if(nav_pos_pid.ki==0||!fly_ready)nav_pos_ctrl[i].err_i=0;
@@ -563,14 +565,43 @@ head  |    1 PIT y-   90d in marker
 		nav_pos_ctrl[i].err_d =  nav_pos_pid.kd *( 0.6f *(-(float)spd[i]*out_timer_nav) + 0.4f *(nav_pos_ctrl[i].err - nav_pos_ctrl[i].err_old) );
 
 		nav_pos_ctrl[i].pid_out = nav_pos_ctrl[i].err +nav_pos_ctrl[i].err_i + nav_pos_ctrl[i].err_d;
-		nav_pos_ctrl[i].pid_out = LIMIT(nav_pos_ctrl[i].pid_out,-2*1000,2*1000);//m/s
+		nav_spd_ctrl[i].exp=nav_pos_ctrl[i].pid_out = LIMIT(nav_pos_ctrl[i].pid_out,-5*1000,5*1000);//m/s
 		nav_pos_ctrl[i].err_old = nav_pos_ctrl[i].err;
 		}
 	}
 	
-	 in_timer_nav=Get_Cycle_T(GET_T_IN_NAV);
-	for (i=0;i<2;i++){
-	nav_spd_ctrl[i].exp=nav_pos_ctrl[i].pid_out;	
+	  
+	static u8 state_tune_spd;
+	static u8 flag_way;
+	static u16 cnt_s1;
+	switch(state_tune_spd){
+	case 0:	
+	if(mode.trig_flow_spd)
+	{state_tune_spd=1;cnt_s1=0;flag_way=!flag_way;}
+	break;
+	case 1:
+	if(mode.trig_flow_spd)
+	{	if(flag_way)
+	nav_spd_ctrl[X].exp=300;
+	else
+	nav_spd_ctrl[X].exp=-300;		
+	}
+	else
+	state_tune_spd=0;	
+	if(cnt_s1++>3/T)
+	{cnt_s1=0;state_tune_spd=2;}
+	break;
+	case 2:
+	nav_spd_ctrl[X].exp=0;			
+	if(cnt_s1++>1.5/T)	
+	state_tune_spd=0;
+	if(!mode.trig_flow_spd)
+	state_tune_spd=0;
+	break;
+	}
+//速度环	
+	in_timer_nav=Get_Cycle_T(GET_T_IN_NAV);
+	for (i=0;i<2;i++){	
 	nav_spd_ctrl[i].now=spd[i];
 	nav_spd_ctrl[i].err = nav_spd_pid.kp *LIMIT(my_deathzoom( nav_spd_ctrl[i].exp - nav_spd_ctrl[i].now,nav_spd_pid.dead),-3000,3000);
 	nav_spd_ctrl[i].err_d = 0.002f/T *10*nav_spd_pid.kd * my_deathzoom(-acc[i] ,50) *in_timer_nav;
@@ -580,21 +611,10 @@ head  |    1 PIT y-   90d in marker
 	nav_spd_ctrl[i].pid_out =LIMIT(( nav_spd_pid.f_kp*LIMIT(nav_spd_ctrl[i].exp,-100,100)+nav_spd_ctrl[i].err + nav_spd_ctrl[i].err_d + nav_spd_ctrl[i].err_i),-250,250)/10;	
 	nav_spd_ctrl[i].err_old =nav_spd_ctrl[i].err;
   }
-	nav[ROLr]=nav_spd_ctrl[X].pid_out;
+	
 	nav[PITr]=nav_spd_ctrl[Y].pid_out;
-		/*
-		north    LAT=1     V_West+                             __________
-		|   Y+  y                                              P- R- GPS-
-		                                        
-		|P+
-	
-    _____	R	+   x         LON=0  V_East+
-	   
-head  |    1 PIT y-  RC0
-			| 
-		   _____  0 ROL x+   RC 1
-	
-		*/
+	nav[ROLr]=nav_spd_ctrl[X].pid_out;
+
 }
 
 
