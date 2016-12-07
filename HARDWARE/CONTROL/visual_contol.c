@@ -477,6 +477,125 @@ head  |    1 PIT y-  RC0
 		*/
 }
 
+#define NAV_POS_INT        500//mm/s  
+#define NAV_SPD_INT        300//mm/s
+
+float out_timer_nav,in_timer_nav;
+float acc_temp[3];
+_pos_pid nav_pos_pid;
+_pos_pid nav_spd_pid;
+_pos_control nav_pos_ctrl[2];
+_pos_control nav_spd_ctrl[2];
+void reset_nav_pos(u8 sel)
+{
+if(sel==Y)	
+nav_pos_ctrl[Y].exp=POS_UKF_Y;//mm
+if(sel==X)
+nav_pos_ctrl[X].exp=POS_UKF_X;//mm
+}
+void Positon_control(float T)//     光流定点 
+{
+	u8 i;
+	static u8 cnt[2],init;
+	if(!init){init=1;
+		nav_pos_pid.kp=0.2;
+		nav_pos_pid.ki=0.0;
+		nav_pos_pid.kd=0.0;
+		nav_pos_pid.dead=0.02;
+		
+		
+		nav_spd_pid.kp=0.2;
+		nav_spd_pid.ki=0.01;
+		nav_spd_pid.kd=0.05;
+		nav_spd_pid.dead=20;
+	}
+	
+	if(fabs(CH_filter[PITr])>50||ALT_POS_SONAR2<0.35)
+		 reset_nav_pos(Y);
+	if(fabs(CH_filter[ROLr])>50||ALT_POS_SONAR2<0.35)
+		 reset_nav_pos(X);
+	
+			/*
+		north    LAT=1     V_West+                             __________
+		|   Y+  y                                              P- R- GPS-
+		                                        
+		|P+
+	
+    _____	R	+   x         LON=0  V_East+
+	
+
+	   
+head  |    1 PIT y-   90d in marker
+			| 
+		   _____  0 ROL x+
+
+		*/
+  float pos[2];
+	int spd[2],acc[2];
+	float a_br[3];	
+	
+	a_br[0] =(float) mpu6050_fc.Acc.x/4096.;//16438.;
+	a_br[1] =(float) mpu6050_fc.Acc.y/4096.;//16438.;
+	a_br[2] =(float) mpu6050_fc.Acc.z/4096.;//16438.;
+
+	acc_temp[0] = a_br[1]*reference_vr_imd_down[2]  - a_br[2]*reference_vr_imd_down[1] ;
+	acc_temp[1] = a_br[2]*reference_vr_imd_down[0]  - a_br[0]*reference_vr_imd_down[2] ;
+	
+	
+	
+	pos[Y]=POS_UKF_Y;//mm
+  pos[X]=POS_UKF_X;//mm
+	
+	spd[Y]=VEL_UKF_Y*1000;//mm
+  spd[X]=VEL_UKF_X*1000;//mm
+	acc[Y]=acc_temp[1]*9800;//mm
+  acc[X]=acc_temp[0]*9800;//mm
+	
+	if(cnt[0]++>1){cnt[0]=0;
+	 out_timer_nav=Get_Cycle_T(GET_T_OUT_NAV);
+	for (i=0;i<2;i++){ 
+		nav_pos_ctrl[i].now=pos[i];
+		if(nav_pos_pid.ki==0||!fly_ready)nav_pos_ctrl[i].err_i=0;
+		nav_pos_ctrl[i].err = ( nav_pos_pid.kp*LIMIT(my_deathzoom(nav_pos_ctrl[i].exp - nav_pos_ctrl[i].now,nav_pos_pid.dead),-3,3) )*1000;
+
+		nav_pos_ctrl[i].err_i += nav_pos_pid.ki *nav_pos_ctrl[i].err *out_timer_nav;
+		nav_pos_ctrl[i].err_i = LIMIT(nav_pos_ctrl[i].err_i,-Thr_Weight *NAV_POS_INT,Thr_Weight *NAV_POS_INT);
+		nav_pos_ctrl[i].err_d =  nav_pos_pid.kd *( 0.6f *(-(float)spd[i]*out_timer_nav) + 0.4f *(nav_pos_ctrl[i].err - nav_pos_ctrl[i].err_old) );
+
+		nav_pos_ctrl[i].pid_out = nav_pos_ctrl[i].err +nav_pos_ctrl[i].err_i + nav_pos_ctrl[i].err_d;
+		nav_pos_ctrl[i].pid_out = LIMIT(nav_pos_ctrl[i].pid_out,-2*1000,2*1000);//m/s
+		nav_pos_ctrl[i].err_old = nav_pos_ctrl[i].err;
+		}
+	}
+	
+	 in_timer_nav=Get_Cycle_T(GET_T_IN_NAV);
+	for (i=0;i<2;i++){
+	nav_spd_ctrl[i].exp=nav_pos_ctrl[i].pid_out;	
+	nav_spd_ctrl[i].now=spd[i];
+	nav_spd_ctrl[i].err = nav_spd_pid.kp *LIMIT(my_deathzoom( nav_spd_ctrl[i].exp - nav_spd_ctrl[i].now,nav_spd_pid.dead),-3000,3000);
+	nav_spd_ctrl[i].err_d = 0.002f/T *10*nav_spd_pid.kd * my_deathzoom(-acc[i] ,50) *in_timer_nav;
+	nav_spd_ctrl[i].err_i += nav_spd_pid.ki *nav_spd_ctrl[i].err *in_timer_nav;
+	nav_spd_ctrl[i].err_i = LIMIT(nav_spd_ctrl[i].err_i,-Thr_Weight *NAV_SPD_INT,Thr_Weight *NAV_SPD_INT);
+	//HIGH_CONTROL_SPD_ESO(&eso_att_inner_c[THRr],exp_z_speed,wz_speed,eso_att_inner_c[THRr].u,T,400);//速度环自抗扰控制
+	nav_spd_ctrl[i].pid_out =LIMIT(( nav_spd_pid.f_kp*LIMIT(nav_spd_ctrl[i].exp,-100,100)+nav_spd_ctrl[i].err + nav_spd_ctrl[i].err_d + nav_spd_ctrl[i].err_i),-250,250)/10;	
+	nav_spd_ctrl[i].err_old =nav_spd_ctrl[i].err;
+  }
+	nav[ROLr]=nav_spd_ctrl[X].pid_out;
+	nav[PITr]=nav_spd_ctrl[Y].pid_out;
+		/*
+		north    LAT=1     V_West+                             __________
+		|   Y+  y                                              P- R- GPS-
+		                                        
+		|P+
+	
+    _____	R	+   x         LON=0  V_East+
+	   
+head  |    1 PIT y-  RC0
+			| 
+		   _____  0 ROL x+   RC 1
+	
+		*/
+}
 
 
 //--------------------------------------自动起飞降落 视觉导航状态机 未使用

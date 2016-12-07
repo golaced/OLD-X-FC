@@ -83,7 +83,8 @@
 #define AUX3r 6
 #define AUX4r 7
 
-#define GET_TIME_NUM 	(15)		//设置获取时间的数组数量
+#define X 0
+#define Y 1
 //=======================参数宏定义==========
 #define RtA 		57.324841				
 #define AtR    	0.0174533				

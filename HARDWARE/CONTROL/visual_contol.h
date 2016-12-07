@@ -3,8 +3,34 @@
 
 #include "stm32f4xx.h"
 
+typedef struct
+{ float exp;
+	float now;
+	float err;
+	float err_old;
+	float err_d;
+	float err_i;
+	float pid_out;
+
+}_pos_control;
+
+typedef struct
+{ float f_kp;
+	float kp;
+	float kd;
+	float ki;
+  float dead;
+}_pos_pid;
 
 
+extern _pos_pid nav_pos_pid;
+extern _pos_pid nav_spd_pid;
+extern _pos_control nav_pos_ctrl[2];
+extern _pos_control nav_spd_ctrl[2];
+void Positon_control(float T);//     光流定点 
+void reset_nav_pos(u8 sel);
+
+//---------------------
  typedef struct
 {
  int x,y,z;

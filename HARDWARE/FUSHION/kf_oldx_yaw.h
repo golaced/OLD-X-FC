@@ -13,7 +13,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include "rtwtypes.h"
-#include "kf_oldx_yaw_types.h"
+#include "../HARDWARE/FUSHION/kf_oldx_yaw.h"
 
 /* Function Declarations */
 extern void kf_oldx_yaw(double X[2], double P[4], const double Z[2], double U,

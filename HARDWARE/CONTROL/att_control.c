@@ -80,8 +80,8 @@ void CTRL_2(float T)//角度环
  PIT=1
 	*/
 //=========================== 期望角度 ========================================
-	 except_A_SB_lft[PITr] = -my_deathzoom_2(MAX_CTRL_ANGLE  *( my_deathzoom( (CH_filter[ROLr]) ,30 )/500.0f ),1);  
-	 except_A_SB_lft[ROLr] =  my_deathzoom_2(MAX_CTRL_ANGLE  *( my_deathzoom( (CH_filter[PITr]) ,30 )/500.0f ),1);  
+	 except_A_SB_lft[PITr] =  my_deathzoom_2(MAX_CTRL_ANGLE  *( my_deathzoom( (CH_filter[PITr]) ,30 )/500.0f ),1);  
+	 except_A_SB_lft[ROLr] =  my_deathzoom_2(MAX_CTRL_ANGLE  *( my_deathzoom( (CH_filter[ROLr]) ,30 )/500.0f ),1);  
 	
 	 except_A_SB[ROLr]  += scale_lf_sb *T *3.14f * ( except_A_SB_lft[ROLr] - except_A_SB[ROLr] );
 //---------------------------NAV_angle------------------------------------	
@@ -92,24 +92,24 @@ if(!mode.dj_lock)	{
 				if(mode.en_circle_control){
 				if(circle.check){	
 					if(ALT_POS_SONAR2>0.2){
-					nav_angle_lft[PITr]=-my_deathzoom_2(nav_circle[PITr],0.1);//  -nav_ukf_g[PIT];//nav[PIT];
-					nav_angle_lft[ROLr]=-my_deathzoom_2(nav_circle[ROLr],0.1);// nav_ukf_g[ROL];//nav[ROL];	
+					nav_angle_lft[PITr]=my_deathzoom_2(nav_circle[PITr],0.1);//  -nav_ukf_g[PIT];//nav[PIT];
+					nav_angle_lft[ROLr]=my_deathzoom_2(nav_circle[ROLr],0.1);// nav_ukf_g[ROL];//nav[ROL];	
 					}
 					else
 					{
-					nav_angle_lft[PITr]=LIMIT(-my_deathzoom_2(nav_circle[PITr],0.1),-3,3);//  -nav_ukf_g[PIT];//nav[PIT];
-					nav_angle_lft[ROLr]=LIMIT(-my_deathzoom_2(nav_circle[ROLr],0.1),-3,3);// nav_ukf_g[ROL];//nav[ROL];	
+					nav_angle_lft[PITr]=LIMIT(my_deathzoom_2(nav_circle[PITr],0.1),-3,3);//  -nav_ukf_g[PIT];//nav[PIT];
+					nav_angle_lft[ROLr]=LIMIT(my_deathzoom_2(nav_circle[ROLr],0.1),-3,3);// nav_ukf_g[ROL];//nav[ROL];	
 					}	
 				}
 				else
 					{if(ALT_POS_SONAR2>0.2){
-					nav_angle_lft[PITr]=-my_deathzoom_2(nav[PITr],0.1);//  -nav_ukf_g[PIT];//nav[PIT];
-					nav_angle_lft[ROLr]=-my_deathzoom_2(nav[ROLr],0.1);// nav_ukf_g[ROL];//nav[ROL];	
+					nav_angle_lft[PITr]=my_deathzoom_2(nav[PITr],0.1);//  -nav_ukf_g[PIT];//nav[PIT];
+					nav_angle_lft[ROLr]=my_deathzoom_2(nav[ROLr],0.1);// nav_ukf_g[ROL];//nav[ROL];	
 					}
 					else if(ALT_POS_SONAR2>0.11)
 					{
-					nav_angle_lft[PITr]=LIMIT(-my_deathzoom_2(nav[PITr],0.1),-3,3);//  -nav_ukf_g[PIT];//nav[PIT];
-					nav_angle_lft[ROLr]=LIMIT(-my_deathzoom_2(nav[ROLr],0.1),-3,3);// nav_ukf_g[ROL];//nav[ROL];	
+					nav_angle_lft[PITr]=LIMIT(my_deathzoom_2(nav[PITr],0.1),-3,3);//  -nav_ukf_g[PIT];//nav[PIT];
+					nav_angle_lft[ROLr]=LIMIT(my_deathzoom_2(nav[ROLr],0.1),-3,3);// nav_ukf_g[ROL];//nav[ROL];	
 					}
 					else
 					{
@@ -120,12 +120,12 @@ if(!mode.dj_lock)	{
 				}//---------------
 				else{
 				if(ALT_POS_SONAR2>0.1){
-				nav_angle_lft[PITr]=-my_deathzoom_2(nav[PITr],0.1);//  -nav_ukf_g[PIT];//nav[PIT];
+				nav_angle_lft[PITr]= my_deathzoom_2(nav[PITr],0.1);//  -nav_ukf_g[PIT];//nav[PIT];
 				nav_angle_lft[ROLr]= my_deathzoom_2(nav[ROLr],0.1);// nav_ukf_g[ROL];//nav[ROL];	
 				}
 				else if(ALT_POS_SONAR2>0.05)
 				{
-				nav_angle_lft[PITr]=LIMIT(-my_deathzoom_2(nav[PITr],0.1),-3,3);//  -nav_ukf_g[PIT];//nav[PIT];
+				nav_angle_lft[PITr]=LIMIT(my_deathzoom_2(nav[PITr],0.1),-3,3);//  -nav_ukf_g[PIT];//nav[PIT];
 				nav_angle_lft[ROLr]=LIMIT(my_deathzoom_2(nav[ROLr],0.1),-3,3);// nav_ukf_g[ROL];//nav[ROL];	
 				}
         else
@@ -485,8 +485,8 @@ if(0){//mode.en_eso){
 	//NEURON_PID_LQ(&neuron_pid_outter[PITr],ctrl_2.err.y ,except_A.y,10, T);NEURON_PID(&neuron_pid_outter[ROLr],ctrl_2.err.y ,except_A.y,7.5, T);
 	//NEURON_PID_LQ(&neuron_pid_outter[ROLr],ctrl_2.err.x ,except_A.x,10, T);
 	//---------------------SELF DISTURB------------------------------
-	ATT_CONTRL_OUTER_ESO_3(&eso_att_outter_c[PITr],except_A.y,Pitch,ctrl_2.out.y,T,20,ctrl_2.err.y);
-	ATT_CONTRL_OUTER_ESO_3(&eso_att_outter_c[ROLr],except_A.x,Roll,ctrl_2.out.x,T,20,ctrl_2.err.x);
+	ATT_CONTRL_OUTER_ESO_3(&eso_att_outter_c[PITr],except_A.y,Pit_fc,ctrl_2.out.y,T,20,ctrl_2.err.y);
+	ATT_CONTRL_OUTER_ESO_3(&eso_att_outter_c[ROLr],except_A.x,Rol_fc,ctrl_2.out.x,T,20,ctrl_2.err.x);
 	/* 角度PID输出 */
 	#define MAX_W_NEURO 1/(1.618+1)
 	float x_out,y_out;

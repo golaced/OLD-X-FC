@@ -18,7 +18,7 @@
 #include "../HARDWARE/FUSHION/imu1.h"
 #include <math.h>
 #include "../HARDWARE/include.h"
-#include "../HARDWARE/FUSHION/kf_oldx_yaw.h"
+//#include "../HARDWARE/FUSHION/kf_oldx_yaw.h"
 
 
 float K_yaw=1;
@@ -175,7 +175,7 @@ void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, fl
 	{Z_yaw[0]=X_kf_yaw[0];yaw_cross=1;}
 	else
 	yaw_cross=0;
-	kf_oldx_yaw( X_kf_yaw,  P_kf_yaw,  Z_yaw,  -gz*k_kf_z, gh_yaw,  ga_yaw,  gw_yaw,  half_T*2);
+	kf_oldx_yaw(X_kf_yaw,P_kf_yaw,Z_yaw ,-gz*k_kf_z,gh_yaw,ga_yaw,gw_yaw,half_T*2);
 
 	yaw_kf=Moving_Median( 19,5,X_kf_yaw[0]);
 	//=============================================================================

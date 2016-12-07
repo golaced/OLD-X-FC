@@ -2,7 +2,7 @@
 #define _TIME_H_
 
 #include "stm32f4xx.h"
-#define GET_TIME_NUM 	(15)	
+#define GET_TIME_NUM 	(20)	
 void TIM_INIT(void);
 void sys_time(void);
 
@@ -40,4 +40,6 @@ void TIM3_Int_Init(u16 arr,u16 psc);
 #define GET_T_OUTTER_C 11
 #define GET_T_HIGH_CONTROL 12
 #define GET_T_HML_CAL 13
+#define GET_T_OUT_NAV 14
+#define GET_T_IN_NAV 15
 #endif

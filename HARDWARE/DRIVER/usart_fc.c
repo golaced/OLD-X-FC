@@ -127,8 +127,8 @@ int k_scale_pix;
 		ALT_POS_BMP_EKF=(float)(int32_t)((*(data_buf+29)<<24)|(*(data_buf+30)<<16)|(*(data_buf+31)<<8)|*(data_buf+32))/1000.;//m
 		POS_UKF_X=(float)(int16_t)((*(data_buf+33)<<8)|*(data_buf+34))/1000.;//m  ->0
 		POS_UKF_Y=(float)(int16_t)((*(data_buf+35)<<8)|*(data_buf+36))/1000.;//m  ->1
-		VEL_UKF_Y=(float)(int16_t)((*(data_buf+37)<<8)|*(data_buf+38))/1000.;//m
-		VEL_UKF_X=(float)(int16_t)((*(data_buf+39)<<8)|*(data_buf+40))/1000.;//m			
+		VEL_UKF_X=(float)(int16_t)((*(data_buf+37)<<8)|*(data_buf+38))/1000.;//m
+		VEL_UKF_Y=(float)(int16_t)((*(data_buf+39)<<8)|*(data_buf+40))/1000.;//m			
 				
     if(mode.flow_f_use_ukfm){
     now_position[LON]=POS_UKF_X;//m  lon->0 X
@@ -1516,8 +1516,8 @@ void Data_Receive_Anl4(u8 *data_buf,u8 num)
 		Rc_Get_PWM.POS_MODE=((int16_t)(*(data_buf+18)<<8)|*(data_buf+19));
 		
 	  RX_CH_PWM[THRr]=	LIMIT(Rc_Get_PWM.THROTTLE-RX_CH_FIX_PWM[THRr]-20,1000,2000)	;
-	  RX_CH_PWM[PITr]=  my_deathzoom_rc(Rc_Get_PWM.ROLL-RX_CH_FIX_PWM[ROLr]-20,5)	;
-	  RX_CH_PWM[ROLr]=  my_deathzoom_rc(Rc_Get_PWM.PITCH-RX_CH_FIX_PWM[PITr]-20,5)	;
+	  RX_CH_PWM[ROLr]=  my_deathzoom_rc(Rc_Get_PWM.ROLL-RX_CH_FIX_PWM[ROLr]-20,5)	;
+	  RX_CH_PWM[PITr]=  my_deathzoom_rc(Rc_Get_PWM.PITCH-RX_CH_FIX_PWM[PITr]-20,5)	;
 				
 		if(!mode.yaw_imu_control)	
 		RX_CH_PWM[YAWr]=  my_deathzoom_rc(Rc_Get_PWM.YAW-RX_CH_FIX_PWM[YAWr]-20,5)	;

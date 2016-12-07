@@ -43,8 +43,9 @@ void tmr3_callback(OS_TMR *ptmr,void *p_arg);
 	#define F_OUTTER 		5
 	#define F_EKF 			5
 #endif
-#define F_POS 				10
+#define F_POS 				20
 #define F_BARO 				10
+
 #define H_INNER				10
 #define H_OUTTER      20
 

@@ -91,7 +91,3 @@
 ..\obj\imu1.o: ..\CORE\../HARDWARE/../HARDWARE/MATH/miniMatrix.h
 ..\obj\imu1.o: ..\CORE\../HARDWARE/../HARDWARE/DRIVER/pwm_out.h
 ..\obj\imu1.o: ..\CORE\../HARDWARE/define.h
-..\obj\imu1.o: ..\CORE\../HARDWARE/FUSHION/kf_oldx_yaw.h
-..\obj\imu1.o: e:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
-..\obj\imu1.o: ..\HARDWARE\UKF_BARO\rtwtypes.h
-..\obj\imu1.o: ..\CORE\../HARDWARE/FUSHION/kf_oldx_yaw_types.h

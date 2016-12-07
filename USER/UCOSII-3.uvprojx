@@ -423,14 +423,14 @@
               <FilePath>.\stm32f4xx_it.c</FilePath>
             </File>
             <File>
-              <FileName>system_stm32f4xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\system_stm32f4xx.c</FilePath>
-            </File>
-            <File>
               <FileName>delay.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\SYSTEM\delay\delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>system_stm32f4xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\system_stm32f4xx.c</FilePath>
             </File>
             <File>
               <FileName>sys.c</FileName>

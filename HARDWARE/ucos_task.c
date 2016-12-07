@@ -171,15 +171,20 @@ void pos_task(void *pdata)
 	{	
 	if(cnt++>5-1){cnt=0;
 	if(!mode.use_dji) 
-	GPS_calc_poshold(0.01*5);//光流GPS定点
+	;//GPS_calc_poshold(0.01*2);//光流GPS定点
+	
  }
 	if(cnt1++>5-1){cnt1=0;
 	if(!mode.use_dji)
-	circle_control(0.01*5);//图像目标跟踪 未使用
+	circle_control(0.01*2);//图像目标跟踪 未使用
  }
 	if(cnt2++>0.01*10&&mode.en_sonar_avoid){cnt2=0;
 		;//oldx_avoid();  //避障 未使用
 	}
+	
+  Positon_control(F_POS/1000.);//     光流定点 
+		
+	
 	delay_ms(F_POS);
 	}
 }		
@@ -235,16 +240,16 @@ void nrf_task(void *pdata)
 		//mode.height_safe=1;//mode.en_sd_save=1;
 		//else
 		//mode.height_safe=0;//	mode.en_sd_save=0;
-		if(mode.flow_hold_position<1)
-			mode.height_safe=1;
-		else{
+//		if(mode.flow_hold_position<1)
+//			mode.height_safe=1;
+//		else{
 		#if USE_RC_GROUND
 			if(Rc_Get_PWM.AUX1>1500)
 			mode.height_safe=1;//mode.en_sd_save=1;
 			else
 			mode.height_safe=0;//	mode.en_sd_save=0;
 		#endif	
-			}
+			//}
 		mode.att_pid_tune=KEY[6]&&KEY[5]&&KEY[3]&&KEY[2]&&KEY[1]&&KEY[0];
 		
 		if(!mode.att_pid_tune){
@@ -522,13 +527,13 @@ void uart_task(void *pdata)
 											0,ultra_speed/10,ultra_ctrl_out_use/10,
 											0,0,0,
 											(int16_t)(Yaw*10),(int16_t)(Pitch*10.0),(int16_t)(Roll*10.0),thr_test,0,0/10,0);break;
-											case 24://TRIG PID TUNNING 
+											case 25://TRIG PID TUNNING 
 											data_per_uart1(
-											0,0,d_flow_watch[0]*100,
-											0,0,d_flow_watch[1]*100,
+											0,0,VEL_UKF_Y*1000,
+											0,0,VEL_UKF_X*1000,
 											0,acc_body[1]*100,0,
 											(int16_t)(Yaw*10),(int16_t)(Pitch*10.0),(int16_t)(Roll*10.0),thr_test,0,0/10,0);break;
-											case 25://TRIG PID TUNNING 
+											case 24://TRIG PID TUNNING 
 											data_per_uart1(
 											yaw_mag_view[4]*10,yaw_mag_view[0]*10,yaw_mag_view[1]*10,
 											yaw_mag_view[3]*10,0,0,
