@@ -984,358 +984,362 @@ u16 i;
 
 
 void Send_Status(void)
-{u8 i;	u8 sum = 0,_temp3;	vs32 _temp2 = 0;	vs16 _temp;u8 data_to_send[50];
+{u8 i;	u8 sum = 0,_temp3;	vs32 _temp2 = 0;	vs16 _temp;//u8 data_to_send[50];
 	u8 _cnt=0;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0x01;
-	data_to_send[_cnt++]=0;
+	u8 st=SendBuff1_cnt;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0x01;
+	SendBuff1[SendBuff1_cnt++]=0;
 
 	_temp = (int)(Rol_fc*100);
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = (int)(Pit_fc*100);
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = (int)(Yaw_fc*100);
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
   _temp3=fly_ready;
-	data_to_send[_cnt++]=_temp3;
+	SendBuff1[SendBuff1_cnt++]=_temp3;
 	_temp3=NS;//1;//is_RC_PIN;
-	data_to_send[_cnt++]=_temp3;
+	SendBuff1[SendBuff1_cnt++]=_temp3;
   _temp3=EN_FIX_GPSF;
-	data_to_send[_cnt++]=_temp3;
+	SendBuff1[SendBuff1_cnt++]=_temp3;
 	_temp3=EN_FIX_LOCKWF;
-	data_to_send[_cnt++]=_temp3;
+	SendBuff1[SendBuff1_cnt++]=_temp3;
 	_temp3=EN_CONTROL_IMUF;
-	data_to_send[_cnt++]=_temp3;
+	SendBuff1[SendBuff1_cnt++]=_temp3;
 	_temp3=EN_FIX_INSF;
-	data_to_send[_cnt++]=_temp3;
+	SendBuff1[SendBuff1_cnt++]=_temp3;
 	_temp3=EN_FIX_HIGHF;
-	data_to_send[_cnt++]=_temp3;
+	SendBuff1[SendBuff1_cnt++]=_temp3;
  
 	
 	
 	
-	data_to_send[3] = _cnt-4;
-	for( i=0;i<_cnt;i++)
-		sum += data_to_send[i];
-	data_to_send[_cnt++]=sum;
+	SendBuff1[3+st] = SendBuff1_cnt-st-4;
+	for( i=st;i<SendBuff1_cnt;i++)
+		sum += SendBuff1[i];
+	SendBuff1[SendBuff1_cnt++]=sum;
 	
-	Send_Data_APP(data_to_send, _cnt);
+//	Send_Data_APP(SendBuff1, SendBuff1_cnt);
 }
 
 
 void Send_GPS(void)
-{u8 i;	u8 sum = 0;u8 data_to_send[50];
-	u8 _cnt=0;
-		vs32 _temp;	u8 _temp4=0;	float _temp2 =0;	vs16 _temp3=0;
+{u8 i;	u8 sum = 0;//u8 SendBuff1[50];
+	//u8 SendBuff1_cnt=0;
+	u8 st=SendBuff1_cnt;
+	vs32 _temp;	u8 _temp4=0;	float _temp2 =0;	vs16 _temp3=0;
 	double GPS_W,GPS_J;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0x04;
-	data_to_send[_cnt++]=0;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0x04;
+	SendBuff1[SendBuff1_cnt++]=0;
   GPS_W=32.12345678;
 	GPS_J=123.12345678;
 	_temp = (vs32)(GPS_W*1000000);
-  data_to_send[_cnt++]=BYTE3(_temp);
-	data_to_send[_cnt++]=BYTE2(_temp);
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+  SendBuff1[SendBuff1_cnt++]=BYTE3(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE2(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = (vs32)(GPS_J*1000000);
-  data_to_send[_cnt++]=BYTE3(_temp);
-	data_to_send[_cnt++]=BYTE2(_temp);
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+  SendBuff1[SendBuff1_cnt++]=BYTE3(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE2(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
    //hight
 	_temp=(vs32)(LIMIT(ALT_POS_SONAR2*100,0,5*100));
-	data_to_send[_cnt++]=BYTE3(_temp);
-	data_to_send[_cnt++]=BYTE2(_temp);
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE3(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE2(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp2=0;
-	data_to_send[_cnt++]=BYTE3(_temp2);
-	data_to_send[_cnt++]=BYTE2(_temp2);
-	data_to_send[_cnt++]=BYTE1(_temp2);
-	data_to_send[_cnt++]=BYTE0(_temp2);
+	SendBuff1[SendBuff1_cnt++]=BYTE3(_temp2);
+	SendBuff1[SendBuff1_cnt++]=BYTE2(_temp2);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp2);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp2);
 
-	data_to_send[_cnt++]=BYTE1(_temp3);
-	data_to_send[_cnt++]=BYTE0(_temp3);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp3);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp3);
 	 _temp3=0;
-	data_to_send[_cnt++]=BYTE1(_temp3);
-	data_to_send[_cnt++]=BYTE0(_temp3);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp3);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp3);
 
-	data_to_send[_cnt++]=BYTE0(_temp4);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp4);
 	_temp4=0;
-	data_to_send[_cnt++]=BYTE0(_temp4);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp4);
 	
-	data_to_send[3] = _cnt-4;
+	SendBuff1[3+st] = SendBuff1_cnt-st-4;
 	
 
-	for( i=0;i<_cnt;i++)
-		sum += data_to_send[i];
-	data_to_send[_cnt++]=sum;
+	for( i=st;i<SendBuff1_cnt;i++)
+		sum += SendBuff1[i];
+	SendBuff1[SendBuff1_cnt++]=sum;
 	
-	Send_Data_APP(data_to_send, _cnt);
+//	Send_Data_APP(SendBuff1, SendBuff1_cnt);
 }
 
 void Send_BAT(void)
-{u8 i;	u8 sum = 0;u8 data_to_send[50];
-	u8 _cnt=0;
+{u8 i;	u8 sum = 0;//u8 SendBuff1[50];
+	//u8 SendBuff1_cnt=0;
+	u8 st=SendBuff1_cnt;
 		vs32 _temp;	u8 _temp4=0;	float _temp2 =0;	vs16 _temp3=0;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0x05;
-	data_to_send[_cnt++]=0;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0x05;
+	SendBuff1[SendBuff1_cnt++]=0;
 
 	//_temp3 = (int)(bat_fly*5);
-	data_to_send[_cnt++]=BYTE1(_temp3);
-	data_to_send[_cnt++]=BYTE0(_temp3);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp3);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp3);
 	//_temp3 = (int)(Rc_Get.AUX5);
-	data_to_send[_cnt++]=BYTE1(_temp3);
-	data_to_send[_cnt++]=BYTE0(_temp3);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp3);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp3);
 	//_temp3 = (int)(bat_fly);
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	
 	
-	data_to_send[3] = _cnt-4;
+	SendBuff1[3+st] = SendBuff1_cnt-st-4;
 	
 
-	for( i=0;i<_cnt;i++)
-		sum += data_to_send[i];
-	data_to_send[_cnt++]=sum;
+	for( i=st;i<SendBuff1_cnt;i++)
+		sum += SendBuff1[i];
+	SendBuff1[SendBuff1_cnt++]=sum;
 	
-	Send_Data_APP(data_to_send, _cnt);
+//	Send_Data_APP(SendBuff1, SendBuff1_cnt);
 }
 
 
 
 
 void Send_PID1(void)
-{u8 i;	u8 sum = 0;u8 data_to_send[50];
-	u8 _cnt=0;
-	vs16 _temp;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0x06;
-	data_to_send[_cnt++]=0;
+{u8 i;	u8 sum = 0;//u8 SendBuff1[50];
+	//u8 SendBuff1_cnt=0;
+	vs16 _temp;u8 st=SendBuff1_cnt;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0x06;
+	SendBuff1[SendBuff1_cnt++]=0;
 	_temp = SPID.OP;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = SPID.OI;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = SPID.OD;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = SPID.IP;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = SPID.II;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = SPID.ID;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = SPID.YP;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = SPID.YI;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = SPID.YD;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	
-	data_to_send[3] = _cnt-4;
+	SendBuff1[3+st] = SendBuff1_cnt-st-4;
 
-	for( i=0;i<_cnt;i++)
-		sum += data_to_send[i];
-	data_to_send[_cnt++] = sum;
+	for( i=st;i<SendBuff1_cnt;i++)
+		sum += SendBuff1[i];
+	SendBuff1[SendBuff1_cnt++] = sum;
 	
-	Send_Data_APP(data_to_send, _cnt);
+	//Send_Data_APP(SendBuff1, SendBuff1_cnt);
 }
 
 
 void Send_PID2(void)
-{u8 i;	u8 sum = 0;u8 data_to_send[50];
-	u8 _cnt=0;
-	vs16 _temp;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0x07;
-	data_to_send[_cnt++]=0;
+{u8 i;	u8 sum = 0;//u8 SendBuff1[50];
+//	u8 SendBuff1_cnt=0;
+	vs16 _temp;u8 st=SendBuff1_cnt;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0x07;
+	SendBuff1[SendBuff1_cnt++]=0;
 	_temp = HPID.OP;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = HPID.OI;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = HPID.OD;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	
 	//_temp = fix_pit;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	//_temp = fix_rol;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	
-	data_to_send[3] = _cnt-4;
+	SendBuff1[3+st] = SendBuff1_cnt-st-4;
 
-	for( i=0;i<_cnt;i++)
-		sum += data_to_send[i];
-	data_to_send[_cnt++] = sum;
+	for( i=st;i<SendBuff1_cnt;i++)
+		sum += SendBuff1[i];
+	SendBuff1[SendBuff1_cnt++] = sum;
 	
-	Send_Data_APP(data_to_send, _cnt);
+//	Send_Data_APP(SendBuff1, SendBuff1_cnt);
 }
 
 void Send_Senser(void)
-{u8 i;	u8 sum = 0;u8 data_to_send[50];
-	u8 _cnt=0;
-	vs16 _temp;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0x08;
-	data_to_send[_cnt++]=0;
+{u8 i;	u8 sum = 0;//u8 SendBuff1[50];
+//	u8 SendBuff1_cnt=0;
+	vs16 _temp;u8 st=SendBuff1_cnt;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0x08;
+	SendBuff1[SendBuff1_cnt++]=0;
 	_temp = mpu6050_fc.Acc.x;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = mpu6050_fc.Acc.y;
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = mpu6050_fc.Acc.z;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = mpu6050_fc.Gyro.x;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = mpu6050_fc.Gyro.y;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = mpu6050_fc.Gyro.z;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = ak8975_fc.Mag_Val.x;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = ak8975_fc.Mag_Val.y;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = ak8975_fc.Mag_Val.z;	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = thr_test*(500/630.);	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = motor[0];	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = motor[1];	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = motor[2];	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = motor[3];	
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
-	data_to_send[3] = _cnt-4;
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	SendBuff1[3+st] = SendBuff1_cnt-st-4;
 
-	for( i=0;i<_cnt;i++)
-		sum += data_to_send[i];
-	data_to_send[_cnt++] = sum;
+	for( i=st;i<SendBuff1_cnt;i++)
+		sum += SendBuff1[i];
+	SendBuff1[SendBuff1_cnt++] = sum;
 	
-	Send_Data_APP(data_to_send, _cnt);
+	//Send_Data_APP(SendBuff1, SendBuff1_cnt);
 }
 
 
 void Send_GPS_Ublox(void)
-{u8 i;	u8 sum = 0;u8 data_to_send[50];
-	u8 _cnt=0;
+{u8 i;	u8 sum = 0;//u8 SendBuff1[50];
+	//u8 SendBuff1_cnt=0;
 	vs16 _temp;
-	vs32 _temp32;
+	vs32 _temp32;u8 st=SendBuff1_cnt;
 		double GPS_W,GPS_J;
   GPS_W=32.12345678;
 	GPS_J=123.12345678;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0x09;//功能字
-	data_to_send[_cnt++]=0;//数据量
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0x09;//功能字
+	SendBuff1[SendBuff1_cnt++]=0;//数据量
 	_temp32 =  GPS_J*10000000;//imu_nav.gps.J;
-	data_to_send[_cnt++]=BYTE3(_temp32);
-	data_to_send[_cnt++]=BYTE2(_temp32);
-	data_to_send[_cnt++]=BYTE1(_temp32);
-	data_to_send[_cnt++]=BYTE0(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE3(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE2(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp32);
 	_temp32 =  GPS_W*10000000;//imu_nav.gps.W;
-	data_to_send[_cnt++]=BYTE3(_temp32);
-	data_to_send[_cnt++]=BYTE2(_temp32);
-	data_to_send[_cnt++]=BYTE1(_temp32);
-	data_to_send[_cnt++]=BYTE0(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE3(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE2(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp32);
 	_temp =imu_nav.gps.gps_mode;
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp =imu_nav.gps.star_num;
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp32 =  imu_nav.gps.X_O;
-	data_to_send[_cnt++]=BYTE3(_temp32);
-	data_to_send[_cnt++]=BYTE2(_temp32);
-	data_to_send[_cnt++]=BYTE1(_temp32);
-	data_to_send[_cnt++]=BYTE0(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE3(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE2(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp32);
 	_temp32 =  imu_nav.gps.Y_O;
-	data_to_send[_cnt++]=BYTE3(_temp32);
-	data_to_send[_cnt++]=BYTE2(_temp32);
-	data_to_send[_cnt++]=BYTE1(_temp32);
-	data_to_send[_cnt++]=BYTE0(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE3(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE2(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp32);
 	_temp32 =  imu_nav.gps.X_UKF;
-	data_to_send[_cnt++]=BYTE3(_temp32);
-	data_to_send[_cnt++]=BYTE2(_temp32);
-	data_to_send[_cnt++]=BYTE1(_temp32);
-	data_to_send[_cnt++]=BYTE0(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE3(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE2(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp32);
 	_temp32 =  imu_nav.gps.Y_UKF;
-	data_to_send[_cnt++]=BYTE3(_temp32);
-	data_to_send[_cnt++]=BYTE2(_temp32);
-	data_to_send[_cnt++]=BYTE1(_temp32);
-	data_to_send[_cnt++]=BYTE0(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE3(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE2(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp32);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp32);
 	
 	
 
 	
-	data_to_send[3] = _cnt-4;
+	SendBuff1[3+st] = SendBuff1_cnt-st-4;
 
-	for( i=0;i<_cnt;i++)
-		sum += data_to_send[i];
-	data_to_send[_cnt++] = sum;
+	for( i=st;i<SendBuff1_cnt;i++)
+		sum += SendBuff1[i];
+	SendBuff1[SendBuff1_cnt++] = sum;
 	
-	Send_Data_APP(data_to_send, _cnt);
+	//Send_Data_APP(SendBuff1, SendBuff1_cnt);
 }
 
 void Send_DEBUG1(void)
-{u8 i;	u8 sum = 0,_temp3;	vs32 _temp2 = 0;	vs16 _temp;u8 data_to_send[50];
-	u8 _cnt=0;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=0xAA;
-	data_to_send[_cnt++]=30;
-	data_to_send[_cnt++]=0;
+{u8 i;	u8 sum = 0,_temp3;	vs32 _temp2 = 0;	vs16 _temp;//u8 SendBuff1[50];
+	u8 st=SendBuff1_cnt;
+	//u8 SendBuff1_cnt=0;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=0xAA;
+	SendBuff1[SendBuff1_cnt++]=30;
+	SendBuff1[SendBuff1_cnt++]=0;
 	for(i=1;i<=14;i++)
 	DEBUG[i]=BLE_DEBUG[i]*10;
 
   for(i=1;i<=14;i++){
 	_temp = DEBUG[i];
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
  }
 	
-	data_to_send[3] = _cnt-4;
+	SendBuff1[3+st] = SendBuff1_cnt-4-st;
 	
 
-	for( i=0;i<_cnt;i++)
-		sum += data_to_send[i];
-	data_to_send[_cnt++]=sum;
+	for( i=st;i<SendBuff1_cnt;i++)
+		sum += SendBuff1[i];
+	SendBuff1[SendBuff1_cnt++]=sum;
 	
-	Send_Data_APP(data_to_send, _cnt);
+//	Send_Data_APP(SendBuff1, _cnt);
 }
 
 void APP_LINK(void)
@@ -2652,6 +2656,7 @@ void Send_IMU_NAV(void)
 
 int16_t BLE_DEBUG[16];
 u8 SendBuff1[SEND_BUF_SIZE1];	//发送数据缓冲区
+u8 SendBuff1_cnt;
 void data_per_uart1(int16_t ax,int16_t ay, int16_t az, int16_t gx,int16_t  gy, int16_t gz,int16_t hx, int16_t hy, int16_t hz,
 	int16_t yaw,int16_t pitch,int16_t roll,int16_t alt,int16_t tempr,int16_t press,int16_t IMUpersec)
 {
@@ -2678,150 +2683,150 @@ BLE_DEBUG[15]=IMUpersec;
 
 
 	
-SendBuff1[i++]=0xa5;
-SendBuff1[i++]=0x5a;
-SendBuff1[i++]=14+8;
-SendBuff1[i++]=0xA2;
+SendBuff1[SendBuff1_cnt++]=0xa5;
+SendBuff1[SendBuff1_cnt++]=0x5a;
+SendBuff1[SendBuff1_cnt++]=14+8;
+SendBuff1[SendBuff1_cnt++]=0xA2;
 
 if(ax<0)ax=32768-ax;
 ctemp=ax>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=ax;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
 if(ay<0)ay=32768-ay;
 ctemp=ay>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=ay;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
 if(az<0)az=32768-az;
 ctemp=az>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=az;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
 if(gx<0)gx=32768-gx;
 ctemp=gx>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=gx;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
 if(gy<0)gy=32768-gy;
 ctemp=gy>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=gy;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 //-------------------------
 if(gz<0)gz=32768-gz;
 ctemp=gz>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=gz;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
 if(hx<0)hx=32768-hx;
 ctemp=hx>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=hx;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
 if(hy<0)hy=32768-hy;
 ctemp=hy>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=hy;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
 if(hz<0)hz=32768-hz;
 ctemp=hz>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=hz;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
-SendBuff1[i++]=temp%256;
-SendBuff1[i++]=(0xaa);
+SendBuff1[SendBuff1_cnt++]=temp%256;
+SendBuff1[SendBuff1_cnt++]=(0xaa);
 //
  temp=0xaF+2+2;
-SendBuff1[i++]=(0xa5);
-SendBuff1[i++]=(0x5a);
-SendBuff1[i++]=(14+4);
-SendBuff1[i++]=(0xA1);
+SendBuff1[SendBuff1_cnt++]=(0xa5);
+SendBuff1[SendBuff1_cnt++]=(0x5a);
+SendBuff1[SendBuff1_cnt++]=(14+4);
+SendBuff1[SendBuff1_cnt++]=(0xA1);
 
 
 if(yaw<0)yaw=32768-yaw;
 ctemp=yaw>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=yaw;							
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
 if(pitch<0)pitch=32768-pitch;
 ctemp=pitch>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=pitch;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 							 
 if(roll<0)roll=32768-roll;
 ctemp=roll>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=roll;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
 if(alt<0)alt=32768-alt;
 ctemp=alt>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;				
 ctemp=alt;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
 if(tempr<0)tempr=32768-tempr;
 ctemp=tempr>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=tempr;
-SendBuff1[i++]=ctemp;	   
+SendBuff1[SendBuff1_cnt++]=ctemp;	   
 temp+=ctemp;
 
 if(press<0)press=32768-press;
 ctemp=press>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=press;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
 ctemp=IMUpersec>>8;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 ctemp=IMUpersec;
-SendBuff1[i++]=ctemp;
+SendBuff1[SendBuff1_cnt++]=ctemp;
 temp+=ctemp;
 
-SendBuff1[i++]=(temp%256);
-SendBuff1[i++]=(0xaa);
+SendBuff1[SendBuff1_cnt++]=(temp%256);
+SendBuff1[SendBuff1_cnt++]=(0xaa);
 }
 
 

@@ -64,6 +64,8 @@
 
 #define IMU_HML_ADD_500 1//新的磁力融合
 #define USE_BLE_FOR_APP 1//直接使用FC蓝牙与APP通信
+
+#define TUNING_X 0
 //===============================系统时钟宏定义==========
 #define A_X 0
 #define A_Y 1
@@ -128,7 +130,7 @@
 extern float dj_angle_set,dj_angle_offset[3],Angle_Yun[2];
 extern float off_yaw;//遥控方向
 //=================PWM========================
-#define MAX_PWM				100			///%	最大PWM输出为100%油门
+#define MAX_PWM				60			///%	最大PWM输出为100%油门
 #define MAX_THR       80 			///%	油门通道最大占比80%，留20%给控制量
 #define READY_SPEED   20      ///%	解锁后电机转速20%油门
 //================系统设置===================

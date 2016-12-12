@@ -49,10 +49,10 @@ void inner_task(void *pdata)
  	while(1)
 	{	
 	float temp = Get_Cycle_T(GET_T_INNER_TIM);								
-	if(temp>0)
+	if(temp>0.001)
 	inner_loop_time_time=temp;
 	else
-	inner_loop_time_time=1.0/F_INNER;
+	inner_loop_time_time=(float)F_INNER/1000.;
 	if(!init){if(cnt_init++>40)
 		init=1;
 	inner_loop_time_time=0.005;
@@ -85,10 +85,10 @@ void outer_task(void *pdata)
   u8 i,j;	
  	while(1)
 	{	float temp = Get_Cycle_T(GET_T_OUTTER_C);								
-		if(temp>0)
+		if(temp>0.001)
 		outer_loop_time_C=temp;
 		else
-		outer_loop_time_C=1.0/F_OUTTER;
+		outer_loop_time_C=(float)F_OUTTER/1000.;
 	if(!init){if(cnt_init++>40)
 		init=1;
 	outer_loop_time_C=0.01;
@@ -133,10 +133,10 @@ void ekf_task(void *pdata)
 	}
 	else
 	{ float temp = Get_Cycle_T(GET_T_EKF);								
-		if(temp>0)
+		if(temp>0.001)
 		ekf_loop_time=temp;
 		else
-		ekf_loop_time=1.0/F_EKF;
+		ekf_loop_time=(float)F_EKF/1000.;
 			
 	if(cnt1++>1){cnt1=0;
   	IMUupdate(0.5f *ekf_loop_time*2,my_deathzoom_2(mpu6050_fc.Gyro_deg.x,0.0), my_deathzoom_2(mpu6050_fc.Gyro_deg.y,0.0), 
@@ -180,7 +180,7 @@ void pos_task(void *pdata)
 		;//oldx_avoid();  //避障 未使用
 	}
 	
-  Positon_control(F_POS/1000.);//     光流定点 
+  Positon_control((float)F_POS/1000.);//     光流定点 
 		
 	delay_ms(F_POS);
 	}
@@ -273,10 +273,10 @@ void baro_task(void *pdata)
 	}
 	else
 	{ float temp = Get_Cycle_T(GET_T_BARO_UKF);							
-		if(temp>0)
+		if(temp>0.001)
 		baro_task_time=temp;
 		else
-		baro_task_time=1.0/F_BARO;	
+		baro_task_time=(float)F_BARO/1000.;	
  
 	  ukf_baro_task1(baro_task_time)	;
 	}
@@ -334,7 +334,7 @@ void uart_task(void *pdata)
 							}			
 				
 				//To  IMU模块	
-				if(cnt[1]++>1){cnt[1]=0;	
+				if(cnt[1]++>5){cnt[1]=0;	
 				  #if EN_DMA_UART2 					
 					if(DMA_GetFlagStatus(DMA1_Stream6,DMA_FLAG_TCIF6)!=RESET)//等待DMA2_Steam7传输完成
 								{ 
@@ -349,20 +349,30 @@ void uart_task(void *pdata)
 							}					
 							
 				//BLE UPLOAD《----------------------蓝牙调试
-					#if USE_BLE_FOR_APP			  
-					APP_LINK();
-					#endif
-				if(cnt[2]++>1){cnt[2]=0;
-			
+					
 					if(DMA_GetFlagStatus(DMA2_Stream7,DMA_FLAG_TCIF7)!=RESET)//等待DMA2_Steam7传输完成
 							{ 	DMA_ClearFlag(DMA2_Stream7,DMA_FLAG_TCIF7);//清除DMA2_Steam7传输完成标志
+								  SendBuff1_cnt=0;
+									#if USE_BLE_FOR_APP			  
+									APP_LINK();
+									#endif
+								  
+							if(cnt[2]++>1){cnt[2]=0;
 									#if !BLE_BAD
 								    if(mode.att_pid_tune){//PID TUNING
 											if(KEY[7])//OUTTER
 											data_per_uart1(
+											#if TUNING_X
 											0,-except_A.x*10,0,
+											#else
+											0,except_A.y*10,0,
+											#endif
 											#if EN_ATT_CAL_FC
+											#if TUNING_X
 											0,-Rol_fc*10,0,
+											#else
+											0,Pit_fc*10,0,
+											#endif
 											#else
 											0,-Roll*10,0,
 											#endif
@@ -526,11 +536,12 @@ void uart_task(void *pdata)
 											default:break;
 											}
 										}
+									}
 										#endif
 							USART_DMACmd(USART1,USART_DMAReq_Tx,ENABLE);  //使能串口1的DMA发送     
 							MYDMA_Enable(DMA2_Stream7,SEND_BUF_SIZE1+2);     //开始一次DMA传输！	  
 							}	
-						}
+						//}
 				
 						
 				//To  SD卡
@@ -541,9 +552,9 @@ void uart_task(void *pdata)
 								{ 
 							DMA_ClearFlag(DMA1_Stream4,DMA_FLAG_TCIF4);
 							
-							if(KEY[3]&&!mode.en_sd_save)
-							data_per_uart4(SEND_DEBUG);
-						  else
+//							if(!mode.en_sd_save)
+//							data_per_uart4(SEND_DEBUG);
+//						  else
 							switch(sd_sel){
 							case 0:sd_sel=1;		
 							data_per_uart4(SEND_IMU);

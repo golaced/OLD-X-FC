@@ -249,7 +249,7 @@ void CTRL_2(float T)//角度环
 	 ctrl_angle_offset.y=off_temp[1];}	
 	
 	//-----------------------------------ATT PID  TUNING--------------------------
-#define TUNING_X 0
+
 	if(mode.att_pid_tune)
 	{
 	if(KEY_SEL[0])//TRIG for tuning
@@ -265,9 +265,22 @@ void CTRL_2(float T)//角度环
 	except_A.y=LIMIT(except_A.y,-15,15);	
 	#endif
 	cal_ero_outter_px4(); 
+  if(mode.use_px4_err){
   ctrl_2.err.x =  my_deathzoom_2(ero_angle_px4[0],0.0);
 	ctrl_2.err.y =  my_deathzoom_2(ero_angle_px4[1],0.0);
+	#if EN_ATT_CAL_FC
+	ctrl_2.err.z =  my_deathzoom_2(LIMIT(To_180_degrees( ctrl_angle_offset.z + except_A.z - Yaw_fc	 ),-YAW_ERO_MAX,YAW_ERO_MAX),0.5);//*LIMIT(ero_angle_px4[3],0.5,1);
+	#else	
 	ctrl_2.err.z =  my_deathzoom_2(LIMIT(To_180_degrees( ctrl_angle_offset.z + except_A.z - Yaw	 ),-YAW_ERO_MAX,YAW_ERO_MAX),0.5);//*LIMIT(ero_angle_px4[3],0.5,1);
+	#endif
+	}else{	
+	ctrl_2.err.x =  my_deathzoom_2(To_180_degrees( ctrl_angle_offset.x + except_A.x - Roll  ),0.1);
+	ctrl_2.err.y =  my_deathzoom_2(To_180_degrees( ctrl_angle_offset.y + except_A.y - Pitch ),0.1);}
+	#if EN_ATT_CAL_FC
+	ctrl_2.err.z =  my_deathzoom_2(LIMIT(To_180_degrees( ctrl_angle_offset.z + except_A.z - Yaw_fc	 ),-YAW_ERO_MAX,YAW_ERO_MAX),0.5);//*LIMIT(ero_angle_px4[3],0.5,1);
+	#else	
+	ctrl_2.err.z =  my_deathzoom_2(LIMIT(To_180_degrees( ctrl_angle_offset.z + except_A.z - Yaw	 ),-YAW_ERO_MAX,YAW_ERO_MAX),0.5);//*LIMIT(ero_angle_px4[3],0.5,1);
+	#endif	
 	}
 	else{	
 	cal_ero_outter_px4(); 
@@ -325,7 +338,7 @@ void CTRL_2(float T)//角度环
 	ctrl_2.err_weight.y = ABS(ctrl_2.err.y)/ANGLE_TO_MAX_AS;
 	ctrl_2.err_weight.z = ABS(ctrl_2.err.z)/ANGLE_TO_MAX_AS;
 	/* 角度误差微分（跟随误差曲线变化）*/
-	if(1){//mode.en_fuzzy_angle_pid){
+	if(0){//mode.en_fuzzy_angle_pid){
 	ctrl_2.err_d.x = 10 *eso_att_outter_c[PITr].KD *(ctrl_2.err.x - ctrl_2.err_old.x) *( 0.005f/T ) *( 0.65f + 0.35f *ctrl_2.err_weight.x );
 	ctrl_2.err_d.y = 10 *eso_att_outter_c[PITr].KD *(ctrl_2.err.y - ctrl_2.err_old.y) *( 0.005f/T ) *( 0.65f + 0.35f *ctrl_2.err_weight.y );
 	}else{	
@@ -394,7 +407,6 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 	ctrl_angle_weight[1]=ctrl_2.err_weight.y;
 	ctrl_angle_weight[2]=ctrl_2.err_weight.z;
 	
-	if(!mode.use_dji){
 	/* 给期望（目标）角速度 */
 	EXP_LPF_TMP.x = MAX_CTRL_ASPEED *(ctrl_angle_out[0]/ANGLE_TO_MAX_AS);//*( (CH_filter[0])/500.0f );//
 	EXP_LPF_TMP.y = MAX_CTRL_ASPEED *(ctrl_angle_out[1]/ANGLE_TO_MAX_AS);//*( (CH_filter[1])/500.0f );//
@@ -454,7 +466,7 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 	ctrl_1.out.y = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.y),0,1)*except_AS.y + ( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDPITCH].kp *( ctrl_1.err.y + ctrl_1.err_d.y + ctrl_1.err_i.y ) );
 	ctrl_1.out.z = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.z),0,1)*except_AS.z + ( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDYAW].kp   *( ctrl_1.err.z + ctrl_1.err_d.z + ctrl_1.err_i.z ) );
 	}
-}
+
 	
 #if !EN_TIM_INNER
 	Thr_Ctrl(T);// 油门控制

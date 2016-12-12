@@ -475,6 +475,7 @@ u8 temp;
 						ctrl_1.PID[PIDPITCH].kp =ctrl_1.PID[PIDROLL].kp  = 0.001*SPID.IP;
 						ctrl_1.PID[PIDPITCH].ki =ctrl_1.PID[PIDROLL].ki  = 0.001*SPID.II;
 						ctrl_1.PID[PIDPITCH].kd =ctrl_1.PID[PIDROLL].kd  = 0.001*SPID.ID;
+					  ctrl_1.FB	= 0.001*SPID.YI;	
 						//		ctrl_2.PID[PIDYAW].kp 	= 0.001*SPID.YP;
 						//		ctrl_2.PID[PIDYAW].ki 	= 0.001*SPID.YI;
 						//		ctrl_2.PID[PIDYAW].kd 	= 0.001*SPID.YD;
