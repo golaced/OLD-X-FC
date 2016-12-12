@@ -85,6 +85,9 @@
 
 #define X 0
 #define Y 1
+
+#define East 0
+#define North 1
 //=======================参数宏定义==========
 #define RtA 		57.324841				
 #define AtR    	0.0174533				

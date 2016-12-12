@@ -2,7 +2,7 @@
 #define	_CIRCLE_H_
 
 #include "stm32f4xx.h"
-
+extern float yaw_qr_off;
 typedef struct
 { float exp;
 	float now;
@@ -11,7 +11,7 @@ typedef struct
 	float err_d;
 	float err_i;
 	float pid_out;
-
+  u8 mode;
 }_pos_control;
 
 typedef struct

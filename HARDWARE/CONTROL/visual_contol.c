@@ -479,7 +479,7 @@ head  |    1 PIT y-  RC0
 
 #define NAV_POS_INT        500//mm/s  
 #define NAV_SPD_INT        300//mm/s
-
+float yaw_qr_off;
 float out_timer_nav,in_timer_nav;
 float acc_temp[3];
 _pos_pid nav_pos_pid;
@@ -498,6 +498,7 @@ void Positon_control(float T)//     光流定点
 	u8 i;
 	static u8 cnt[2],init;
 	if(!init){init=1;
+		nav_pos_ctrl[X].mode=2;
 		nav_pos_pid.kp=0.2;
 		nav_pos_pid.ki=0.0;
 		nav_pos_pid.kd=0.0;
@@ -565,12 +566,21 @@ head  |    1 PIT y-   90d in marker
 		nav_pos_ctrl[i].err_d =  nav_pos_pid.kd *( 0.6f *(-(float)spd[i]*out_timer_nav) + 0.4f *(nav_pos_ctrl[i].err - nav_pos_ctrl[i].err_old) );
 
 		nav_pos_ctrl[i].pid_out = nav_pos_ctrl[i].err +nav_pos_ctrl[i].err_i + nav_pos_ctrl[i].err_d;
-		nav_spd_ctrl[i].exp=nav_pos_ctrl[i].pid_out = LIMIT(nav_pos_ctrl[i].pid_out,-5*1000,5*1000);//m/s
+		nav_pos_ctrl[i].pid_out = LIMIT(nav_pos_ctrl[i].pid_out,-5*1000,5*1000);//m/s
 		nav_pos_ctrl[i].err_old = nav_pos_ctrl[i].err;
 		}
 	}
+	float Yaw_qr=To_180_degrees(Yaw+yaw_qr_off);
+	if(nav_pos_ctrl[X].mode==2){//global  Yaw from IMU
+	nav_spd_ctrl[Y].exp= nav_pos_ctrl[North].pid_out*cos(Yaw_qr*0.0173)+nav_pos_ctrl[East].pid_out*sin(Yaw_qr*0.0173); 
+	nav_spd_ctrl[X].exp=-nav_pos_ctrl[North].pid_out*sin(Yaw_qr*0.0173)+nav_pos_ctrl[East].pid_out*cos(Yaw_qr*0.0173);
+	}
+	else
+	{
+	nav_spd_ctrl[Y].exp=nav_pos_ctrl[Y].pid_out;
+	nav_spd_ctrl[X].exp=nav_pos_ctrl[X].pid_out;	
+	}		
 	
-	  
 	static u8 state_tune_spd;
 	static u8 flag_way;
 	static u16 cnt_s1;

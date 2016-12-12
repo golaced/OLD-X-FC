@@ -622,6 +622,15 @@ void Send_PID(void)
 	_temp = HPID.OD;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	_temp=nav_pos_ctrl[X].mode;
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	_temp = (vs16)(yaw_qr_off*10);
+	data_to_send[_cnt++]=BYTE1(_temp);
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	
 	data_to_send[3] = _cnt-4;
 
 	for( i=0;i<_cnt;i++)
