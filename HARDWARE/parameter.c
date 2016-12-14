@@ -327,23 +327,23 @@ static void  Param_SetSettingToFC(void) //fly thr 45% at 4s full 4.4Ah
 			eso_att_outter[PITr].n=eso_att_outter[ROLr].n=eso_att_outter[YAWr].n=15;//10;
 			eso_att_inner[PITr].n=eso_att_inner[ROLr].n=eso_att_inner[YAWr].n=66;
 			#else //9045
-			pid_setup.groups.ctrl2.roll.kp=pid_setup.groups.ctrl2.pitch.kp =0.35;//0.425;//0.66;//0.35;//28;//0.425;//0.425;//<-----------mini0.45 for 4050  0.4 for 6030 WT
+			pid_setup.groups.ctrl2.roll.kp=pid_setup.groups.ctrl2.pitch.kp =0.4;//0.35;//0.425;//0.66;//0.35;//28;//0.425;//0.425;//<-----------mini0.45 for 4050  0.4 for 6030 WT
 			SPID.IP=pid_setup.groups.ctrl2.roll.kp*1000;
 			//i
-			pid_setup.groups.ctrl2.roll.ki =pid_setup.groups.ctrl2.pitch.ki = 0.00;//5;//5;//0.15;//0.25;//0.05;
+			pid_setup.groups.ctrl2.roll.ki =pid_setup.groups.ctrl2.pitch.ki = 0.05;//5;//5;//0.15;//0.25;//0.05;
 			SPID.II=pid_setup.groups.ctrl2.roll.ki*1000;
 			//d
-			pid_setup.groups.ctrl2.roll.kd  = pid_setup.groups.ctrl2.pitch.kd =0.5;//0.3;//0.3;//2;//0.425;//35;//<-------------mini
+			pid_setup.groups.ctrl2.roll.kd  = pid_setup.groups.ctrl2.pitch.kd =0.8;//0.5;//0.3;//0.3;//2;//0.425;//35;//<-------------mini
 			SPID.ID=pid_setup.groups.ctrl2.roll.kd*1000;
 			//---------------------------------------GRO--------------------------------
 			//p
-			pid_setup.groups.ctrl1.roll.kp=pid_setup.groups.ctrl1.pitch.kp = 0.35;//0.425;//0.466;//0.3;//0.425;//0.35;//<-----------mini                                                                               WT
+			pid_setup.groups.ctrl1.roll.kp=pid_setup.groups.ctrl1.pitch.kp = 0.5;//0.35;//0.425;//0.466;//0.3;//0.425;//0.35;//<-----------mini                                                                               WT
 			SPID.OP=pid_setup.groups.ctrl1.roll.kp*1000;
 			//i
 			pid_setup.groups.ctrl1.roll.ki =pid_setup.groups.ctrl1.pitch.ki =0.05;//0.1;// 0.05;//0.1;
 			SPID.OI=pid_setup.groups.ctrl1.roll.ki*1000;
 			//d
-			pid_setup.groups.ctrl1.roll.kd=pid_setup.groups.ctrl1.pitch.kd =4;//8;// 2.0;//4;//2.0;
+			pid_setup.groups.ctrl1.roll.kd=pid_setup.groups.ctrl1.pitch.kd =8;//4;//8;// 2.0;//4;//2.0;
 			SPID.OD=pid_setup.groups.ctrl1.roll.kd*1000;
 			//--------------------------------------YAW-------------------------------------------------
 			pid_setup.groups.ctrl2.yaw.kp   = 0.8;//0.4;//0.8;	
@@ -372,7 +372,7 @@ static void  Param_SetSettingToFC(void) //fly thr 45% at 4s full 4.4Ah
 		 //-----------------------------±ÚÕÏ----------------------------------
 			pid.avoid.out.p=0.06;
 		 //----------------------------ESO------------------------------------
-			eso_att_outter_c[PITr].n=eso_att_outter_c[ROLr].n=eso_att_outter_c[YAWr].n=22;//100;//13;//10;need tuning
+			eso_att_outter_c[PITr].n=eso_att_outter_c[ROLr].n=eso_att_outter_c[YAWr].n=18;//100;//13;//10;need tuning
 			eso_att_inner[PITr].n=eso_att_inner[ROLr].n=eso_att_inner[YAWr].n=66;
 			#endif
 	

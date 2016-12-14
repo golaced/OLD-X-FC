@@ -474,13 +474,14 @@ u8 temp;
 						ctrl_2.PID[PIDPITCH].kd =ctrl_2.PID[PIDROLL].kd  = 0.001*SPID.OD;
 						ctrl_1.PID[PIDPITCH].kp =ctrl_1.PID[PIDROLL].kp  = 0.001*SPID.IP;
 						ctrl_1.PID[PIDPITCH].ki =ctrl_1.PID[PIDROLL].ki  = 0.001*SPID.II;
-						ctrl_1.PID[PIDPITCH].kd =ctrl_1.PID[PIDROLL].kd  = 0.001*SPID.ID;
-					  ctrl_1.FB	= 0.001*SPID.YI;	
+						ctrl_1.PID[PIDPITCH].kd =ctrl_1.PID[PIDROLL].kd  = 0.01*SPID.ID;
+					 // ctrl_1.FB	= 0.001*SPID.YI;	
 						//		ctrl_2.PID[PIDYAW].kp 	= 0.001*SPID.YP;
 						//		ctrl_2.PID[PIDYAW].ki 	= 0.001*SPID.YI;
 						//		ctrl_2.PID[PIDYAW].kd 	= 0.001*SPID.YD;
 		
 						eso_att_outter_c[PITr].b0=eso_att_outter_c[ROLr].b0= SPID.YD;//姿态控制自抗扰b0
+						eso_att_inner_c[PITr].b0=eso_att_inner_c[ROLr].b0= SPID.YI;//角速度控制自抗扰b0	
 						if(SPID.YP!=0)
 						att_tuning_thr_limit=SPID.YP;//  PID调试时油门限制
 						else

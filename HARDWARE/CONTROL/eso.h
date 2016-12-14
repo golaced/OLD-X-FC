@@ -4,7 +4,7 @@
 #include "stm32f4xx.h"
 
 typedef struct
-{
+{ float eso_dead;
   float beta0,beta1,beta2,beta3;
 	float disturb,disturb_u;
 	float alfa1,alfa2,alfa0,tao,KP,KD,KI,e;
@@ -12,7 +12,7 @@ typedef struct
 	float h,integer;
 	u8 init,level;
 	u8 n,out_mode,use_td;
-  
+  u8 not_use_px4;
 	float v1,v2,h0,r0,b0,h1,r1,c,u;
 }ESO;
 

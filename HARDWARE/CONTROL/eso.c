@@ -84,7 +84,7 @@ float ESO_2N(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4
 	eso_in->h=eso_in->h0;
 //********  eso  *************
 
-	e=eso_in->e=my_deathzoom_2(eso_in->z[0]-y,0);
+	e=eso_in->e=my_deathzoom_2(eso_in->z[0]-y,eso_in->eso_dead);
 	fe=fal(e,0.5,eso_in->h0);
 	fe1=fal(e,0.25,eso_in->h0);
 	eso_in->z[0]+=eso_in->h0*(eso_in->z[1]-eso_in->beta0*e+eso_in->b0*Thr_Weight *u);
@@ -98,14 +98,13 @@ float ESO_2N(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4
 float ESO_2N_R(ESO *eso_in,float v,float y,float u,float T,float MAX)             // v是控制系统的输入，y是控制系统的输出，反馈给ESO，u是ADRC的输出控制量
 {
 	float e=0,fe,fe1;
-	eso_in->h=T;
+	eso_in->h=eso_in->h0;
 //********  eso  *************
-	
-	e=eso_in->e=my_deathzoom_2(eso_in->z[0]-y,0);
+	e=eso_in->e=my_deathzoom_2(eso_in->z[0]-y,eso_in->eso_dead);
 	fe=fal(e,0.5,eso_in->h0);
 	fe1=fal(e,0.25,eso_in->h0);
 	eso_in->z[0]+=eso_in->h0*(eso_in->z[1]-eso_in->beta0*e+eso_in->b0*Thr_Weight *u);
-	eso_in->z[1]+=-eso_in->h0*eso_in->beta1*fe;
+	eso_in->z[1]+=-eso_in->h0*eso_in->beta1*e;
 	if(eso_in->n==0)
 		eso_in->n=1;
 	return eso_in->disturb=LIMIT(eso_in->z[1]/eso_in->n,-MAX,MAX);
@@ -117,7 +116,7 @@ float ESO_3N(ESO *eso_in,float v,float y,float u,float T,float MAX)             
 	float e=0,fe,fe1;
 	eso_in->h=eso_in->h0;
 //********  eso  *************
-	e=eso_in->e=my_deathzoom_2(eso_in->z[0]-y,0.25);
+	e=eso_in->e=my_deathzoom_2(eso_in->z[0]-y,eso_in->eso_dead);
 	fe=fal(e,0.5,eso_in->h0);
 	fe1=fal(e,0.25,eso_in->h0);
 	eso_in->z[0]+=eso_in->h*(eso_in->z[1]-eso_in->beta0*e);
@@ -131,10 +130,15 @@ float ESO_3N(ESO *eso_in,float v,float y,float u,float T,float MAX)             
 
 float ESO_CONTROL(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4)
 {static float e0,e1,e2;
-if(mode.use_px4_err)
+if(eso_in->not_use_px4)
 {
-e1=ero_px4;
+e1=v-eso_in->z[0];
 e2=-eso_in->z[1];
+}	
+else if(mode.use_px4_err)
+{
+e1=my_deathzoom_2(ero_px4,eso_in->eso_dead);
+e2=eso_in->z[1];
 }
 else if(!eso_in->use_td)
 {
@@ -147,13 +151,14 @@ e2=eso_in->v2-eso_in->z[1];
 }
 e0+=eso_in->e;//*T;
 
-	eso_in->u=eso_in->KP*fal(e1,eso_in->alfa1,eso_in->tao);
+	eso_in->u=eso_in->KP*fal(e1,eso_in->alfa1,eso_in->tao);//+eso_in->KD*fal(e2,eso_in->alfa2,eso_in->tao);
 	if(eso_in->b0!=0){
   switch(eso_in->level){
 		case 1:eso_in->disturb_u=eso_in->z[1]/eso_in->b0;break; 
 		case 2:eso_in->disturb_u=eso_in->z[2]/eso_in->b0;break;
 	}
-  eso_in->u-=Thr_Weight *eso_in->disturb_u;
+	if(fabs(e1)>eso_in->eso_dead)
+  eso_in->u-=Thr_Weight *eso_in->disturb_u;		
 	}
 return  eso_in->u=LIMIT(eso_in->u+eso_in->integer,-MAX,MAX);
 }
@@ -202,6 +207,7 @@ float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 		eso_in->beta1=1/(30*pow(eso_in->h0,2));
 		eso_in->beta2=1000;//2/(64*pow(eso_in->h0,2));	
 		#endif
+	eso_in->eso_dead=2;	
  //-------------反馈----------------
 	eso_in->out_mode=1;	
 	//-------liner    0
@@ -225,10 +231,10 @@ float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 			eso_in->beta0=1/(eso_in->h0+0.000001);
    	  eso_in->beta1=1/(30*pow(eso_in->h0,2)+0.000001);
 	#endif
-		if(mode.att_pid_tune&&mode.en_pid_sb_set){
+	if(mode.att_pid_tune&&mode.en_pid_sb_set){
 	eso_in->KD=0.001*SPID.OD*4;
 	eso_in->KP=0.001*SPID.OP*2;
-		}
+	}
 	//if(SPID.YD!=0)eso_in->b0=SPID.YD;
 	SMOOTH_IN_ESO(eso_in,v);
 	switch(eso_in->level){
@@ -242,76 +248,22 @@ float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 	return eso_in->u;
 }
 
-//姿态航向
-float ATT_CONTRL_OUTER_ESO_3_Y(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4)//航向
-{ if(!eso_in->init)
-	{
-  eso_in->init=1;
-	eso_in->level=1;//系统阶次	
- //-------------跟踪器
-	eso_in->use_td=0;		
-	eso_in->r0=4000;//跟踪速度
-  eso_in->h0=T;//滤波因子
- //-------------观测器
-		#if EN_TIM_INNER
-	  eso_in->beta0=200;
-	  eso_in->beta1=600;//1/(3*pow(eso_in->h0,2));
-    eso_in->beta2=2000;//2/(64*pow(eso_in->h0,2));	
-		#else
-		eso_in->beta0=100;
-	  eso_in->beta1=300;//1/(3*pow(eso_in->h0,2));
-    eso_in->beta2=1000;//2/(64*pow(eso_in->h0,2));	
-		#endif
-
- //-------------反馈----------------
-	eso_in->out_mode=1;	
-		//-------liner    0
-	eso_in->KP=ctrl_2.PID[PIDYAW].kp*2;
-	eso_in->KI=0;
-	eso_in->KD=ctrl_2.PID[PIDYAW].kd*4;
-		//-------noliner  1
-	eso_in->alfa0=0.25;
-  eso_in->alfa1=0.75;
-	eso_in->alfa2=1.5;	
-  eso_in->tao=eso_in->h0*2;		
-	  //-------noliner  2 3
-	eso_in->c=0.5;//阻尼因子	
-	eso_in->r1=0.5/pow(eso_in->h0,2);
-	eso_in->h1=eso_in->h0*5;
-	//----------模型增益
-		eso_in->b0=100;		
-	}
-		if(mode.att_pid_tune&&mode.en_pid_sb_set){
-	eso_in->KD=0.001*SPID.OD*4;
-	eso_in->KP=0.001*SPID.OP*2;
-		}
-	//if(SPID.YD!=0)eso_in->b0=SPID.YD;
-	SMOOTH_IN_ESO(eso_in,v);
-	switch(eso_in->level){
-		case 1:ESO_2N(eso_in,v, y, u, T, MAX,ero_px4);break;
-		case 2:ESO_3N(eso_in,v, y, u, T, MAX);break;
-	}
-
-	eso_in->integer+=eso_in->KI*(v-y)*T;
-	eso_in->integer = LIMIT( eso_in->integer, -Thr_Weight *CTRL_2_INT_LIMIT,Thr_Weight *CTRL_2_INT_LIMIT );
-	ESO_CONTROL_Y(eso_in,v, y, u, T, MAX,ero_px4);
-	return eso_in->u;
-}
 //姿态内环
 float ATT_CONTRL_INNER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float MAX)
 { if(!eso_in->init)
 	{
   eso_in->init=1;
 	eso_in->level=1;//系统阶次	
+  eso_in->not_use_px4=1;
  //-------------跟踪器
 	eso_in->use_td=0;		
-	eso_in->r0=20000;//跟踪速度
-  eso_in->h0=T;//滤波因子
+	eso_in->r0=4000;//跟踪速度
+  eso_in->h0=(float)F_INNER/1000;//滤波因子
  //-------------观测器
-	eso_in->beta0=100;
-	eso_in->beta1=300;
-  eso_in->beta2=2000;
-
+	eso_in->beta0=1/(eso_in->h0);
+	eso_in->beta1=1/(30*pow(eso_in->h0,2));
+	eso_in->beta2=1000;	
+  eso_in->eso_dead=0;
  //-------------反馈----------------
 	eso_in->out_mode=1;	
 		//-------liner    0
@@ -328,9 +280,18 @@ float ATT_CONTRL_INNER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 	eso_in->r1=0.5/pow(eso_in->h0,2);
 	eso_in->h1=eso_in->h0*5;
 	//----------模型增益
-  eso_in->b0=40;		
+  eso_in->b0=0;//40;		
 	}
 	//if(SPID.YD!=0)eso_in->b0=SPID.YD;
+	#if ESO_PARA_USE_REAL_TIME
+	    eso_in->h0=T;
+			eso_in->beta0=1/(eso_in->h0+0.000001);
+   	  eso_in->beta1=1/(30*pow(eso_in->h0,2)+0.000001);
+	#endif
+	if(mode.att_pid_tune&&mode.en_pid_sb_set){
+	eso_in->KD=0.001*SPID.ID*4;
+	eso_in->KP=0.001*SPID.IP*10;
+	}
 	SMOOTH_IN_ESO(eso_in,v);
 	switch(eso_in->level){
 		case 1:ESO_2N_R(eso_in,v, y, u, T, MAX);break;

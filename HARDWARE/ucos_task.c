@@ -360,6 +360,29 @@ void uart_task(void *pdata)
 							if(cnt[2]++>1){cnt[2]=0;
 									#if !BLE_BAD
 								    if(mode.att_pid_tune){//PID TUNING
+											
+											if(mcuID[0]==TUNNING_DRONE_CHIP_ID)
+											{
+											if(ctrl_2.PID->kp!=0&&KEY[7])	
+											data_per_uart1(
+											
+											0,-except_A.x*10,0,
+											#if EN_ATT_CAL_FC										
+											0,-Rol_fc*10,0,
+											#else
+											0,-Roll*10,0,
+											#endif
+											-ctrl_2.err.y*10,-eso_att_outter[ROLr].disturb*10,0,
+											(int16_t)(eso_att_outter_c[ROLr].disturb_u*100),(int16_t)(0*10.0),(int16_t)(0*100.0),0/10,0,0/10,0*0);
+											else
+											data_per_uart1(
+											0,-except_AS.x,0,
+											0,-mpu6050.Gyro_deg.x,0,  
+											-ctrl_1.err.y,-eso_att_inner[ROLr].disturb,0,
+											(int16_t)(eso_att_outter_c[ROLr].disturb_u*10),(int16_t)(0*10.0),(int16_t)(0*10.0),0/10,0,0/10,0*0);	
+											
+											}else{
+											
 											if(KEY[7])//OUTTER
 											data_per_uart1(
 											#if TUNING_X
@@ -383,7 +406,8 @@ void uart_task(void *pdata)
 											0,-except_AS.x,0,
 											0,-mpu6050.Gyro_deg.x,0,  
 											-ctrl_1.err.y,-eso_att_inner[ROLr].disturb,0,
-											(int16_t)(eso_att_outter_c[ROLr].disturb_u*10),(int16_t)(0*10.0),(int16_t)(0*10.0),0/10,0,0/10,0*0);	
+											(int16_t)(eso_att_outter_c[ROLr].disturb_u*10),(int16_t)(0*10.0),(int16_t)(0*10.0),0/10,0,0/10,0*0);
+											}
 										}
 										else if(flow_debug.en_ble_debug||force_flow_ble_debug)//DEBUG  FLOW
 											data_per_uart1(

@@ -207,142 +207,76 @@
           <Name>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32F4xx_1024 -FS08000000 -FL0100000 -FP0($$Device:STM32F407ZG$Flash\STM32F4xx_1024.FLM))</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>23</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134257776</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>C:\Users\user\Desktop\FC_MIN_椋炴帶鐮旂┒\UCOS - mini\Half+ -divid\OLD_X_FC\HARDWARE\DRIVER\pwm_out.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\UCOSII_3\../HARDWARE/DRIVER/pwm_out.c\23</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>91</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134221600</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>C:\Users\user\Desktop\FC_MIN_椋炴帶鐮旂┒\UCOS - mini\Half+ -divid\OLD_X_FC\HARDWARE\ucos_task.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\UCOSII_3\../HARDWARE/ucos_task.c\91</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>55</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134221406</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>C:\Users\user\Desktop\FC_MIN_椋炴帶鐮旂┒\UCOS - mini\Half+ -divid\OLD_X_FC\HARDWARE\ucos_task.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\UCOSII_3\../HARDWARE/ucos_task.c\55</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>outer_loop_time</ItemText>
+          <ItemText>app_connect_fc</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>outer_loop_time_C</ItemText>
+          <ItemText>RxBuffer_app</ItemText>
         </Ww>
         <Ww>
           <count>2</count>
           <WinNumber>1</WinNumber>
-          <ItemText>inner_loop_time</ItemText>
+          <ItemText>mcuID</ItemText>
         </Ww>
         <Ww>
           <count>3</count>
           <WinNumber>1</WinNumber>
-          <ItemText>GET_T_INNER_TIM_USE1</ItemText>
-        </Ww>
-        <Ww>
-          <count>4</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Rol_fc</ItemText>
-        </Ww>
-        <Ww>
-          <count>5</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Pit_fc</ItemText>
-        </Ww>
-        <Ww>
-          <count>6</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>imu_nav</ItemText>
-        </Ww>
-        <Ww>
-          <count>7</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>VEL_UKF_Y</ItemText>
-        </Ww>
-        <Ww>
-          <count>8</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>VEL_UKF_X</ItemText>
-        </Ww>
-        <Ww>
-          <count>9</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>POS_UKF_X</ItemText>
-        </Ww>
-        <Ww>
-          <count>10</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>POS_UKF_Y</ItemText>
-        </Ww>
-        <Ww>
-          <count>11</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Yaw_fc</ItemText>
-        </Ww>
-        <Ww>
-          <count>12</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>acc_temp</ItemText>
-        </Ww>
-        <Ww>
-          <count>13</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>nav_spd_ctrl</ItemText>
-        </Ww>
-        <Ww>
-          <count>14</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>nav_spd_pid</ItemText>
-        </Ww>
-        <Ww>
-          <count>15</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>spd</ItemText>
-        </Ww>
-        <Ww>
-          <count>16</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>GPS_angle</ItemText>
-        </Ww>
-        <Ww>
-          <count>17</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>\\UCOSII_3\../HARDWARE/CONTROL/visual_contol.c\nav_spd_ctrl[1].exp</ItemText>
-        </Ww>
-        <Ww>
-          <count>18</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>nav_pos_ctrl</ItemText>
-        </Ww>
-        <Ww>
-          <count>19</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>nav_pos_pid</ItemText>
-        </Ww>
-        <Ww>
-          <count>20</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>CH_filter</ItemText>
-        </Ww>
-        <Ww>
-          <count>21</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>except_A_SB_lft</ItemText>
-        </Ww>
-        <Ww>
-          <count>22</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>except_AR</ItemText>
-        </Ww>
-        <Ww>
-          <count>23</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>nav_angle</ItemText>
-        </Ww>
-        <Ww>
-          <count>24</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>except_A</ItemText>
-        </Ww>
-        <Ww>
-          <count>25</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Yaw_fc</ItemText>
-        </Ww>
-        <Ww>
-          <count>26</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>Yaw</ItemText>
+          <ItemText>\\UCOSII_3\main.c\mcuID,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -420,6 +354,101 @@
           <count>14</count>
           <WinNumber>2</WinNumber>
           <ItemText>ALT_POS_SONAR2</ItemText>
+        </Ww>
+        <Ww>
+          <count>15</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>motor_cal</ItemText>
+        </Ww>
+        <Ww>
+          <count>16</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>except_A</ItemText>
+        </Ww>
+        <Ww>
+          <count>17</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>mpu6050_fc</ItemText>
+        </Ww>
+        <Ww>
+          <count>18</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>ctrl_2</ItemText>
+        </Ww>
+        <Ww>
+          <count>19</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>SPID,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>20</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>eso_att_outter_c</ItemText>
+        </Ww>
+        <Ww>
+          <count>21</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>motor</ItemText>
+        </Ww>
+        <Ww>
+          <count>22</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>inner_loop_time_time</ItemText>
+        </Ww>
+        <Ww>
+          <count>23</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>outer_loop_time_C</ItemText>
+        </Ww>
+        <Ww>
+          <count>24</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>ctrl_1</ItemText>
+        </Ww>
+        <Ww>
+          <count>25</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>Thr_Low</ItemText>
+        </Ww>
+        <Ww>
+          <count>26</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>mode.use_px4_err)</ItemText>
+        </Ww>
+        <Ww>
+          <count>27</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>mode.use_px4_err</ItemText>
+        </Ww>
+        <Ww>
+          <count>28</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>Thr_Weight</ItemText>
+        </Ww>
+        <Ww>
+          <count>29</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>force_Thr_low</ItemText>
+        </Ww>
+        <Ww>
+          <count>30</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>\\UCOSII_3\../HARDWARE/CONTROL/att_control.c\except_A</ItemText>
+        </Ww>
+        <Ww>
+          <count>31</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>ALT_POS_SONAR2</ItemText>
+        </Ww>
+        <Ww>
+          <count>32</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>k_rc_gyro_spd</ItemText>
+        </Ww>
+        <Ww>
+          <count>33</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>k_eso_pid</ItemText>
         </Ww>
       </WatchWindow2>
       <MemoryWindow1>

@@ -46,6 +46,7 @@ int flag_eso=1;
 //float off_temp[2]={(-3.24-(-4.6)),(1.57-(2.56)) };
 float off_temp[2]={0 };
 float off_yaw=0;//遥控 航向偏执
+float k_eso_pid;
 void CTRL_2(float T)//角度环
 { float px,py,ix,iy,d;
 	static xyz_f_t acc_no_g;
@@ -252,6 +253,13 @@ void CTRL_2(float T)//角度环
 
 	if(mode.att_pid_tune)
 	{
+		
+	if(mcuID[0]==TUNNING_DRONE_CHIP_ID){
+	if(KEY_SEL[0])//TRIG for tuning
+	except_A.x=-15;
+	else
+	except_A.x=LIMIT(except_A.x,-30,30);	
+	}else{	
 	if(KEY_SEL[0])//TRIG for tuning
 	#if TUNING_X	
 	except_A.x=-15;
@@ -264,6 +272,10 @@ void CTRL_2(float T)//角度环
 	#else
 	except_A.y=LIMIT(except_A.y,-15,15);	
 	#endif
+  }
+	
+		
+	
 	cal_ero_outter_px4(); 
   if(mode.use_px4_err){
   ctrl_2.err.x =  my_deathzoom_2(ero_angle_px4[0],0.0);
@@ -337,14 +349,14 @@ void CTRL_2(float T)//角度环
 	ctrl_2.err_weight.x = ABS(ctrl_2.err.x)/ANGLE_TO_MAX_AS;
 	ctrl_2.err_weight.y = ABS(ctrl_2.err.y)/ANGLE_TO_MAX_AS;
 	ctrl_2.err_weight.z = ABS(ctrl_2.err.z)/ANGLE_TO_MAX_AS;
-	/* 角度误差微分（跟随误差曲线变化）*/
-	if(0){//mode.en_fuzzy_angle_pid){
-	ctrl_2.err_d.x = 10 *eso_att_outter_c[PITr].KD *(ctrl_2.err.x - ctrl_2.err_old.x) *( 0.005f/T ) *( 0.65f + 0.35f *ctrl_2.err_weight.x );
-	ctrl_2.err_d.y = 10 *eso_att_outter_c[PITr].KD *(ctrl_2.err.y - ctrl_2.err_old.y) *( 0.005f/T ) *( 0.65f + 0.35f *ctrl_2.err_weight.y );
-	}else{	
+//	/* 角度误差微分（跟随误差曲线变化）*/
+//	if(0){//mode.en_fuzzy_angle_pid){
+//	ctrl_2.err_d.x = 10 *eso_att_outter_c[PITr].KD *(ctrl_2.err.x - ctrl_2.err_old.x) *( 0.005f/T ) *( 0.65f + 0.35f *ctrl_2.err_weight.x );
+//	ctrl_2.err_d.y = 10 *eso_att_outter_c[PITr].KD *(ctrl_2.err.y - ctrl_2.err_old.y) *( 0.005f/T ) *( 0.65f + 0.35f *ctrl_2.err_weight.y );
+//	}else{	
 	ctrl_2.err_d.x = 10 *d *(ctrl_2.err.x - ctrl_2.err_old.x) *( 0.005f/T ) *( 0.65f + 0.35f *ctrl_2.err_weight.x );
 	ctrl_2.err_d.y = 10 *d *(ctrl_2.err.y - ctrl_2.err_old.y) *( 0.005f/T ) *( 0.65f + 0.35f *ctrl_2.err_weight.y );
-	}
+	//}
 	ctrl_2.err_d.z = 10 *ctrl_2.PID[PIDYAW].kd 	 *(ctrl_2.err.z - ctrl_2.err_old.z) *( 0.005f/T ) *( 0.65f + 0.35f *ctrl_2.err_weight.z );
 	/* 角度误差积分 */
 	ctrl_2.err_i.x +=ix  *ctrl_2.err.x *T;
@@ -355,28 +367,36 @@ void CTRL_2(float T)//角度环
 	ctrl_2.eliminate_I.y = Thr_Weight *CTRL_2_INT_LIMIT;
 	ctrl_2.eliminate_I.z = Thr_Weight *CTRL_2_INT_LIMIT;
 	/* 角度误差积分限幅 */
+	if(fabs(ctrl_2.err.x)<eso_att_outter_c[PITr].eso_dead)
 	ctrl_2.err_i.x = LIMIT( ctrl_2.err_i.x, -ctrl_2.eliminate_I.x,ctrl_2.eliminate_I.x );
+	else
+	ctrl_2.err_i.x=0;
+
+	if(fabs(ctrl_2.err.y)<eso_att_outter_c[PITr].eso_dead)
 	ctrl_2.err_i.y = LIMIT( ctrl_2.err_i.y, -ctrl_2.eliminate_I.y,ctrl_2.eliminate_I.y );
+	else
+	ctrl_2.err_i.y=0;
+	
 	ctrl_2.err_i.z = LIMIT( ctrl_2.err_i.z, -ctrl_2.eliminate_I.z,ctrl_2.eliminate_I.z );
 	/* 对用于计算比例项输出的角度误差限幅 */
 	ctrl_2.err.x = LIMIT( ctrl_2.err.x, -90, 90 );
 	ctrl_2.err.y = LIMIT( ctrl_2.err.y, -90, 90 );
 	ctrl_2.err.z = LIMIT( ctrl_2.err.z, -90, 90 );
 	//---------------------SELF DISTURB------------------------------
-	ATT_CONTRL_OUTER_ESO_3(&eso_att_outter_c[PITr],except_A.y,Pit_fc,ctrl_2.out.y,T,20,ctrl_2.err.y);
-	ATT_CONTRL_OUTER_ESO_3(&eso_att_outter_c[ROLr],except_A.x,Rol_fc,ctrl_2.out.x,T,20,ctrl_2.err.x);
-	/* 角度PID输出 */
-	#define MAX_W_NEURO 1/(1.618+1)
+	ATT_CONTRL_OUTER_ESO_3(&eso_att_outter_c[PITr],except_A.y,Pit_fc,ctrl_2.out.y,T,ANGLE_TO_MAX_AS,ctrl_2.err.y);
+	ATT_CONTRL_OUTER_ESO_3(&eso_att_outter_c[ROLr],except_A.x,Rol_fc,ctrl_2.out.x,T,ANGLE_TO_MAX_AS,ctrl_2.err.x);
 	float x_out,y_out;
 	x_out=px*( ctrl_2.err.x + ctrl_2.err_d.x + ctrl_2.err_i.x );
 	y_out=py*( ctrl_2.err.y + ctrl_2.err_d.y + ctrl_2.err_i.y );
 //-----------------------------------CONTROL OUT SEL---------------------	
-	if(eso_att_outter_c[PITr].b0!=0){
-	ctrl_2.err_i.x=ctrl_2.err_i.y=ctrl_2.err_i.z=0;
-	ctrl_2.out.x= (eso_att_outter_c[ROLr].u+px  *( ctrl_2.err_d.x ));//*w_neuro[0]+(1-w_neuro[0])*x_out;
-	ctrl_2.out.y=	(eso_att_outter_c[PITr].u+py  *( ctrl_2.err_d.y ));//*w_neuro[1]+(1-w_neuro[1])*y_out;
+	
+	k_eso_pid=LIMIT(10*fabs(ctrl_2.err.x)/MAX_CTRL_ANGLE,0.3,1);///eso_att_outter_c[PITr].eso_dead;
+	if(eso_att_outter_c[PITr].b0!=0){//use eso
+	//ctrl_2.err_i.x=ctrl_2.err_i.y=ctrl_2.err_i.z=0;
+	ctrl_2.out.x=(eso_att_outter_c[ROLr].u+px  *( ctrl_2.err_d.x+ ctrl_2.err_i.x  ));//*w_neuro[0]+(1-w_neuro[0])*x_out;
+	ctrl_2.out.y=	(eso_att_outter_c[PITr].u+py  *( ctrl_2.err_d.y+ ctrl_2.err_i.y  ));//*w_neuro[1]+(1-w_neuro[1])*y_out;
 	}
-	else{
+	else{//origin pid
 	ctrl_2.out.x = x_out;	//rol
 	ctrl_2.out.y = y_out;  //pit
   }
@@ -394,15 +414,21 @@ void CTRL_2(float T)//角度环
 xyz_f_t except_AS;
 
 float g_old[7];
- 
+float k_rc_gyro_spd=0.4;
 void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 {float ctrl_angle_out[3],ctrl_angle_weight[3];
 	xyz_f_t EXP_LPF_TMP;
 	
-
+  if(ctrl_2.PID->kp==0||KEY[7]==0){
+	if(fabs(Rol_fc)<50)	
+	ctrl_angle_out[0]=except_A.x*k_rc_gyro_spd;
+	ctrl_angle_out[1]=ctrl_2.out.y;
+	ctrl_angle_out[2]=ctrl_2.out.z;	
+	}else{
 	ctrl_angle_out[0]=ctrl_2.out.x;
 	ctrl_angle_out[1]=ctrl_2.out.y;
 	ctrl_angle_out[2]=ctrl_2.out.z;
+	}
 	ctrl_angle_weight[0]=ctrl_2.err_weight.x;
 	ctrl_angle_weight[1]=ctrl_2.err_weight.y;
 	ctrl_angle_weight[2]=ctrl_2.err_weight.z;
@@ -452,13 +478,14 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 	ctrl_1.err_i.y = LIMIT( ctrl_1.err_i.y, -ctrl_1.eliminate_I.y,ctrl_1.eliminate_I.y );
 	ctrl_1.err_i.z = LIMIT( ctrl_1.err_i.z, -ctrl_1.eliminate_I.z,ctrl_1.eliminate_I.z );
 	//-----------------------------------------ESO
-	//ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[PITr],except_AS.y,-mpu6050.Gyro_deg.y,eso_att_inner_c[PITr].u,0.005,200);
-	//ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[ROLr],except_AS.x,mpu6050.Gyro_deg.x,eso_att_inner_c[ROLr].u,0.005,200);
-	if(0){//mode.en_fuzzy_angle_pid){
+	ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[PITr],except_AS.y,-mpu6050.Gyro_deg.y,eso_att_inner_c[PITr].u,T,200);
+	ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[ROLr],except_AS.x,mpu6050.Gyro_deg.x,eso_att_inner_c[ROLr].u,T,200);
+	if(eso_att_inner_c[PITr].b0!=0){
+	//ctrl_1.err_i.x=ctrl_1.err_i.y=ctrl_1.err_i.z=0;
 	ctrl_1.out.x = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.x),0,1)*except_AS.x+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDPITCH].kp *( ctrl_1.err_d.x )) 
-								+eso_att_inner_c[ROLr].u;
+								+( 1 - ctrl_1.FB ) *eso_att_inner_c[ROLr].u;
 	ctrl_1.out.y = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.y),0,1)*except_AS.y+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDPITCH].kp *( ctrl_1.err_d.y ))
-								+eso_att_inner_c[PITr].u;
+								+( 1 - ctrl_1.FB ) *eso_att_inner_c[PITr].u;
 	ctrl_1.out.z = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.z),0,1)*except_AS.z + ( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDYAW].kp   *( ctrl_1.err.z + ctrl_1.err_d.z + ctrl_1.err_i.z ) );
 	}else{	
 	/* 角速度PID输出 */
@@ -474,20 +501,19 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 
 	if(mode.att_pid_tune)
 	{	
+	if(mcuID[0]==TUNNING_DRONE_CHIP_ID){
+	ctrl_1.out.z=0;	
+	ctrl_1.out.y=0;	
+	}else{
 	ctrl_1.out.z=0;
 	#if TUNING_X		
 	ctrl_1.out.y=0;	
 	#else
 	ctrl_1.out.x=0;		
 	#endif
+  }
 	}
-	//if(mode.en_h_inf)
-	//All_Out(ctrl_inf_att_out,0,0);	
-	//else
 
-	if(mode.att_ident1)
-	;//All_Out(CERoll,CEPitch,CEYaw);	
-	else
 	All_Out(ctrl_1.out.x,ctrl_1.out.y,ctrl_1.out.z);
 
 
@@ -618,6 +644,12 @@ void All_Out(float out_roll,float out_pitch,float out_yaw)
 	posture_value[2] = + out_roll - out_pitch + out_yaw ;
 	posture_value[3] = - out_roll - out_pitch - out_yaw ;
 	#endif
+	if(mcuID[0]==TUNNING_DRONE_CHIP_ID){
+	posture_value[0] = - out_roll ;
+	posture_value[1] = + out_roll ;	
+	}
+	
+	
 	for(i=0;i<6;i++)
 	{
 		posture_value[i] = LIMIT(posture_value[i], -1000,1000 );
