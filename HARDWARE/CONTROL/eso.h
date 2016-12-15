@@ -6,7 +6,7 @@
 typedef struct
 { float eso_dead;
   float beta0,beta1,beta2,beta3;
-	float disturb,disturb_u;
+	float disturb,disturb_u,disturb_u_reg;
 	float alfa1,alfa2,alfa0,tao,KP,KD,KI,e;
 	float z[3];
 	float h,integer;

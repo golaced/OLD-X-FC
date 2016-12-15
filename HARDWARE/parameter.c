@@ -372,8 +372,8 @@ static void  Param_SetSettingToFC(void) //fly thr 45% at 4s full 4.4Ah
 		 //-----------------------------±ÚÕÏ----------------------------------
 			pid.avoid.out.p=0.06;
 		 //----------------------------ESO------------------------------------
-			eso_att_outter_c[PITr].n=eso_att_outter_c[ROLr].n=eso_att_outter_c[YAWr].n=18;//100;//13;//10;need tuning
-			eso_att_inner[PITr].n=eso_att_inner[ROLr].n=eso_att_inner[YAWr].n=66;
+//			eso_att_outter_c[PITr].n=eso_att_outter_c[ROLr].n=eso_att_outter_c[YAWr].n=18;//100;//13;//10;need tuning
+//			eso_att_inner_c[PITr].n=eso_att_inner_c[ROLr].n=eso_att_inner_c[YAWr].n=0;
 			#endif
 	
 	

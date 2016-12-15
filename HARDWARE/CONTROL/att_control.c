@@ -367,12 +367,12 @@ void CTRL_2(float T)//角度环
 	ctrl_2.eliminate_I.y = Thr_Weight *CTRL_2_INT_LIMIT;
 	ctrl_2.eliminate_I.z = Thr_Weight *CTRL_2_INT_LIMIT;
 	/* 角度误差积分限幅 */
-	if(fabs(ctrl_2.err.x)<eso_att_outter_c[PITr].eso_dead)
+	if(fabs(ctrl_2.err.x)<eso_att_outter_c[PITr].eso_dead||eso_att_outter_c[PITr].b0==0)
 	ctrl_2.err_i.x = LIMIT( ctrl_2.err_i.x, -ctrl_2.eliminate_I.x,ctrl_2.eliminate_I.x );
 	else
 	ctrl_2.err_i.x=0;
 
-	if(fabs(ctrl_2.err.y)<eso_att_outter_c[PITr].eso_dead)
+	if(fabs(ctrl_2.err.y)<eso_att_outter_c[PITr].eso_dead||eso_att_outter_c[PITr].b0==0)
 	ctrl_2.err_i.y = LIMIT( ctrl_2.err_i.y, -ctrl_2.eliminate_I.y,ctrl_2.eliminate_I.y );
 	else
 	ctrl_2.err_i.y=0;
@@ -412,23 +412,26 @@ void CTRL_2(float T)//角度环
 
 //----------------------------------------INNER------------------------------------------------
 xyz_f_t except_AS;
-
+int inner_set=0;
 float g_old[7];
 float k_rc_gyro_spd=0.4;
 void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
-{float ctrl_angle_out[3],ctrl_angle_weight[3];
+{float ctrl_angle_out[3]={0},ctrl_angle_weight[3]={0};
 	xyz_f_t EXP_LPF_TMP;
 	
   if(ctrl_2.PID->kp==0||KEY[7]==0){
-	if(fabs(Rol_fc)<50)	
+	if(fabs(Rol_fc)<40)
 	ctrl_angle_out[0]=except_A.x*k_rc_gyro_spd;
-	ctrl_angle_out[1]=ctrl_2.out.y;
-	ctrl_angle_out[2]=ctrl_2.out.z;	
-	}else{
+  else
 	ctrl_angle_out[0]=ctrl_2.out.x;
 	ctrl_angle_out[1]=ctrl_2.out.y;
 	ctrl_angle_out[2]=ctrl_2.out.z;
-	}
+		
+	}else{
+	ctrl_angle_out[0]=ctrl_2.out.x;
+	ctrl_angle_out[1]=ctrl_2.out.y;
+	ctrl_angle_out[2]=ctrl_2.out.z;}
+	
 	ctrl_angle_weight[0]=ctrl_2.err_weight.x;
 	ctrl_angle_weight[1]=ctrl_2.err_weight.y;
 	ctrl_angle_weight[2]=ctrl_2.err_weight.z;
@@ -437,7 +440,7 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 	EXP_LPF_TMP.x = MAX_CTRL_ASPEED *(ctrl_angle_out[0]/ANGLE_TO_MAX_AS);//*( (CH_filter[0])/500.0f );//
 	EXP_LPF_TMP.y = MAX_CTRL_ASPEED *(ctrl_angle_out[1]/ANGLE_TO_MAX_AS);//*( (CH_filter[1])/500.0f );//
 	EXP_LPF_TMP.z = MAX_CTRL_ASPEED *(ctrl_angle_out[2]/ANGLE_TO_MAX_AS);
-	
+
 	except_AS.x = EXP_LPF_TMP.x;//20 *3.14 *T *( EXP_LPF_TMP.x - except_AS.x );//
 	except_AS.y = EXP_LPF_TMP.y;//20 *3.14 *T *( EXP_LPF_TMP.y - except_AS.y );//
 	except_AS.z = EXP_LPF_TMP.z;//20 *3.14 *T *( EXP_LPF_TMP.z - except_AS.z );//
@@ -474,27 +477,42 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 	ctrl_1.eliminate_I.y = Thr_Weight *CTRL_1_INT_LIMIT ;
 	ctrl_1.eliminate_I.z = Thr_Weight *CTRL_1_INT_LIMIT ;
 	/* 角速度误差积分限幅 */
+	if(fabs(ctrl_1.err.x)<eso_att_inner_c[PITr].eso_dead||eso_att_inner_c[PITr].b0==0)
 	ctrl_1.err_i.x = LIMIT( ctrl_1.err_i.x, -ctrl_1.eliminate_I.x,ctrl_1.eliminate_I.x );
+	else
+	ctrl_1.err_i.x=0;
+	
+	if(fabs(ctrl_1.err.y)<eso_att_inner_c[PITr].eso_dead||eso_att_inner_c[PITr].b0==0)
 	ctrl_1.err_i.y = LIMIT( ctrl_1.err_i.y, -ctrl_1.eliminate_I.y,ctrl_1.eliminate_I.y );
+	else
+	ctrl_1.err_i.y=0;
+	if(fabs(ctrl_1.err.z)<eso_att_inner_c[PITr].eso_dead||eso_att_inner_c[PITr].b0==0)
 	ctrl_1.err_i.z = LIMIT( ctrl_1.err_i.z, -ctrl_1.eliminate_I.z,ctrl_1.eliminate_I.z );
+	else
+	ctrl_1.err_i.z=0;
 	//-----------------------------------------ESO
 	ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[PITr],except_AS.y,-mpu6050.Gyro_deg.y,eso_att_inner_c[PITr].u,T,200);
 	ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[ROLr],except_AS.x,mpu6050.Gyro_deg.x,eso_att_inner_c[ROLr].u,T,200);
+	ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[YAWr],except_AS.z,mpu6050.Gyro_deg.z,eso_att_inner_c[YAWr].u,T,200);
 	if(eso_att_inner_c[PITr].b0!=0){
+		ctrl_1.FB=0;
 	//ctrl_1.err_i.x=ctrl_1.err_i.y=ctrl_1.err_i.z=0;
-	ctrl_1.out.x = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.x),0,1)*except_AS.x+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDPITCH].kp *( ctrl_1.err_d.x )) 
+	ctrl_1.out.x = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.x),0,1)*except_AS.x+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDPITCH].kp *( ctrl_1.err_d.x + ctrl_1.err_i.x)) 
 								+( 1 - ctrl_1.FB ) *eso_att_inner_c[ROLr].u;
-	ctrl_1.out.y = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.y),0,1)*except_AS.y+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDPITCH].kp *( ctrl_1.err_d.y ))
+	ctrl_1.out.y = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.y),0,1)*except_AS.y+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDPITCH].kp *( ctrl_1.err_d.y + ctrl_1.err_i.y))
 								+( 1 - ctrl_1.FB ) *eso_att_inner_c[PITr].u;
-	ctrl_1.out.z = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.z),0,1)*except_AS.z + ( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDYAW].kp   *( ctrl_1.err.z + ctrl_1.err_d.z + ctrl_1.err_i.z ) );
+	ctrl_1.out.z = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.z),0,1)*except_AS.z+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDYAW].kp *(  ctrl_1.err_i.z  + ctrl_1.err_i.z) )
+								+( 1 - ctrl_1.FB ) *eso_att_inner_c[PITr].u;;
 	}else{	
+		ctrl_1.FB=0.2;
 	/* 角速度PID输出 */
 	ctrl_1.out.x = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.x),0,1)*except_AS.x + ( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDROLL].kp  *( ctrl_1.err.x + ctrl_1.err_d.x + ctrl_1.err_i.x ) );
 	ctrl_1.out.y = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.y),0,1)*except_AS.y + ( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDPITCH].kp *( ctrl_1.err.y + ctrl_1.err_d.y + ctrl_1.err_i.y ) );
 	ctrl_1.out.z = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.z),0,1)*except_AS.z + ( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDYAW].kp   *( ctrl_1.err.z + ctrl_1.err_d.z + ctrl_1.err_i.z ) );
 	}
 
-	
+	if(inner_set!=0)
+	ctrl_1.out.x=inner_set;	
 #if !EN_TIM_INNER
 	Thr_Ctrl(T);// 油门控制
 #endif

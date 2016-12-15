@@ -306,12 +306,15 @@ static float lpf_tmp,hc_speed_i,hc_speed_i_2,wz_speed_0,wz_speed_1,wz_speed_2,hc
 	d_view=d_view*(1-k_d)+k_d*d_view_temp;//调试用
 	
 	wz_speed_pid_v.err_i += wz_speed_pid_use.ki *( exp_z_speed - h_speed ) *T;
+	if(fabs(wz_speed_pid_v.err)<eso_att_inner_c[THRr].eso_dead||eso_att_inner_c[THRr].b0==0||mode.en_eso_h_in==0)
 	wz_speed_pid_v.err_i = LIMIT(wz_speed_pid_v.err_i,-Thr_Weight *300,Thr_Weight *300);
+	else
+	wz_speed_pid_v.err_i=0;
 	
 	HIGH_CONTROL_SPD_ESO(&eso_att_inner_c[THRr],exp_z_speed,wz_speed,eso_att_inner_c[THRr].u,T,400);//速度环自抗扰控制
 	
-	if(mode.en_eso_h_in&&!mode.height_safe){//ADRC
-	wz_speed_pid_v.pid_out=thr_lpf + Thr_Weight *LIMIT(wz_speed_pid_use.kp*1 *LIMIT(exp_z_speed,-250,250)+eso_att_inner_c[THRr].u + wz_speed_pid_v.err_d ,-400,400);
+	if(mode.en_eso_h_in&&!mode.height_safe&&eso_att_inner_c[THRr].b0!=0){//ADRC
+	wz_speed_pid_v.pid_out=thr_lpf + Thr_Weight *LIMIT(wz_speed_pid_use.kp*0 *LIMIT(exp_z_speed,-250,250)+eso_att_inner_c[THRr].u +wz_speed_pid_v.err_i+ wz_speed_pid_v.err_d ,-400,400);
 	}
 	else if(mode.en_hinf_height_spd&&!mode.height_safe){//鲁棒控制  未使用	
 	//wz_speed_pid_v.pid_out=thr_lpf + Thr_Weight *LIMIT(wz_speed_pid_use.kp*0.35 *LIMIT(exp_z_speed,-250,250)+ h_inf_height_spd_out((float)exp_z_speed/1000,(float)wz_speed/1000) ,-400,400);

@@ -58,7 +58,7 @@ float fal(float e,float alfa,float delta)
 {
 	float y=0.0;
 	if(fabs(e)>delta) y=pow(fabs(e),alfa)*sign(e);
-	else			  y=e/pow(delta,1.0-alfa);
+	else			  y=e/(pow(delta,1.0-alfa)+0.000001);
 	return(y);	
 }
 
@@ -84,7 +84,7 @@ float ESO_2N(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4
 	eso_in->h=eso_in->h0;
 //********  eso  *************
 
-	e=eso_in->e=my_deathzoom_2(eso_in->z[0]-y,eso_in->eso_dead);
+	e=eso_in->e=my_deathzoom(eso_in->z[0]-y,eso_in->eso_dead);
 	fe=fal(e,0.5,eso_in->h0);
 	fe1=fal(e,0.25,eso_in->h0);
 	eso_in->z[0]+=eso_in->h0*(eso_in->z[1]-eso_in->beta0*e+eso_in->b0*Thr_Weight *u);
@@ -100,11 +100,12 @@ float ESO_2N_R(ESO *eso_in,float v,float y,float u,float T,float MAX)           
 	float e=0,fe,fe1;
 	eso_in->h=eso_in->h0;
 //********  eso  *************
-	e=eso_in->e=my_deathzoom_2(eso_in->z[0]-y,eso_in->eso_dead);
+	e=eso_in->e=my_deathzoom(eso_in->z[0]-y,eso_in->eso_dead);
 	fe=fal(e,0.5,eso_in->h0);
 	fe1=fal(e,0.25,eso_in->h0);
 	eso_in->z[0]+=eso_in->h0*(eso_in->z[1]-eso_in->beta0*e+eso_in->b0*Thr_Weight *u);
 	eso_in->z[1]+=-eso_in->h0*eso_in->beta1*e;
+	eso_in->z[1]=LIMIT(eso_in->z[1],-MAX*Thr_Weight*(eso_in->b0+1),MAX*Thr_Weight*(eso_in->b0+1));
 	if(eso_in->n==0)
 		eso_in->n=1;
 	return eso_in->disturb=LIMIT(eso_in->z[1]/eso_in->n,-MAX,MAX);
@@ -116,7 +117,7 @@ float ESO_3N(ESO *eso_in,float v,float y,float u,float T,float MAX)             
 	float e=0,fe,fe1;
 	eso_in->h=eso_in->h0;
 //********  eso  *************
-	e=eso_in->e=my_deathzoom_2(eso_in->z[0]-y,eso_in->eso_dead);
+	e=eso_in->e=my_deathzoom(eso_in->z[0]-y,eso_in->eso_dead);
 	fe=fal(e,0.5,eso_in->h0);
 	fe1=fal(e,0.25,eso_in->h0);
 	eso_in->z[0]+=eso_in->h*(eso_in->z[1]-eso_in->beta0*e);
@@ -127,17 +128,18 @@ float ESO_3N(ESO *eso_in,float v,float y,float u,float T,float MAX)             
 	return eso_in->disturb=LIMIT(eso_in->z[2]/eso_in->n,-MAX,MAX);
 }  
 
-
+float flt_eso=0.5;
 float ESO_CONTROL(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4)
 {static float e0,e1,e2;
 if(eso_in->not_use_px4)
 {
-e1=v-eso_in->z[0];
-e2=-eso_in->z[1];
+e1=my_deathzoom(v-eso_in->z[0],eso_in->eso_dead);
+//e2=-eso_in->z[1];
+e2=eso_in->v2-eso_in->z[1];	
 }	
 else if(mode.use_px4_err)
 {
-e1=my_deathzoom_2(ero_px4,eso_in->eso_dead);
+e1=my_deathzoom(ero_px4,eso_in->eso_dead);
 e2=eso_in->z[1];
 }
 else if(!eso_in->use_td)
@@ -151,16 +153,20 @@ e2=eso_in->v2-eso_in->z[1];
 }
 e0+=eso_in->e;//*T;
 
-	eso_in->u=eso_in->KP*fal(e1,eso_in->alfa1,eso_in->tao);//+eso_in->KD*fal(e2,eso_in->alfa2,eso_in->tao);
+eso_in->u=eso_in->KP*fal(e1,eso_in->alfa1,eso_in->tao)+0*eso_in->KD*fal(e2,eso_in->alfa2,eso_in->tao);
 	if(eso_in->b0!=0){
   switch(eso_in->level){
 		case 1:eso_in->disturb_u=eso_in->z[1]/eso_in->b0;break; 
 		case 2:eso_in->disturb_u=eso_in->z[2]/eso_in->b0;break;
 	}
 	if(fabs(e1)>eso_in->eso_dead)
-  eso_in->u-=Thr_Weight *eso_in->disturb_u;		
+  eso_in->disturb_u_reg=eso_in->disturb_u;
+//	else
+//	eso_in->disturb_u_reg*flt_eso+(1-flt_eso)*eso_in->disturb_u;	
+	
+	eso_in->u-=Thr_Weight *eso_in->disturb_u_reg;	
 	}
-return  eso_in->u=LIMIT(eso_in->u+eso_in->integer,-MAX,MAX);
+return  eso_in->u=LIMIT(eso_in->u+0*eso_in->integer,-MAX,MAX);
 }
 
 #define YAW_ERO_MAX 45
@@ -207,7 +213,7 @@ float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 		eso_in->beta1=1/(30*pow(eso_in->h0,2));
 		eso_in->beta2=1000;//2/(64*pow(eso_in->h0,2));	
 		#endif
-	eso_in->eso_dead=2;	
+	eso_in->eso_dead=0.5;	
  //-------------反馈----------------
 	eso_in->out_mode=1;	
 	//-------liner    0
@@ -224,15 +230,16 @@ float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 	eso_in->r1=0.5/pow(eso_in->h0,2);
 	eso_in->h1=eso_in->h0*5;
 	//----------模型增益
-	 eso_in->b0=100;		
+	 eso_in->b0=18;		
 	}  
 	#if ESO_PARA_USE_REAL_TIME
 	    eso_in->h0=T;
 			eso_in->beta0=1/(eso_in->h0+0.000001);
    	  eso_in->beta1=1/(30*pow(eso_in->h0,2)+0.000001);
+			eso_in->tao=eso_in->h0*2;
 	#endif
 	if(mode.att_pid_tune&&mode.en_pid_sb_set){
-	eso_in->KD=0.001*SPID.OD*4;
+	//eso_in->KD=0.001*SPID.OD*4;
 	eso_in->KP=0.001*SPID.OP*2;
 	}
 	//if(SPID.YD!=0)eso_in->b0=SPID.YD;
@@ -263,7 +270,7 @@ float ATT_CONTRL_INNER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 	eso_in->beta0=1/(eso_in->h0);
 	eso_in->beta1=1/(30*pow(eso_in->h0,2));
 	eso_in->beta2=1000;	
-  eso_in->eso_dead=0;
+  eso_in->eso_dead=1;
  //-------------反馈----------------
 	eso_in->out_mode=1;	
 		//-------liner    0
@@ -287,9 +294,10 @@ float ATT_CONTRL_INNER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 	    eso_in->h0=T;
 			eso_in->beta0=1/(eso_in->h0+0.000001);
    	  eso_in->beta1=1/(30*pow(eso_in->h0,2)+0.000001);
+			eso_in->tao=eso_in->h0*2;
 	#endif
 	if(mode.att_pid_tune&&mode.en_pid_sb_set){
-	eso_in->KD=0.001*SPID.ID*4;
+	//eso_in->KD=0.001*SPID.ID*4;
 	eso_in->KP=0.001*SPID.IP*10;
 	}
 	SMOOTH_IN_ESO(eso_in,v);
@@ -309,8 +317,8 @@ float ATT_CONTRL_INNER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 //高度内环
 float ESO_CONTROL_HEIGH(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4)
 {static float e0,e1,e2;
-
-e1=v-eso_in->z[0];
+e1=my_deathzoom(v-eso_in->z[0],eso_in->eso_dead);
+//e1=v-eso_in->z[0];
 e2=-eso_in->z[1];
 eso_in->u=eso_in->KP*e1;
 	
@@ -325,7 +333,7 @@ float ESO_2N_H(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_p
 {
 	float e=0,fe,fe1;
 	eso_in->h=eso_in->h0;
-	e=eso_in->e=my_deathzoom_2(eso_in->z[0]-y,25);
+	e=eso_in->e=my_deathzoom(eso_in->z[0]-y,eso_in->eso_dead);
 	fe=fal(e,0.5,eso_in->h0);
 	fe1=fal(e,0.25,eso_in->h0);
 	eso_in->z[0]+=eso_in->h0*(eso_in->z[1]-eso_in->beta0*e+eso_in->b0*Thr_Weight *u);
@@ -351,6 +359,7 @@ float HIGH_CONTROL_SPD_ESO(ESO *eso_in,float v,float y,float u,float T,float MAX
 	eso_in->beta0=1/(eso_in->h0);
 	eso_in->beta1=1/(30*pow(eso_in->h0,2));
 	eso_in->beta2=1000;	
+	eso_in->eso_dead=25;	
  //-------------反馈----------------
 	eso_in->out_mode=1;	
 		//-------liner    0
@@ -373,11 +382,21 @@ float HIGH_CONTROL_SPD_ESO(ESO *eso_in,float v,float y,float u,float T,float MAX
 	    eso_in->h0=T;
   		eso_in->beta0=1/(eso_in->h0+0.000001);
    	  eso_in->beta1=1/(30*pow(eso_in->h0,2)+0.000001);
+	    eso_in->tao=eso_in->h0*2;	
 	 #endif
 	eso_in->KP=wz_speed_pid.kp;
 	if(SPID.YD!=0&&SPID.YD!=800&&(KEY[0]==1&&KEY[1]==1))eso_in->b0=SPID.YD;
   ESO_2N_H(eso_in,v, y, u, T, MAX,0);
 	ESO_CONTROL_HEIGH(eso_in,v, y, u, T, MAX,0);
 	return eso_in->u;
+}
+ 
+
+float AUTO_B0(ESO *eso_in,float v,float y,float u,float T,float MAX)
+{
+
+
+
+
 }
 
