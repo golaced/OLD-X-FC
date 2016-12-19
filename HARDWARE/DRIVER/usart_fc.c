@@ -657,7 +657,7 @@ Send_PID();
 }
 
 
-void Uart5_Init(u32 br_num)//-----video sonar F
+void Uart5_Init(u32 br_num)//-----odroid
 {
 	USART_InitTypeDef USART_InitStructure;
 	//USART_ClockInitTypeDef USART_ClockInitStruct;
@@ -756,7 +756,7 @@ void Data_Receive_Anl5(u8 *data_buf,u8 num)
 	circle.r=(int8_t)(*(data_buf+10));
 	//track.check=(int8_t)(*(data_buf+11));
 	}	
-	else if(*(data_buf+2)==0x21)//Num
+	else if(*(data_buf+2)==0x21)//QR
   {
 	circle.connect=1;
 	circle.lose_cnt=0;
@@ -766,7 +766,7 @@ void Data_Receive_Anl5(u8 *data_buf,u8 num)
 	circle.z=(int16_t)((*(data_buf+9)<<8)|*(data_buf+10));
 	circle.pit=(int16_t)((*(data_buf+11)<<8)|*(data_buf+12));
 	circle.rol=(int16_t)((*(data_buf+13)<<8)|*(data_buf+14));
-	circle.yaw=(int16_t)((*(data_buf+15)<<8)|*(data_buf+16));	
+	circle.yaw=To_180_degrees((int16_t)((*(data_buf+15)<<8)|*(data_buf+16))-180);	
 		
 	}	
 }
