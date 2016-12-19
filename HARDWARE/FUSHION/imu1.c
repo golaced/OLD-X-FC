@@ -320,16 +320,13 @@ void MadgwickAHRSupdate(float dt,float gx, float gy, float gz, float ax, float a
 	float _2q0mx, _2q0my, _2q0mz, _2q1mx, _2bx, _2bz, _4bx, _4bz, _2q0, _2q1, _2q2, _2q3, _2q0q2, _2q2q3, q0q0, q0q1, q0q2, q0q3, q1q1, q1q2, q1q3, q2q2, q2q3, q3q3;
   static u16 init_cnt;
 		if(init_cnt++>100){init_cnt=100+1;T=dt;
-			
-		
-			
 		}
-			else 
-			{		
+		else 
+		{		
 	  if(init_q){
     float Pit,Rol;
-    Pit=atan(mpu6050.Acc.x/sqrt(pow(mpu6050.Acc.y,2)+pow(mpu6050.Acc.z,2)))*180/3.14;
-		Rol=atan(mpu6050.Acc.y/sqrt(pow(mpu6050.Acc.x,2)+pow(mpu6050.Acc.z,2)))*180/3.14;
+    Pit=-atan(mpu6050.Acc.x/mpu6050.Acc.z)*57.3;
+		Rol=atan(mpu6050.Acc.y/mpu6050.Acc.z)*57.3;
 			
 		#if IMU_HML_ADD_500
 		float magTmp2 [3];	
@@ -337,8 +334,8 @@ void MadgwickAHRSupdate(float dt,float gx, float gy, float gz, float ax, float a
 		magTmp2[1]=ak8975_fc.Mag_Val.y;
 		magTmp2[2]=ak8975_fc.Mag_Val.z;
 		float euler[2]; 	
-		euler[1]=Pit/RAD_DEG  ;
-		euler[0]=Rol/RAD_DEG  ;
+		euler[1]=Pit*0.0173  ;
+		euler[0]=Rol*0.0173  ;
 		float calMagY = magTmp2[0] * cos(euler[1]) + magTmp2[1] * sin(euler[1])* sin(euler[0])+magTmp2[2] * sin(euler[1]) * cos(euler[0]); 
 		float calMagX = magTmp2[1] * cos(euler[0]) + magTmp2[2] * sin(euler[0]);
 		float yaw_mag=To_180_degrees(fast_atan2(calMagX,calMagY)* RAD_DEG +180);
@@ -351,8 +348,7 @@ void MadgwickAHRSupdate(float dt,float gx, float gy, float gz, float ax, float a
 	  q0_fc=ref_q_imd_down_fc[0];
 	  q1_fc=ref_q_imd_down_fc[1];
 	  q2_fc=ref_q_imd_down_fc[2];
-	  q3_fc=ref_q_imd_down_fc[3];
-		
+	  q3_fc=ref_q_imd_down_fc[3];	
 	  }T=2*dt;
 		
 	}

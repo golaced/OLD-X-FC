@@ -25,7 +25,7 @@ float CH_Old[CH_NUM];
 float CH_filter[CH_NUM];
 float CH_filter_Old[CH_NUM];
 float CH_filter_D[CH_NUM];
-u8 NS,CH_Error[CH_NUM];
+u8 NS=0,CH_Error[CH_NUM];
 u16 NS_cnt,CLR_CH_Error[CH_NUM];
  
 s16 MAX_CH[CH_NUM]  = {1900 ,1900 ,1900 ,1900 ,1900 ,1900 ,1900 ,1900 };	//Ò¡¸Ë×î´ó

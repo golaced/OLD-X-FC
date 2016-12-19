@@ -1,11 +1,11 @@
 /*
  * File: ert_main.c
  *
- * Code generated for Simulink model 'KSW2'.
+ * Code generated for Simulink model 'W1'.
  *
- * Model version                  : 1.6
+ * Model version                  : 1.8
  * Simulink Coder version         : 8.7 (R2014b) 08-Sep-2014
- * C/C++ source code generated on : Sun Jul 17 09:40:15 2016
+ * C/C++ source code generated on : Fri Dec 16 10:35:18 2016
  *
  * Target selection: ert.tlc
  * Embedded hardware selection: ARM Compatible->ARM Cortex
@@ -15,7 +15,7 @@
 
 #include <stddef.h>
 #include <stdio.h>                     /* This ert_main.c example uses printf/fflush */
-#include "KSW2.h"                      /* Model's header file */
+#include "W1.h"                        /* Model's header file */
 #include "rtwtypes.h"
 
 /*
@@ -38,7 +38,7 @@ void rt_OneStep(void)
 
   /* Check for overrun */
   if (OverrunFlag) {
-    rtmSetErrorStatus(KSW2_M, "Overrun");
+    rtmSetErrorStatus(W1_M, "Overrun");
     return;
   }
 
@@ -49,7 +49,7 @@ void rt_OneStep(void)
   /* Set model inputs here */
 
   /* Step the model */
-  KSW2_step();
+  W1_step();
 
   /* Get model outputs here */
 
@@ -74,7 +74,7 @@ int_T main(int_T argc, const char *argv[])
   (void)(argv);
 
   /* Initialize model */
-  KSW2_initialize();
+  W1_initialize();
 
   /* Attach rt_OneStep to a timer or interrupt service routine with
    * period 0.2 seconds (the model's base sample time) here.  The
@@ -86,14 +86,14 @@ int_T main(int_T argc, const char *argv[])
          "Generated ERT main won't simulate model step behavior. "
          "To change this behavior select the 'MAT-file logging' option.\n");
   fflush((NULL));
-  while (rtmGetErrorStatus(KSW2_M) == (NULL)) {
+  while (rtmGetErrorStatus(W1_M) == (NULL)) {
     /*  Perform other application tasks here */
   }
 
   /* Disable rt_OneStep() here */
 
   /* Terminate model */
-  KSW2_terminate();
+  W1_terminate();
   return 0;
 }
 

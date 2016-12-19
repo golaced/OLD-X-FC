@@ -85,6 +85,13 @@
 ..\obj\ultrasonic.o: ..\CORE\../HARDWARE/define.h
 ..\obj\ultrasonic.o: ..\CORE\../HARDWARE/../HARDWARE/CONTROL/h_inf.h
 ..\obj\ultrasonic.o: ..\CORE\../HARDWARE/define.h
+..\obj\ultrasonic.o: ..\CORE\../HARDWARE/HINF/W1_ert_rtw/W1.h
+..\obj\ultrasonic.o: e:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\ultrasonic.o: ..\CORE\../HARDWARE/HINF/W1_ert_rtw/rtwtypes.h
+..\obj\ultrasonic.o: ..\CORE\../HARDWARE/HINF/W1_ert_rtw/W1_types.h
+..\obj\ultrasonic.o: ..\CORE\../HARDWARE/HINF/KSW2_ert_rtw/KSW2.h
+..\obj\ultrasonic.o: ..\CORE\../HARDWARE/HINF/KSW2_ert_rtw/rtwtypes.h
+..\obj\ultrasonic.o: ..\CORE\../HARDWARE/HINF/KSW2_ert_rtw/KSW2_types.h
 ..\obj\ultrasonic.o: ..\CORE\../HARDWARE/../HARDWARE/MATH/Quaternion.h
 ..\obj\ultrasonic.o: ..\CORE\../HARDWARE/../HARDWARE/MATH/FastMath.h
 ..\obj\ultrasonic.o: ..\CORE\../HARDWARE/../HARDWARE/MATH/Double.h

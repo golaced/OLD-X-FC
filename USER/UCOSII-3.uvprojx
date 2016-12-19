@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER,ARM_MATH_CM4, __FPU_PRESENT=1, __FPU_USED =1, __CC_ARM</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\HARDWARE\LED;..\HARDWARE\LCD;..\HARDWARE\KEY;..\HARDWARE\IIC;..\HARDWARE\24CXX;..\FWLIB\inc;..\HARDWARE\TOUCH;..\HARDWARE\BEEP;..\UCOSII\CONFIG;..\UCOSII\CORE;..\UCOSII\PORT;..\HARDWARE\TPAD;..\MALLOC;..\HARDWARE\UKF_BARO;..\HARDWARE\EKF_BARO;..\HARDWARE\SYS_IDENT;..\HARDWARE\AVOID</IncludePath>
+              <IncludePath>..\CORE;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\HARDWARE\LED;..\HARDWARE\LCD;..\HARDWARE\KEY;..\HARDWARE\IIC;..\HARDWARE\24CXX;..\FWLIB\inc;..\HARDWARE\TOUCH;..\HARDWARE\BEEP;..\UCOSII\CONFIG;..\UCOSII\CORE;..\UCOSII\PORT;..\HARDWARE\TPAD;..\MALLOC;..\HARDWARE\UKF_BARO;..\HARDWARE\EKF_BARO;..\HARDWARE\SYS_IDENT;..\HARDWARE\AVOID;..\HARDWARE\HINF\W1_ert_rtw</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -766,7 +766,29 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>SYS_IDENT</GroupName>
+          <GroupName>Hinf_Matlab_Gen</GroupName>
+          <Files>
+            <File>
+              <FileName>W1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\HINF\W1_ert_rtw\W1.c</FilePath>
+            </File>
+            <File>
+              <FileName>W1_data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\HINF\W1_ert_rtw\W1_data.c</FilePath>
+            </File>
+            <File>
+              <FileName>KSW2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\HINF\KSW2_ert_rtw\KSW2.c</FilePath>
+            </File>
+            <File>
+              <FileName>KSW2_data.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\HINF\KSW2_ert_rtw\KSW2_data.c</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>AVOID</GroupName>

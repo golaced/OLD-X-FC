@@ -383,29 +383,29 @@ void Send_IMU_TO_FLOW(void)
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
 	
-	_temp =(vs16)( mpu6050.Acc.x);//ultra_distance;
+	_temp =(vs16)( circle.check&&circle.connect);//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
- 	_temp = (vs16)(mpu6050.Acc.y);//ultra_distance;
+ 	_temp = (vs16)( circle.x);//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = (vs16)(mpu6050.Acc.z);//ultra_distance;
+	_temp = (vs16)(circle.y);//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
 
 
 	
-	_temp = (vs16)(mpu6050.Gyro_deg.x*100);//q_nav[0]*1000;//ultra_distance;
+	_temp = (vs16)(circle.z);//q_nav[0]*1000;//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
- 	_temp = (vs16)(mpu6050.Gyro_deg.y*100);//q_nav[1]*1000;//ultra_distance;
+ 	_temp = (vs16)(circle.pit);//q_nav[1]*1000;//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = (vs16)(mpu6050.Gyro_deg.z*100);// q_nav[2]*1000;//ultra_distance;
+	_temp = (vs16)(circle.rol);// q_nav[2]*1000;//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
 	
-	_temp = (vs16)(ak8975.Mag_Val.x);//ultra_distance;
+	_temp = (vs16)(circle.yaw);//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
  	_temp = (vs16)(ak8975.Mag_Val.y);//ultra_distance;
@@ -414,7 +414,7 @@ void Send_IMU_TO_FLOW(void)
 	_temp = (vs16)(ak8975.Mag_Val.z);//mode.save_video;//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp =  Rc_Get_PWM.THROTTLE>1250||(mode.use_dji&&(Rc_Get.THROTTLE>1050));//
+	_temp =  NS==0||Rc_Get_PWM.THROTTLE>1250||(mode.use_dji&&(Rc_Get.THROTTLE>1050));//
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);	
 //	_temp =  mode.save_video;
@@ -1015,8 +1015,15 @@ void Send_Status(void)
 	SendBuff1[SendBuff1_cnt++]=_temp3;
 	_temp3=EN_FIX_HIGHF;
 	SendBuff1[SendBuff1_cnt++]=_temp3;
- 
-	
+ 	_temp =  mcuID[0];
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	_temp = (int)(POS_UKF_X*1000);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	_temp = (int)(POS_UKF_Y*1000);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	
 	
 	SendBuff1[3+st] = SendBuff1_cnt-st-4;
@@ -1568,7 +1575,7 @@ void Data_Receive_Anl4(u8 *data_buf,u8 num)
 		sum += *(data_buf+i);
 	if(!(sum==*(data_buf+num-1)))		return;		//ÅÐ¶Ïsum
 	if(!(*(data_buf)==0xAA && *(data_buf+1)==0xAF))		return;		//ÅÐ¶ÏÖ¡Í·
-	if(Rc_Get_PWM.THROTTLE!=1139)
+	if((Rc_Get_PWM.THROTTLE>1139+5||Rc_Get_PWM.THROTTLE<1139-5)&&Rc_Get_PWM.THROTTLE!=1000)
 	Feed_Rc_Dog(2);//Í¨ÐÅ¿´ÃÅ¹·Î¹¹·
   if(*(data_buf+2)==0x66)//RC_GET1
   {

@@ -2,7 +2,7 @@
 ## Makefile generated for Simulink model 'KSW2'. 
 ## 
 ## Makefile     : KSW2.mk
-## Generated on : Sun Jul 17 09:40:19 2016
+## Generated on : Fri Dec 16 10:39:39 2016
 ## MATLAB Coder version: 2.7 (R2014b)
 ## 
 ## Build Info:
@@ -33,7 +33,7 @@ MATLAB_ROOT               = E:\PROGRA~2\MATLAB\R2014b
 MATLAB_BIN                = E:\PROGRA~2\MATLAB\R2014b\bin
 MATLAB_ARCH_BIN           = E:\PROGRA~2\MATLAB\R2014b\bin\win64
 MASTER_ANCHOR_DIR         = 
-START_DIR                 = C:\Users\user\Desktop
+START_DIR                 = F:\Quarotor\MATLAB\Quarotor_simulink
 ARCH                      = win64
 SOLVER                    = 
 SOLVER_OBJ                = 

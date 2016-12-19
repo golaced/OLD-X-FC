@@ -32,17 +32,17 @@ float den_w1[N_W1_den] = { 1   , -1};
 #define N_K_W2_num 5
 #define N_K_W2_den 5
 float K_kw2=1;
-double num_kw2[N_K_W2_num] = {   -22.9196  , 55.8632  ,-46.2348 ,  14.8366 ,  -1.5777};//-28.0892  , 90.8207 ,-106.3194 ,  52.5141  , -8.9262}; //-37.9501 , 150.0452, -222.4559  ,146.5762  ,-36.2156};//
-double den_kw2[N_K_W2_den] = {    1.0000  , -1.4463   , 0.6002  , -0.0961  ,  0.0052};//1.0000  , -2.3191   , 1.6869 ,  -0.3748,    0.0071};//	1.0000  , -3.6390  ,  4.9303  , -2.9434  ,  0.6521};//
+double num_kw2[N_K_W2_num] = { -11.7911304193333  ,        39.5035680351943     ,    -48.5761905582863    ,      25.7778761120505 , -4.91440406546654};//-28.0892  , 90.8207 ,-106.3194 ,  52.5141  , -8.9262}; //-37.9501 , 150.0452, -222.4559  ,146.5762  ,-36.2156};//
+double den_kw2[N_K_W2_den] = {    1    ,     -2.87077504678393      ,    2.97145244756849     ,    -1.30804105872186, 0.207644580710823};//1.0000  , -2.3191   , 1.6869 ,  -0.3748,    0.0071};//	1.0000  , -3.6390  ,  4.9303  , -2.9434  ,  0.6521};//
 
-float ks_w2_0=  -0.5144;
+float ks_w2_0=  -0.413024457588263;
 float test1;
-float Out_k=0.01;//0.26
+float Out_k=1;//0.26
 u16 inf_cnt;
 float d_inf;
 float kd=1;
 float ero_inf;
-void h_inf_att_out(float set,float in)//×ËÌ¬
+float h_inf_att_inner(float set,float in,float max)//×ËÌ¬INNER
 {
   double ero,temp=0;
 	u8 i;
@@ -51,7 +51,7 @@ void h_inf_att_out(float set,float in)//×ËÌ¬
  //Ks_W2_j
 	  inf_cnt++;
 	  static int a;
-    u1w2[0]=in*DEG_RAD;//ctrl_inf_att_out2=10*sin(a++*DEG_RAD);
+    u1w2[0]=in*0.0173;//ctrl_inf_att_out2=10*sin(a++*DEG_RAD);
     for(i=1;i<N_K_W2_den;i++)
         {temp=temp-den_kw2[i]*y1w2[i];}
     
@@ -83,7 +83,7 @@ void h_inf_att_out(float set,float in)//×ËÌ¬
         u1w2[1]=u1w2[0];
     
 
-	ero_inf=-set*DEG_RAD*ks_w2_0+y1w2[0];
+	ero_inf=-set*0.0173*ks_w2_0+y1w2[0];
  
 //W1
 	  temp=0;
@@ -121,7 +121,7 @@ void h_inf_att_out(float set,float in)//×ËÌ¬
 	  ero_d=set-in;
 	d_inf= 10 *kd *(ero_d - ero_r) *( 0.005f/0.01 ) ;
 		ero_r=ero_d;
- ctrl_inf_att_out=LIMIT(y2[0]*Out_k,-300,300);
+ return ctrl_inf_att_out=LIMIT(y2[0]*Out_k,-max,max);
 }
 
 
@@ -210,3 +210,59 @@ float h_inf_height_spd_out(float set,float in)//¸ß¶È
  return thr_inf=LIMIT(y2[0]*Out_k,-400,400);
 }
 
+float PWM_OFF=0;
+float h_inf_att_inner1(float set,float in,float max)
+{	static u8 init;
+	if(!init){init=1;
+		 W1_initialize();
+		 KSW2_initialize();
+	}
+  double ero,temp=0;
+	u8 i;
+	static double y1w2[10],u1w2[10];
+	static double y2[10],u2[10];
+	if(!fly_ready||Thr_Low)
+	{
+	 W1_initialize();
+	 KSW2_initialize();
+	}
+ //Ks_W2_j
+	  inf_cnt++;
+	  static int a;
+	  KSW2_U.In1 =in*0.0173;
+	  KSW2_step();
+	  ero_inf=-set*0.0173*ks_w2_0+KSW2_Y.Out1;
+ 
+//W1
+		W1_U.In1 =ero_inf;
+	  W1_step();
+ return thr_inf=LIMIT(W1_Y.Out1*Out_k-PWM_OFF,-max,max);
+}
+
+float h_inf_att_inner2(float set,float in,float max)
+{	static u8 init;
+	if(!init){init=1;
+		 W1_initialize();
+		 KSW2_initialize();
+	}
+  double ero,temp=0;
+	u8 i;
+	static double y1w2[10],u1w2[10];
+	static double y2[10],u2[10];
+	if(!fly_ready||Thr_Low)
+	{
+	 W1_initialize();
+	 KSW2_initialize();
+	}
+ //Ks_W2_j
+	  inf_cnt++;
+	  static int a;
+	  KSW2_U.In1 =(-set+in)*0.0173;
+	  KSW2_step();
+	  ero_inf=KSW2_Y.Out1;
+ 
+//W1
+		W1_U.In1 =ero_inf;
+	  W1_step();
+ return thr_inf=LIMIT(W1_Y.Out1*Out_k-PWM_OFF,-max,max);
+}

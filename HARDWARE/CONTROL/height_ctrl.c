@@ -306,7 +306,7 @@ static float lpf_tmp,hc_speed_i,hc_speed_i_2,wz_speed_0,wz_speed_1,wz_speed_2,hc
 	d_view=d_view*(1-k_d)+k_d*d_view_temp;//µ÷ÊÔÓÃ
 	
 	wz_speed_pid_v.err_i += wz_speed_pid_use.ki *( exp_z_speed - h_speed ) *T;
-	if(fabs(wz_speed_pid_v.err)<eso_att_inner_c[THRr].eso_dead||eso_att_inner_c[THRr].b0==0||mode.en_eso_h_in==0)
+	if(fabs(wz_speed_pid_v.err)<eso_att_inner_c[THRr].eso_dead||eso_att_inner_c[THRr].b0==0||mode.en_eso_h_in==0||mode.height_safe==1)
 	wz_speed_pid_v.err_i = LIMIT(wz_speed_pid_v.err_i,-Thr_Weight *300,Thr_Weight *300);
 	else
 	wz_speed_pid_v.err_i=0;

@@ -85,6 +85,13 @@
 ..\obj\height_ctrl.o: ..\CORE\../HARDWARE/define.h
 ..\obj\height_ctrl.o: ..\CORE\../HARDWARE/../HARDWARE/CONTROL/h_inf.h
 ..\obj\height_ctrl.o: ..\CORE\../HARDWARE/define.h
+..\obj\height_ctrl.o: ..\CORE\../HARDWARE/HINF/W1_ert_rtw/W1.h
+..\obj\height_ctrl.o: e:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\height_ctrl.o: ..\CORE\../HARDWARE/HINF/W1_ert_rtw/rtwtypes.h
+..\obj\height_ctrl.o: ..\CORE\../HARDWARE/HINF/W1_ert_rtw/W1_types.h
+..\obj\height_ctrl.o: ..\CORE\../HARDWARE/HINF/KSW2_ert_rtw/KSW2.h
+..\obj\height_ctrl.o: ..\CORE\../HARDWARE/HINF/KSW2_ert_rtw/rtwtypes.h
+..\obj\height_ctrl.o: ..\CORE\../HARDWARE/HINF/KSW2_ert_rtw/KSW2_types.h
 ..\obj\height_ctrl.o: ..\CORE\../HARDWARE/../HARDWARE/MATH/Quaternion.h
 ..\obj\height_ctrl.o: ..\CORE\../HARDWARE/../HARDWARE/MATH/FastMath.h
 ..\obj\height_ctrl.o: ..\CORE\../HARDWARE/../HARDWARE/MATH/Double.h

@@ -413,15 +413,20 @@ void CTRL_2(float T)//角度环
 //----------------------------------------INNER------------------------------------------------
 xyz_f_t except_AS;
 int inner_set=0;
+u8 en_h_inf=0;
 float g_old[7];
 float k_rc_gyro_spd=0.4;
 void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 {float ctrl_angle_out[3]={0},ctrl_angle_weight[3]={0};
 	xyz_f_t EXP_LPF_TMP;
 	
-  if(ctrl_2.PID->kp==0||KEY[7]==0){
+  if(ctrl_2.PID->kp==0||KEY[7]==0||inner_set){
 	if(fabs(Rol_fc)<40)
 	ctrl_angle_out[0]=except_A.x*k_rc_gyro_spd;
+	else if((Rol_fc)>40)
+	ctrl_angle_out[0]=LIMIT(except_A.x*k_rc_gyro_spd,-MAX_CTRL_ANGLE*k_rc_gyro_spd,0);	
+	else if((Rol_fc)<-40)
+	ctrl_angle_out[0]=LIMIT(except_A.x*k_rc_gyro_spd,0,MAX_CTRL_ANGLE*k_rc_gyro_spd);	
   else
 	ctrl_angle_out[0]=ctrl_2.out.x;
 	ctrl_angle_out[1]=ctrl_2.out.y;
@@ -494,7 +499,16 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 	ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[PITr],except_AS.y,-mpu6050.Gyro_deg.y,eso_att_inner_c[PITr].u,T,200);
 	ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[ROLr],except_AS.x,mpu6050.Gyro_deg.x,eso_att_inner_c[ROLr].u,T,200);
 	ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[YAWr],except_AS.z,mpu6050.Gyro_deg.z,eso_att_inner_c[YAWr].u,T,200);
-	if(eso_att_inner_c[PITr].b0!=0){
+	float inf_out;
+	
+	AUTO_B0(&eso_att_inner_c[PITr],0,0,0,0,0);
+	AUTO_B0(&eso_att_inner_c[ROLr],0,0,0,0,0);
+	AUTO_B0(&eso_att_inner_c[YAWr],0,0,0,0,0);
+	if(en_h_inf){
+	inf_out=h_inf_att_inner1(except_AS.x,mpu6050.Gyro_deg.x,200);	
+	ctrl_1.out.x = inf_out;
+	}	
+	else if(eso_att_inner_c[PITr].b0!=0){
 		ctrl_1.FB=0;
 	//ctrl_1.err_i.x=ctrl_1.err_i.y=ctrl_1.err_i.z=0;
 	ctrl_1.out.x = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.x),0,1)*except_AS.x+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDPITCH].kp *( ctrl_1.err_d.x + ctrl_1.err_i.x)) 
@@ -566,7 +580,7 @@ void Thr_Ctrl(float T)
 //----------Drop protector-----------------
 	if(!fly_ready&&500 + CH_filter[THRr]<100)
 	force_Thr_low=0;
-	if((fabs(Pitch)>60||fabs(Roll)>60)&&fly_ready)
+	if((fabs(Pit_fc)>60||fabs(Rol_fc)>60)&&fly_ready)
 		force_Thr_low=1;
 //protect flag init	
 	if(fly_ready_r==0&&fly_ready==1&&500 + CH_filter[THRr]>100)

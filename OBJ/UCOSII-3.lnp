@@ -62,6 +62,10 @@
 "..\HARDWARE\EKF_BARO\baro_ekf_oldx.lib"
 "..\obj\imu1.o"
 "..\obj\alt_kf.o"
+"..\obj\w1.o"
+"..\obj\w1_data.o"
+"..\obj\ksw2.o"
+"..\obj\ksw2_data.o"
 "..\obj\sonar_avoid.o"
 --strict --scatter "..\OBJ\UCOSII-3.sct"
 --summary_stderr --info summarysizes --map --xref --callgraph --symbols

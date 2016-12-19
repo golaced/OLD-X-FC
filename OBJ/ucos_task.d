@@ -85,6 +85,13 @@
 ..\obj\ucos_task.o: ..\CORE\../HARDWARE/define.h
 ..\obj\ucos_task.o: ..\HARDWARE\../HARDWARE/../HARDWARE/CONTROL/h_inf.h
 ..\obj\ucos_task.o: ..\CORE\../HARDWARE/define.h
+..\obj\ucos_task.o: ..\CORE\../HARDWARE/HINF/W1_ert_rtw/W1.h
+..\obj\ucos_task.o: e:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\ucos_task.o: ..\CORE\../HARDWARE/HINF/W1_ert_rtw/rtwtypes.h
+..\obj\ucos_task.o: ..\CORE\../HARDWARE/HINF/W1_ert_rtw/W1_types.h
+..\obj\ucos_task.o: ..\CORE\../HARDWARE/HINF/KSW2_ert_rtw/KSW2.h
+..\obj\ucos_task.o: ..\CORE\../HARDWARE/HINF/KSW2_ert_rtw/rtwtypes.h
+..\obj\ucos_task.o: ..\CORE\../HARDWARE/HINF/KSW2_ert_rtw/KSW2_types.h
 ..\obj\ucos_task.o: ..\HARDWARE\../HARDWARE/../HARDWARE/MATH/Quaternion.h
 ..\obj\ucos_task.o: ..\HARDWARE\../HARDWARE/../HARDWARE/MATH/FastMath.h
 ..\obj\ucos_task.o: ..\HARDWARE\../HARDWARE/../HARDWARE/MATH/Double.h
