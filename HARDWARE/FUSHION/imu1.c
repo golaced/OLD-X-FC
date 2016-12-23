@@ -62,13 +62,17 @@ int test_flag2[3]={1,1,1};
 float mag_norm ,mag_norm_xyz, yaw_mag_view[5];
 
 //------------------KF  parameter------------------
-float gh_yaw=0.15;
+float gh_yaw=0.1;
 float ga_yaw=0.1;//<---use
 float gw_yaw=0.1;
 float yaw_kf;
 double P_kf_yaw[4]={1,0,0,1}; 
 double X_kf_yaw[2]={0,0};
+#if USE_MINI_BOARD
+float k_kf_z=2;
+#else
 float k_kf_z=1.428;
+#endif
 u8 yaw_cross;
 u8 dis_angle_lock=0;
 void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, float az,float hx,float hy,float hz,float *rol,float *pit,float *yaw) 
@@ -325,8 +329,8 @@ void MadgwickAHRSupdate(float dt,float gx, float gy, float gz, float ax, float a
 		{		
 	  if(init_q){
     float Pit,Rol;
-    Pit=-atan(mpu6050.Acc.x/mpu6050.Acc.z)*57.3;
-		Rol=atan(mpu6050.Acc.y/mpu6050.Acc.z)*57.3;
+    Pit=-atan(mpu6050_fc.Acc.x/mpu6050_fc.Acc.z)*57.3;
+		Rol=atan(mpu6050_fc.Acc.y/mpu6050_fc.Acc.z)*57.3;
 			
 		#if IMU_HML_ADD_500
 		float magTmp2 [3];	

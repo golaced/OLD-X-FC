@@ -12,9 +12,30 @@ u8 flash_init_error;
 static sensor_setup_t sensor_setup;
 static pid_setup_t pid_setup;
 
+struct _DRONE drone;
+static void Drone_init(void)
+{drone.type=DRONE_N;
+ drone.use_drone_pid=1;
+	
+ drone.body.l=0.14;
+ drone.body.mess_l=0.005;
+ 
+ drone.bldc.num=4;	
+ drone.bldc.mess=0.03;	
+ drone.bldc.gain=0.0025;
+ drone.bldc.time=0.014;
+ drone.bldc.off=-0.2734;
+switch(drone.type){	
+	case DRONE_N:
+		drone.ctrl1.roll.kp=drone.ctrl1.pitch.kp=(2*(drone.bldc.mess+2*drone.body.mess_l)*drone.body.l-drone.bldc.off)/(57.3*drone.bldc.gain*5.73);
+  break;		
+	
+}
+}
+
 
 static void  Param_SetSettingToFC(void) //fly thr 45% at 4s full 4.4Ah
-{
+{ Drone_init();
 	memcpy(&mpu6050.Acc_Offset,&sensor_setup.Offset.Accel,sizeof(xyz_f_t));
 	memcpy(&mpu6050.Gyro_Offset,&sensor_setup.Offset.Gyro,sizeof(xyz_f_t));
 	memcpy(&ak8975.Mag_Offset,&sensor_setup.Offset.Mag,sizeof(xyz_f_t));

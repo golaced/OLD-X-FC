@@ -91,11 +91,12 @@ int main(void)
   Uart5_Init(230400L);      // 图像Odroid
 	Delay_ms(100);
 //-------------------------flash始化------------------------------------	
-	Para_Init();				   //PID 参数初始化			
+	Para_Init();				   //PID 参数初始化		
+  #if !FLASH_USE_STM32	
 	W25QXX_Init();			
 	while(W25QXX_ReadID()!=W25Q32)								//检测不到flash
-		Delay_ms(100);
-	
+	Delay_ms(100);
+	#endif
 	READ_PARM();//读取参数
 //-----------------------Mode &  Flag init--------------------	
 //------visual------------

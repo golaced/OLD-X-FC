@@ -20,7 +20,36 @@ void Usart2_Init(u32 br_num)//--GOL-link
 	USART_ClockInitTypeDef USART_ClockInitStruct;
 	NVIC_InitTypeDef NVIC_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
+	#if USE_MINI_BOARD
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE); //开启USART2时钟
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA,ENABLE);	
 	
+	//串口中断优先级
+	NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);	
+
+	
+	GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_USART2);
+  GPIO_PinAFConfig(GPIOA, GPIO_PinSource3, GPIO_AF_USART2);
+	
+	//配置PD5作为USART2　Tx
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2; 
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;
+  GPIO_Init(GPIOA, &GPIO_InitStructure); 
+	//配置PD6作为USART2　Rx
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3 ; 
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+	#else
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE); //开启USART2时钟
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE);	
 	
@@ -49,7 +78,7 @@ void Usart2_Init(u32 br_num)//--GOL-link
   GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
   GPIO_Init(GPIOD, &GPIO_InitStructure); 
-
+  #endif
 	
 
    //USART1 初始化设置
@@ -913,7 +942,15 @@ void Usart1_Init(u32 br_num)//-------UPload_board1
   GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
   GPIO_Init(GPIOA, &GPIO_InitStructure); 
-
+  #if USE_MINI_BOARD
+	//配置PA3  WK  BLE控制端
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1 ; 
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+  GPIO_Init(GPIOA, &GPIO_InitStructure); 
+	#else
 	//配置PA3  WK  BLE控制端
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3 ; 
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
@@ -921,7 +958,7 @@ void Usart1_Init(u32 br_num)//-------UPload_board1
   GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
   GPIO_Init(GPIOA, &GPIO_InitStructure); 
-	
+	#endif
 	
 
    //USART1 初始化设置
@@ -952,9 +989,15 @@ void Usart1_Init(u32 br_num)//-------UPload_board1
 	 Send_Data_UP_LINK(BLE_RENEW,20);
 	 while(1);
 #endif
- GPIO_SetBits(GPIOA,GPIO_Pin_3);//透传模式
- Send_Data_UP_LINK(SET_PIN,20);
-  GPIO_ResetBits(GPIOA,GPIO_Pin_3);//透传模式
+#if USE_MINI_BOARD
+GPIO_SetBits(GPIOA,GPIO_Pin_1);//透传模式
+Send_Data_UP_LINK(SET_PIN,20);
+GPIO_ResetBits(GPIOA,GPIO_Pin_1);//透传模式
+#else
+GPIO_SetBits(GPIOA,GPIO_Pin_3);//透传模式
+Send_Data_UP_LINK(SET_PIN,20);
+GPIO_ResetBits(GPIOA,GPIO_Pin_3);//透传模式
+#endif
 //	   //USART1 初始化设置
 //	USART_InitStructure.USART_BaudRate =  9600;//波特率设置
 //	USART_InitStructure.USART_WordLength = USART_WordLength_8b;//字长为8位数据格式
@@ -984,9 +1027,10 @@ u16 i;
 
 
 void Send_Status(void)
-{u8 i;	u8 sum = 0,_temp3;	vs32 _temp2 = 0;	vs16 _temp;//u8 data_to_send[50];
+{ u8 i;	u8 sum = 0,_temp3;	vs32 _temp2 = 0;	vs16 _temp;//u8 data_to_send[50];
 	u8 _cnt=0;
 	u8 st=SendBuff1_cnt;
+	static u8 yaw_sel;
 	SendBuff1[SendBuff1_cnt++]=0xAA;
 	SendBuff1[SendBuff1_cnt++]=0xAA;
 	SendBuff1[SendBuff1_cnt++]=0x01;
@@ -998,6 +1042,11 @@ void Send_Status(void)
 	_temp = (int)(Pit_fc*100);
 	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
 	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	if(circle.check&&circle.connect)
+		yaw_sel=1;
+	if(yaw_sel)
+	_temp = (int)(Yaw*100);	
+	else
 	_temp = (int)(Yaw_fc*100);
 	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
 	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
@@ -1018,12 +1067,44 @@ void Send_Status(void)
  	_temp =  mcuID[0];
 	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
 	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	static int x,y,z;
+	if(circle.x!=0)
+		x=circle.x*10;
+	if(circle.y!=0)
+		y=-circle.y*10;
+	if(circle.z!=0)
+		z=circle.z*10;
+	_temp = (int)(x);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	_temp = (int)(y);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	_temp = (int)(z);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	
+	_temp = (int)(nav_pos_ctrl[0].exp*1000);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	_temp = (int)(nav_pos_ctrl[1].exp*1000);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	_temp = (int)(exp_height);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	
+	
 	_temp = (int)(POS_UKF_X*1000);
 	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
 	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
 	_temp = (int)(POS_UKF_Y*1000);
 	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
 	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	_temp = (int)(ALT_POS_SONAR2*1000);
+	SendBuff1[SendBuff1_cnt++]=BYTE1(_temp);
+	SendBuff1[SendBuff1_cnt++]=BYTE0(_temp);
+	
 	
 	
 	SendBuff1[3+st] = SendBuff1_cnt-st-4;
@@ -2313,7 +2394,37 @@ void Usart3_Init(u32 br_num)//-------PXY
 	USART_ClockInitTypeDef USART_ClockInitStruct;
 	NVIC_InitTypeDef NVIC_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
+	#if USE_MINI_BOARD
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE); //开启USART2时钟
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB,ENABLE);	
 	
+	//串口中断优先级
+	NVIC_InitStructure.NVIC_IRQChannel = USART3_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+	NVIC_Init(&NVIC_InitStructure);	
+
+	
+	GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_USART3);
+  GPIO_PinAFConfig(GPIOB, GPIO_PinSource11, GPIO_AF_USART3);
+	
+	//配置PD5作为USART2　Tx
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10; 
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;
+  GPIO_Init(GPIOB, &GPIO_InitStructure); 
+	//配置PD6作为USART2　Rx
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11 ; 
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+  GPIO_Init(GPIOB, &GPIO_InitStructure); 
+	
+	#else
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE); //开启USART2时钟
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD,ENABLE);	
 	
@@ -2342,7 +2453,7 @@ void Usart3_Init(u32 br_num)//-------PXY
   GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
   GPIO_Init(GPIOD, &GPIO_InitStructure); 
-
+ #endif
 	
    //USART1 初始化设置
 	USART_InitStructure.USART_BaudRate = br_num;//波特率设置

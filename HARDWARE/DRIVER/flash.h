@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////// 
 
 
-#define SIZE_FLASH_ROOM 80
+#define SIZE_FLASH_ROOM 80*2
 //FLASH起始地址
 #define STM32_FLASH_BASE 0x08000000 	//STM32 FLASH的起始地址
 #define SIZE (SIZE_FLASH_ROOM/4+((SIZE_FLASH_ROOM%4)?1:0))*2
@@ -68,9 +68,11 @@ extern void WRITE_PARM(void);
 #define W25Q128	0XEF17
 
 extern u16 W25QXX_TYPE;					//定义W25QXX芯片型号		   
-
+#if USE_MINI_BOARD
+#define	W25QXX_CS 		PAout(4)  		//W25QXX的片选信号
+#else
 #define	W25QXX_CS 		PBout(12)  		//W25QXX的片选信号
-
+#endif
 ////////////////////////////////////////////////////////////////////////////////// 
 //指令表
 #define W25X_WriteEnable		0x06 

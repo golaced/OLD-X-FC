@@ -57,6 +57,37 @@ typedef union
  }groups;
 }pid_setup_t;
 
+struct _BODY
+{
+float l;//m
+float mess_l;//kg
+float mess_all;//kg
+};
+
+struct _BLDC
+{
+u8 num;
+float gain;
+float off;
+float time;//s
+float mess;//kg
+u16 kv;
+u8 power_level;	//x S
+u8 paralle_1;	
+u8 paralle_2;	
+};
+#define DRONE_N 0
+#define DRONE_X 1
+struct _DRONE
+{u8 type;
+ u8 use_drone_pid;
+ struct _BODY body; 
+ struct _BLDC bldc;
+ pid_group_t ctrl1;
+ pid_group_t ctrl2;	
+};
+extern struct _DRONE drone;
+
 
 void Senser_Calibrat_Read(void);
 void PID_Para_Read(void);

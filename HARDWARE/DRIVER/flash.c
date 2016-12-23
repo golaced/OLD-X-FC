@@ -15,10 +15,19 @@ u16 W25QXX_TYPE=W25Q32;	//默认是W25Q128
 //初始化SPI FLASH的IO口
 void W25QXX_Init(void)
 { 
+	
   GPIO_InitTypeDef  GPIO_InitStructure;
- 
+ #if USE_MINI_BOARD
+	 RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);//使能GPIOB时钟
+	//CS
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;//PB14
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;//输出
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//推挽输出
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;//100MHz
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
+  GPIO_Init(GPIOA, &GPIO_InitStructure);//初始化
+	#else
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);//使能GPIOB时钟
-
 	//CS
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;//PB14
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;//输出
@@ -26,11 +35,12 @@ void W25QXX_Init(void)
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;//100MHz
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
   GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化
-
+  #endif
 	W25QXX_CS=1;			//SPI FLASH不选中
 	SPI1_Init();		   			//初始化SPI
 	SPI1_SetSpeed(SPI_BaudRatePrescaler_2);		//设置为42M时钟,高速模式 
 	W25QXX_TYPE=W25QXX_ReadID();	//读取FLASH ID.
+	
 }  
 
 //读取W25QXX的状态寄存器
@@ -268,7 +278,39 @@ void SPI1_Init(void)
 {	 
   GPIO_InitTypeDef  GPIO_InitStructure;
   SPI_InitTypeDef  SPI_InitStructure;
+	#if USE_MINI_BOARD
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);//使能GPIOA时钟
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);//使能SPI1时钟
+ 
+  //GPIOFB3,4,5初始化设置
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;//PB3~5复用功能输出	
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;//复用功能
+  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//推挽输出
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;//100MHz
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
+  GPIO_Init(GPIOA, &GPIO_InitStructure);//初始化
 	
+	GPIO_PinAFConfig(GPIOA,GPIO_PinSource5,GPIO_AF_SPI1); //PB3复用为 SPI1
+	GPIO_PinAFConfig(GPIOA,GPIO_PinSource6,GPIO_AF_SPI1); //PB4复用为 SPI1
+	GPIO_PinAFConfig(GPIOA,GPIO_PinSource7,GPIO_AF_SPI1); //PB5复用为 SPI1
+ 
+	//这里只针对SPI口初始化
+	RCC_APB2PeriphResetCmd(RCC_APB2Periph_SPI1,ENABLE);//复位SPI1
+	RCC_APB2PeriphResetCmd(RCC_APB2Periph_SPI1,DISABLE);//停止复位SPI1
+
+	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;  //设置SPI单向或者双向的数据模式:SPI设置为双线双向全双工
+	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;		//设置SPI工作模式:设置为主SPI
+	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;		//设置SPI的数据大小:SPI发送接收8位帧结构
+	SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;		//串行同步时钟的空闲状态为高电平
+	SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;	//串行同步时钟的第二个跳变沿（上升或下降）数据被采样
+	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;		//NSS信号由硬件（NSS管脚）还是软件（使用SSI位）管理:内部NSS信号有SSI位控制
+	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;		//定义波特率预分频的值:波特率预分频值为256
+	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;	//指定数据传输从MSB位还是LSB位开始:数据传输从MSB位开始
+	SPI_InitStructure.SPI_CRCPolynomial = 7;	//CRC值计算的多项式
+	SPI_Init(SPI1, &SPI_InitStructure);  //根据SPI_InitStruct中指定的参数初始化外设SPIx寄存器
+ 
+	SPI_Cmd(SPI1, ENABLE); //使能SPI外设
+	#else
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);//使能GPIOA时钟
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);//使能SPI1时钟
  
@@ -300,7 +342,7 @@ void SPI1_Init(void)
 	SPI_Init(SPI2, &SPI_InitStructure);  //根据SPI_InitStruct中指定的参数初始化外设SPIx寄存器
  
 	SPI_Cmd(SPI2, ENABLE); //使能SPI外设
-
+  #endif
 	SPI1_ReadWriteByte(0xff);//启动传输		 
 }   
 //SPI1速度设置函数
@@ -309,17 +351,32 @@ void SPI1_Init(void)
 //fAPB2时钟一般为84Mhz：
 void SPI1_SetSpeed(u8 SPI_BaudRatePrescaler)
 {
+	#if USE_MINI_BOARD
+	assert_param(IS_SPI_BAUDRATE_PRESCALER(SPI_BaudRatePrescaler));//判断有效性
+	SPI1->CR1&=0XFFC7;//位3-5清零，用来设置波特率
+	SPI1->CR1|=SPI_BaudRatePrescaler;	//设置SPI1速度 
+	SPI_Cmd(SPI1,ENABLE); //使能SPI1
+	#else
   assert_param(IS_SPI_BAUDRATE_PRESCALER(SPI_BaudRatePrescaler));//判断有效性
 	SPI2->CR1&=0XFFC7;//位3-5清零，用来设置波特率
 	SPI2->CR1|=SPI_BaudRatePrescaler;	//设置SPI1速度 
 	SPI_Cmd(SPI2,ENABLE); //使能SPI1
+	#endif
 } 
 //SPI1 读写一个字节
 //TxData:要写入的字节
 //返回值:读取到的字节
 u8 SPI1_ReadWriteByte(u8 TxData)
 {		 			 
+  #if USE_MINI_BOARD
+  while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET){}//等待发送区空  
+	
+	SPI_I2S_SendData(SPI1, TxData); //通过外设SPIx发送一个byte  数据
+		
+  while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET){} //等待接收完一个byte  
  
+	return SPI_I2S_ReceiveData(SPI1); //返回通过SPIx最近接收的数据	
+	#else
   while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET){}//等待发送区空  
 	
 	SPI_I2S_SendData(SPI2, TxData); //通过外设SPIx发送一个byte  数据
@@ -327,17 +384,107 @@ u8 SPI1_ReadWriteByte(u8 TxData)
   while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_RXNE) == RESET){} //等待接收完一个byte  
  
 	return SPI_I2S_ReceiveData(SPI2); //返回通过SPIx最近接收的数据	
- 		    
+ 	#endif	    
 }
 
+//读取指定地址的半字(16位数据) 
+//faddr:读地址 
+//返回值:对应数据.
+u32 STMFLASH_ReadWord(u32 faddr)
+{
+	return *(vu32*)faddr; 
+}  
+//获取某个地址所在的flash扇区
+//addr:flash地址
+//返回值:0~11,即addr所在的扇区
+uint16_t STMFLASH_GetFlashSector(u32 addr)
+{
+	if(addr<ADDR_FLASH_SECTOR_1)return FLASH_Sector_0;
+	else if(addr<ADDR_FLASH_SECTOR_2)return FLASH_Sector_1;
+	else if(addr<ADDR_FLASH_SECTOR_3)return FLASH_Sector_2;
+	else if(addr<ADDR_FLASH_SECTOR_4)return FLASH_Sector_3;
+	else if(addr<ADDR_FLASH_SECTOR_5)return FLASH_Sector_4;
+	else if(addr<ADDR_FLASH_SECTOR_6)return FLASH_Sector_5;
+	else if(addr<ADDR_FLASH_SECTOR_7)return FLASH_Sector_6;
+	else if(addr<ADDR_FLASH_SECTOR_8)return FLASH_Sector_7;
+	else if(addr<ADDR_FLASH_SECTOR_9)return FLASH_Sector_8;
+	else if(addr<ADDR_FLASH_SECTOR_10)return FLASH_Sector_9;
+	else if(addr<ADDR_FLASH_SECTOR_11)return FLASH_Sector_10; 
+	return FLASH_Sector_11;	
+}
+//从指定地址开始写入指定长度的数据
+//特别注意:因为STM32F4的扇区实在太大,没办法本地保存扇区数据,所以本函数
+//         写地址如果非0XFF,那么会先擦除整个扇区且不保存扇区数据.所以
+//         写非0XFF的地址,将导致整个扇区数据丢失.建议写之前确保扇区里
+//         没有重要数据,最好是整个扇区先擦除了,然后慢慢往后写. 
+//该函数对OTP区域也有效!可以用来写OTP区!
+//OTP区域地址范围:0X1FFF7800~0X1FFF7A0F
+//WriteAddr:起始地址(此地址必须为4的倍数!!)
+//pBuffer:数据指针
+//NumToWrite:字(32位)数(就是要写入的32位数据的个数.) 
+void STMFLASH_Write(u32 WriteAddr,u32 *pBuffer,u32 NumToWrite)	
+{ 
+  FLASH_Status status = FLASH_COMPLETE;
+	u32 addrx=0;
+	u32 endaddr=0;	
+  if(WriteAddr<STM32_FLASH_BASE||WriteAddr%4)return;	//非法地址
+	FLASH_Unlock();									//解锁 
+  FLASH_DataCacheCmd(DISABLE);//FLASH擦除期间,必须禁止数据缓存
+ 		
+	addrx=WriteAddr;				//写入的起始地址
+	endaddr=WriteAddr+NumToWrite*4;	//写入的结束地址
+	if(addrx<0X1FFF0000)			//只有主存储区,才需要执行擦除操作!!
+	{
+		while(addrx<endaddr)		//扫清一切障碍.(对非FFFFFFFF的地方,先擦除)
+		{
+			if(STMFLASH_ReadWord(addrx)!=0XFFFFFFFF)//有非0XFFFFFFFF的地方,要擦除这个扇区
+			{   
+				status=FLASH_EraseSector(STMFLASH_GetFlashSector(addrx),VoltageRange_3);//VCC=2.7~3.6V之间!!
+				if(status!=FLASH_COMPLETE)break;	//发生错误了
+			}else addrx+=4;
+		} 
+	}
+	if(status==FLASH_COMPLETE)
+	{
+		while(WriteAddr<endaddr)//写数据
+		{
+			if(FLASH_ProgramWord(WriteAddr,*pBuffer)!=FLASH_COMPLETE)//写入数据
+			{ 
+				break;	//写入异常
+			}
+			WriteAddr+=4;
+			pBuffer++;
+		} 
+	}
+  FLASH_DataCacheCmd(ENABLE);	//FLASH擦除结束,开启数据缓存
+	FLASH_Lock();//上锁
+} 
+
+//从指定地址开始读出指定长度的数据
+//ReadAddr:起始地址
+//pBuffer:数据指针
+//NumToRead:字(4位)数
+void STMFLASH_Read(u32 ReadAddr,u32 *pBuffer,u32 NumToRead)   	
+{
+	u32 i;
+	for(i=0;i<NumToRead;i++)
+	{
+		pBuffer[i]=STMFLASH_ReadWord(ReadAddr);//读取4个字节.
+		ReadAddr+=4;//偏移4个字节.	
+	}
+}
 //-----------------------------------------存储参数
-#define SIZE_PARAM 50
+#define SIZE_PARAM 50*2
 u8 FLASH_READ_BUF[SIZE_PARAM]={0};
 u8 FLASH_Buffer[SIZE_PARAM]={0};
 u32 FLASH_SIZE=16*1024*1024;	//FLASH 大小为16字节
 void READ_PARM(void)
 {
+#if FLASH_USE_STM32
+STMFLASH_Read(FLASH_SAVE_ADDR,(u32*)FLASH_READ_BUF,SIZE);	
+#else	
 W25QXX_Read(FLASH_READ_BUF,FLASH_SIZE-100,SIZE_PARAM);					//从倒数第100个地址处开始,读出SIZE个字节
+#endif
 mpu6050_fc.Gyro_Offset.x=(vs16)(FLASH_READ_BUF[1]<<8|FLASH_READ_BUF[0]);
 mpu6050_fc.Gyro_Offset.y=(vs16)(FLASH_READ_BUF[3]<<8|FLASH_READ_BUF[2]);
 mpu6050_fc.Gyro_Offset.z=(vs16)(FLASH_READ_BUF[5]<<8|FLASH_READ_BUF[4]);
@@ -416,8 +563,11 @@ FLASH_Buffer[cnt++]=BYTE1(_temp);
 //_temp=(int16_t)(dj_angle_offset[2]*100);
 //FLASH_Buffer[cnt++]=BYTE0(_temp);
 //FLASH_Buffer[cnt++]=BYTE1(_temp);
-
-	W25QXX_Write((u8*)FLASH_Buffer,FLASH_SIZE-100,SIZE_PARAM);		//从倒数第100个地址处开始,写入SIZE长度的数据
+#if FLASH_USE_STM32
+STMFLASH_Write(FLASH_SAVE_ADDR,(u32*)FLASH_Buffer,SIZE);
+#else
+W25QXX_Write((u8*)FLASH_Buffer,FLASH_SIZE-100,SIZE_PARAM);		//从倒数第100个地址处开始,写入SIZE长度的数据
+#endif
 }
 
 

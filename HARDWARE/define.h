@@ -31,4 +31,8 @@ typedef int16_t s16;
 typedef int8_t  s8;
 
 //----------
+#if USE_MINI_BOARD
+#define MAXMOTORS 		(8)		//电机数量
+#else
 #define MAXMOTORS 		(6)		//电机数量
+#endif

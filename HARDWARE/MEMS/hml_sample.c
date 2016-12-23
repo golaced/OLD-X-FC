@@ -140,7 +140,7 @@ void ANO_AK8975_CalOffset_Mag(void)
 				ak8975_fc.Mag_Gain.y =  temp_max/MagSum.y ;
 				ak8975_fc.Mag_Gain.z =  temp_max/MagSum.z ;
 				
-		  	//WRITE_PARM();//Param_SaveMagOffset(&ak8975_fc.Mag_Offset);
+		  	WRITE_PARM();//Param_SaveMagOffset(&ak8975_fc.Mag_Offset);
 				cnt_m = 0;
 				ak8975_fc.Mag_CALIBRATED = 0;
 			}

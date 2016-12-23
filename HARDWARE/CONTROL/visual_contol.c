@@ -477,6 +477,22 @@ head  |    1 PIT y-  RC0
 		*/
 }
 
+float exp_center_cycle[5]={1.50,1.50,1,0,12};
+void Nav_pos_set_test(u8 mode,float T)
+{
+switch(mode){
+	case 0://cycle
+		  exp_center_cycle[3]+=T*exp_center_cycle[4];
+			if(exp_center_cycle[3]<0)exp_center_cycle[3]=360;
+			if(exp_center_cycle[3]>360)exp_center_cycle[3]=0;
+	        nav_pos_ctrl[X].exp=cos(exp_center_cycle[3]*0.0173)*exp_center_cycle[2]+exp_center_cycle[0];
+					nav_pos_ctrl[Y].exp=sin(exp_center_cycle[3]*0.0173)*exp_center_cycle[2]-exp_center_cycle[1];
+	break;
+
+}
+}
+
+
 #define NAV_POS_INT        500//mm/s  
 #define NAV_SPD_INT        300//mm/s
 float yaw_qr_off;
@@ -511,12 +527,14 @@ void Positon_control(float T)//     光流定点
 		nav_spd_pid.kd=0.05;
 		nav_spd_pid.dead=20;
 	}
-	
+	if(NS==0)
+	Nav_pos_set_test(0,T);
+	else {
 	if(fabs(CH_filter[PITr])>50||ALT_POS_SONAR2<0.35||!fly_ready)
 		 reset_nav_pos(Y);
 	if(fabs(CH_filter[ROLr])>50||ALT_POS_SONAR2<0.35||!fly_ready)
 		 reset_nav_pos(X);
-	
+	}
 			/*
 		north    LAT=1     V_West+                             __________
 		|   Y+  y                                              P- R- GPS-

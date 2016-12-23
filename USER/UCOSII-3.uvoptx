@@ -213,7 +213,7 @@
           <Type>0</Type>
           <LineNumber>23</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134257756</Address>
+          <Address>134258016</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -229,7 +229,7 @@
           <Type>0</Type>
           <LineNumber>91</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134221576</Address>
+          <Address>134221836</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -281,6 +281,31 @@
           <count>7</count>
           <WinNumber>1</WinNumber>
           <ItemText>NS,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>8</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>drone,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>9</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>nav_pos_ctrl</ItemText>
+        </Ww>
+        <Ww>
+          <count>10</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>CH_filter</ItemText>
+        </Ww>
+        <Ww>
+          <count>11</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>exp_center_cycle</ItemText>
+        </Ww>
+        <Ww>
+          <count>12</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>epx_d_angle</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>

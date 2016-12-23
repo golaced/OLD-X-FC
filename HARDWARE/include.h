@@ -135,6 +135,12 @@ extern float off_yaw;//遥控方向
 #define MAX_THR       80 			///%	油门通道最大占比80%，留20%给控制量
 #define READY_SPEED   20      ///%	解锁后电机转速20%油门
 //================系统设置===================
+#define USE_MINI_BOARD  1  //使用MINI OLD-X 飞控板
+#if USE_MINI_BOARD
+#define FLASH_USE_STM32 0  // flash 使用stm32 内部EPROOM
+#else
+#define FLASH_USE_STM32 0  // flash 使用stm32 内部EPROOM
+#endif
 #define DRONE_330_ID 3145777//未使用勿修改
 #define DRONE_350_ID 4915281//未使用勿修改
 
