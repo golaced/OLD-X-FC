@@ -311,7 +311,7 @@ void ident_task(void *pdata)//IDNET TASK
 
 //=======================串口 任务函数===========================
 OS_STK  UART_TASK_STK[UART_STK_SIZE];
-u8 UART_UP_LOAD_SEL=25;//<------------------------------上传数据选择
+u8 UART_UP_LOAD_SEL=0;//<------------------------------上传数据选择
 u8 force_flow_ble_debug;
 u8 state_test=2;
 void uart_task(void *pdata)

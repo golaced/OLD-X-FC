@@ -107,9 +107,9 @@ u8 i,j;
 float acc_temp1,temp;  
 float accIn[3];
 float acc_body_temp[3];
- 		accIn[0] =(float) mpu6050.Acc.x/4096.*9.8-acc_bias[0]*en_bias_fix;//16438.;
-		accIn[1] =(float) mpu6050.Acc.y/4096.*9.8-acc_bias[1]*en_bias_fix;//16438.;
-		accIn[2] =(float) mpu6050.Acc.z/4096.*9.8-acc_bias[2]*en_bias_fix;//16438.;
+ 		accIn[0] =(float) mpu6050_fc.Acc.x/4096.*9.8-acc_bias[0]*en_bias_fix;//16438.;
+		accIn[1] =(float) mpu6050_fc.Acc.y/4096.*9.8-acc_bias[1]*en_bias_fix;//16438.;
+		accIn[2] =(float) mpu6050_fc.Acc.z/4096.*9.8-acc_bias[2]*en_bias_fix;//16438.;
     body_to_NEZ(acc_body_temp, accIn, ref_q_imd_down_fc);
 
     acc_body[0]=flt_body_acc*acc_body_temp[1]*k_body_acc+(1-flt_body_acc)*acc_body[0];

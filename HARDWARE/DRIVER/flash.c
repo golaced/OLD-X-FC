@@ -17,8 +17,8 @@ void W25QXX_Init(void)
 { 
 	
   GPIO_InitTypeDef  GPIO_InitStructure;
- #if USE_MINI_BOARD
-	 RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);//使能GPIOB时钟
+  #if USE_MINI_BOARD
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);//使能GPIOB时钟
 	//CS
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;//PB14
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;//输出
@@ -279,7 +279,7 @@ void SPI1_Init(void)
   GPIO_InitTypeDef  GPIO_InitStructure;
   SPI_InitTypeDef  SPI_InitStructure;
 	#if USE_MINI_BOARD
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);//使能GPIOA时钟
+  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);//使能GPIOA时钟
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);//使能SPI1时钟
  
   //GPIOFB3,4,5初始化设置
@@ -367,15 +367,15 @@ void SPI1_SetSpeed(u8 SPI_BaudRatePrescaler)
 //TxData:要写入的字节
 //返回值:读取到的字节
 u8 SPI1_ReadWriteByte(u8 TxData)
-{		 			 
+{	uint16_t rx; 			 
   #if USE_MINI_BOARD
-  while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET){}//等待发送区空  
-	
-	SPI_I2S_SendData(SPI1, TxData); //通过外设SPIx发送一个byte  数据
-		
-  while (SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET){} //等待接收完一个byte  
- 
-	return SPI_I2S_ReceiveData(SPI1); //返回通过SPIx最近接收的数据	
+	//等待SPI空闲
+	while(SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
+	//发送一个字节
+	SPI_I2S_SendData(SPI1, TxData);
+	while(SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_RXNE) == RESET);
+	rx=SPI_I2S_ReceiveData(SPI1);
+	return rx;//SPI_I2S_ReceiveData(SPI1); //返回通过SPIx最近接收的数据	
 	#else
   while (SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE) == RESET){}//等待发送区空  
 	

@@ -785,6 +785,20 @@ void Data_Receive_Anl5(u8 *data_buf,u8 num)
 	circle.r=(int8_t)(*(data_buf+10));
 	//track.check=(int8_t)(*(data_buf+11));
 	}	
+	else if(*(data_buf+2)==0x2)//track
+  {
+		circle.connect=1;
+	circle.lose_cnt=0;
+	track.check=circle.check=(*(data_buf+4));///10.;
+	rc_value_temp=((int16_t)(*(data_buf+5)<<8)|*(data_buf+6));
+	if(rc_value_temp<320)
+	circle.x=rc_value_temp;//Moving_Median(16,3,rc_value_temp);
+	circle.y=(int16_t)(*(data_buf+7));//Moving_Median(17,3,((int16_t)(*(data_buf+7))));
+	circle.control[0]=(int8_t)(*(data_buf+8));
+	circle.control[1]=(int8_t)(*(data_buf+9));
+	circle.r=(int8_t)(*(data_buf+10));
+		
+	}	
 	else if(*(data_buf+2)==0x21)//QR
   {
 	circle.connect=1;
