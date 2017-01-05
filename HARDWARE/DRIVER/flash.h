@@ -68,7 +68,7 @@ extern void WRITE_PARM(void);
 #define W25Q128	0XEF17
 
 extern u16 W25QXX_TYPE;					//定义W25QXX芯片型号		   
-#if USE_MINI_BOARD
+#if USE_MINI_BOARD1
 #define	W25QXX_CS 		PAout(4)  		//W25QXX的片选信号
 #else
 #define	W25QXX_CS 		PBout(12)  		//W25QXX的片选信号

@@ -56,7 +56,7 @@ u8 PWM_Out_Init(uint16_t hz)//400hz
 		TIM_OCInitTypeDef  TIM_OCInitStructure;
 		GPIO_InitTypeDef GPIO_InitStructure;
 		uint16_t PrescalerValue = 0;
-		u32 hz_set = ACCURACY*hz;
+		u32 hz_set = ACCURACY*hz*2;
 
 		TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 		TIM_OCStructInit(&TIM_OCInitStructure);
@@ -80,7 +80,7 @@ u8 PWM_Out_Init(uint16_t hz)//400hz
 		GPIO_PinAFConfig(GPIOB, GPIO_PinSource0, GPIO_AF_TIM3);
 		GPIO_PinAFConfig(GPIOB, GPIO_PinSource1, GPIO_AF_TIM3);
 
-		/* Compute the prescaler value */
+	/* Compute the prescaler value */
 		PrescalerValue = (uint16_t) ( ( SystemCoreClock ) / hz_set ) - 1;
 		/* Time base configuration */
 		TIM_TimeBaseStructure.TIM_Period = ACCURACY;									
@@ -98,7 +98,7 @@ u8 PWM_Out_Init(uint16_t hz)//400hz
 		TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Set;
 		TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCNIdleState_Reset;
 
-		/* PWM1 Mode configuration: Channel1 */
+		 /* PWM1 Mode configuration: Channel1 */
 		TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
 		TIM_OCInitStructure.TIM_Pulse = INIT_DUTY;
 		TIM_OC1Init(TIM3, &TIM_OCInitStructure);
@@ -121,13 +121,14 @@ u8 PWM_Out_Init(uint16_t hz)//400hz
 		TIM_OCInitStructure.TIM_Pulse = INIT_DUTY;
 		TIM_OC4Init(TIM3, &TIM_OCInitStructure);
 		//TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Enable);
-
+		
 		TIM_CtrlPWMOutputs(TIM3, ENABLE);
 		TIM_ARRPreloadConfig(TIM3, ENABLE);
 		TIM_Cmd(TIM3, ENABLE);	
 
 		//////////////////////////////////////TIM4///////////////////////////////////////////
-
+	  hz_set = ACCURACY*hz;
+		hz_set = LIMIT (hz_set,1,84000000);
 		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7|GPIO_Pin_8 | GPIO_Pin_9; 
 		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
 		GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;

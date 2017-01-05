@@ -17,7 +17,7 @@ void W25QXX_Init(void)
 { 
 	
   GPIO_InitTypeDef  GPIO_InitStructure;
-  #if USE_MINI_BOARD
+  #if USE_MINI_BOARD1
 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);//使能GPIOB时钟
 	//CS
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;//PB14
@@ -278,7 +278,7 @@ void SPI1_Init(void)
 {	 
   GPIO_InitTypeDef  GPIO_InitStructure;
   SPI_InitTypeDef  SPI_InitStructure;
-	#if USE_MINI_BOARD
+	#if USE_MINI_BOARD1
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);//使能GPIOA时钟
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_SPI1, ENABLE);//使能SPI1时钟
  
@@ -351,7 +351,7 @@ void SPI1_Init(void)
 //fAPB2时钟一般为84Mhz：
 void SPI1_SetSpeed(u8 SPI_BaudRatePrescaler)
 {
-	#if USE_MINI_BOARD
+	#if USE_MINI_BOARD1
 	assert_param(IS_SPI_BAUDRATE_PRESCALER(SPI_BaudRatePrescaler));//判断有效性
 	SPI1->CR1&=0XFFC7;//位3-5清零，用来设置波特率
 	SPI1->CR1|=SPI_BaudRatePrescaler;	//设置SPI1速度 
@@ -368,7 +368,7 @@ void SPI1_SetSpeed(u8 SPI_BaudRatePrescaler)
 //返回值:读取到的字节
 u8 SPI1_ReadWriteByte(u8 TxData)
 {	uint16_t rx; 			 
-  #if USE_MINI_BOARD
+  #if USE_MINI_BOARD1
 	//等待SPI空闲
 	while(SPI_I2S_GetFlagStatus(SPI1, SPI_I2S_FLAG_TXE) == RESET);
 	//发送一个字节
