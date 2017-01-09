@@ -383,7 +383,7 @@ void uart_task(void *pdata)
 											
 											}else{
 											
-											if(KEY[7])//OUTTER
+											if(ctrl_2.PID->kp!=0&&KEY[7])//OUTTER
 											data_per_uart1(
 											#if TUNING_X
 											0,-except_A.x*10,0,
@@ -403,8 +403,16 @@ void uart_task(void *pdata)
 											(int16_t)(eso_att_outter_c[ROLr].disturb_u*100),(int16_t)(0*10.0),(int16_t)(0*100.0),0/10,0,0/10,0*0);
 											else//INNER
 											data_per_uart1(
+											#if TUNING_X
 											0,-except_AS.x,0,
-											0,-mpu6050.Gyro_deg.x,0,  
+											#else
+											0,except_AS.y,0,
+											#endif
+											#if TUNING_X
+											0,-mpu6050.Gyro_deg.x,0,
+											#else
+											0,-mpu6050.Gyro_deg.y,0,
+											#endif 
 											-ctrl_1.err.y,-eso_att_inner[ROLr].disturb,0,
 											(int16_t)(eso_att_outter_c[ROLr].disturb_u*10),(int16_t)(0*10.0),(int16_t)(0*10.0),0/10,0,0/10,0*0);
 											}

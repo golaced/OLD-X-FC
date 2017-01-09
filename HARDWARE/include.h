@@ -131,8 +131,8 @@ extern float off_yaw;//遥控方向
 //=================PWM========================
 //#define HOLD_THR_PWM  450
 #define HOLD_THR_PWM  386
-#define MAX_PWM				LIMIT(2*HOLD_THR_PWM,0,100)///%	最大PWM输出为100%油门
-#define MAX_THR       80 			///%	油门通道最大占比80%，留20%给控制量
+#define MAX_PWM				LIMIT(2*HOLD_THR_PWM,0,1000)///%	最大PWM输出为100%油门
+#define MAX_THR       LIMIT(2*HOLD_THR_PWM,0,1000)/10 			///%	油门通道最大占比80%，留20%给控制量
 #define READY_SPEED   20      ///%	解锁后电机转速20%油门
 //================系统设置===================
 #define USE_MINI_BOARD  1  //使用MINI OLD-X 飞控板
@@ -156,7 +156,7 @@ extern float off_yaw;//遥控方向
 #define EN_TIM_INNER  0 //400Hz控制  有BUG请勿使用
 #define EN_ATT_CAL_FC 1 //由FC计算控制IMU数据
 #define EN_TIM_IMU  0     //未使用现在
-#define USE_RECIVER_MINE 0//使用自己的手柄 未使用现在
+#define USE_RECIVER_MINE 1//使用自己的手柄 未使用现在
 #define BLE_BAD 0        //未使用现在
 #define NEW_FLY_BOARD 0  //0—>PWM使用5678   未使用现在
 #define PLANE_IS_BIG  0  //			未使用现在 勿修改

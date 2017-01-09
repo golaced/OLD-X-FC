@@ -7,9 +7,8 @@
 #include "../HARDWARE/MEMS/mpu6050.h"
 #include "../HARDWARE/DRIVER/usart_fc.h"
 #include "../HARDWARE/CONTROL/height_ctrl.h"
+#include "../HARDWARE/include.h"
 
-#include "baro_ekf_oldx.h"
-#include "kf_oldx.h"
 
 //sonar
 float ALT_POS_BMP,ALT_VEL_BMP;
@@ -145,8 +144,12 @@ float acc_body_temp[3];
 	  acc_bmp=LIMIT(my_deathzoom(acc_temp1-acc_off_baro,dead_accz)*acc_scale_bmp,-3.6,3.6);//+LIMIT(acc_bais,-1.5,1.5);
     // rotate acc to world frame
    
-		
-		if(Rc_Get_PWM.THROTTLE<1200)	{	
+		#if USE_RECIVER_MINE==1
+		if(Rc_Get.THROTTLE<1200)		
+		#else
+		if(Rc_Get_PWM.THROTTLE<1200)		
+		#endif
+		{
 		acc_off_baro=LIMIT(acc_temp1,-3,3);
 		X_ukf_baro[0] =posz;X_ukf_baro[1]=X_ukf_baro[2]=0;acc_bais=0;
 		X_kf_baro[0] =posz;X_kf_baro[1]=X_kf_baro[2]=0;
@@ -170,7 +173,11 @@ float acc_body_temp[3];
 	ALT_VEL_BMP_UKF_OLDX=X_apo_height[1];//Moving_Median(22,5,X_ukf_baro[1]);
 	#endif
 	
-	if(Rc_Get_PWM.THROTTLE<1200)//fly_ready&&!Thr_low)
+	#if USE_RECIVER_MINE
+	if(Rc_Get.THROTTLE<1200)	
+	#else
+	if(Rc_Get_PWM.THROTTLE<1200)	
+	#endif
 	Alt_Offset_m1=ALT_POS_BMP_UKF_OLDX;
 	x_tst[0]=kf_tst[0]*x_tst[0]+(1-kf_tst[0])*ALT_VEL_BMP_UKF_OLDX;
 	 

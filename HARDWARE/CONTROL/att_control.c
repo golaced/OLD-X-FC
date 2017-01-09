@@ -421,16 +421,21 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 	xyz_f_t EXP_LPF_TMP;
 	
   if(ctrl_2.PID->kp==0||KEY[7]==0||inner_set){
+  #if TUNING_X
 	if(fabs(Rol_fc)<40)
 	ctrl_angle_out[0]=except_A.x*k_rc_gyro_spd;
 	else if((Rol_fc)>40)
 	ctrl_angle_out[0]=LIMIT(except_A.x*k_rc_gyro_spd,-MAX_CTRL_ANGLE*k_rc_gyro_spd,0);	
 	else if((Rol_fc)<-40)
 	ctrl_angle_out[0]=LIMIT(except_A.x*k_rc_gyro_spd,0,MAX_CTRL_ANGLE*k_rc_gyro_spd);	
-  else
-	ctrl_angle_out[0]=ctrl_2.out.x;
-	ctrl_angle_out[1]=ctrl_2.out.y;
-	ctrl_angle_out[2]=ctrl_2.out.z;
+  #else
+	if(fabs(Pit_fc)<40)
+	ctrl_angle_out[1]=except_A.y*k_rc_gyro_spd;
+	else if((Pit_fc)>40)
+	ctrl_angle_out[1]=LIMIT(except_A.y*k_rc_gyro_spd,-MAX_CTRL_ANGLE*k_rc_gyro_spd,0);	
+	else if((Pit_fc)<-40)
+	ctrl_angle_out[1]=LIMIT(except_A.y*k_rc_gyro_spd,0,MAX_CTRL_ANGLE*k_rc_gyro_spd);	
+	#endif
 		
 	}else{
 	ctrl_angle_out[0]=ctrl_2.out.x;
@@ -515,8 +520,9 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 								+( 1 - ctrl_1.FB ) *eso_att_inner_c[ROLr].u;
 	ctrl_1.out.y = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.y),0,1)*except_AS.y+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDPITCH].kp *( ctrl_1.err_d.y + ctrl_1.err_i.y))
 								+( 1 - ctrl_1.FB ) *eso_att_inner_c[PITr].u;
-	ctrl_1.out.z = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.z),0,1)*except_AS.z+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDYAW].kp *(  ctrl_1.err_i.z  + ctrl_1.err_i.z) )
-								+( 1 - ctrl_1.FB ) *eso_att_inner_c[PITr].u;;
+	//ctrl_1.out.z = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.z),0,1)*except_AS.z+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDYAW].kp *(  ctrl_1.err_i.z  + ctrl_1.err_i.z) )+( 1 - ctrl_1.FB ) *eso_att_inner_c[PITr].u;
+	ctrl_1.out.z = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.z),0,1)*except_AS.z + ( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDYAW].kp   *( ctrl_1.err.z + ctrl_1.err_d.z + ctrl_1.err_i.z ) );
+
 	}else{	
 		ctrl_1.FB=0.2;
 	/* 角速度PID输出 */
@@ -527,9 +533,9 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 
 	if(inner_set!=0)
 	ctrl_1.out.x=inner_set;	
-#if !EN_TIM_INNER
+	#if !EN_TIM_INNER
 	Thr_Ctrl(T);// 油门控制
-#endif
+	#endif
 
 	if(mode.att_pid_tune)
 	{	
@@ -750,12 +756,8 @@ void All_Out(float out_roll,float out_pitch,float out_yaw)
 		}
 	}
 
-  motor_out[0] = (s16)(motor[0]);  
-	motor_out[1] = (s16)(motor[1]);	 
-	motor_out[2] = (s16)(motor[2]);
-	motor_out[3] = (s16)(motor[3]);
-	motor_out[4] = (s16)(motor[4]);
-	motor_out[5] = (s16)(motor[5]);
+	for(i=0;i<MAXMOTORS;i++)
+  motor_out[i] = (s16)(motor[i]);  
 
 	SetPwm(motor_out,0,1000); //
 }

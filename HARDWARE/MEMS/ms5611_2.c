@@ -260,7 +260,12 @@ float MS561101BA_get_altitude(void)
 	//计算相对于上电时的位置的高度值 。单位为m
 	Altitude = 4433000.0 * (1 - pow((MS5611_Pressure / Alt_offset_Pa), 0.1903))*0.01f;  
 	#if !DEBUG_WITHOUT_SB
-	if(Rc_Get_PWM.THROTTLE<1250)//油门低时气压计输出为0
+
+		#if USE_RECIVER_MINE
+		if(Rc_Get.THROTTLE<1200)		
+		#else
+		if(Rc_Get_PWM.THROTTLE<1200)	
+		#endif
 		Alt_Offset_m=Altitude;
 	#endif
 	Altitude = Altitude - Alt_Offset_m ;  //加偏置
