@@ -11,5 +11,5 @@ extern double X_ukf_baro[3];
 extern float X_apo_height[2],x_tst[2],acc_bmp;
 void ukf_baro_task1(float T);
 extern float acc_body[3];
-
+extern float acc_est;
 #endif

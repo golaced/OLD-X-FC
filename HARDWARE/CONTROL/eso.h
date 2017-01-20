@@ -30,6 +30,7 @@ float ESO_3N(ESO *eso_in,float v,float y,float u,float T,float MAX);
 float ESO_2N(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4);
 float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4);
 float ATT_CONTRL_INNER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float MAX);
+float ATT_CONTRL_INNER_ESO_3_Y(ESO *eso_in,float v,float y,float u,float T,float MAX);
 float HIGH_CONTROL_SPD_ESO(ESO *eso_in,float v,float y,float u,float T,float MAX);
 #endif
 

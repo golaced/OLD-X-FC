@@ -527,7 +527,7 @@ void cal_ero_outter_px4(void){
 
 //	Rot_sp.from_euler(_v_att_sp.roll_body, _v_att_sp.pitch_body, _v_att_sp.yaw_body);
 	exp_angle[1]=ctrl_angle_offset.x + except_A.x;
-	exp_angle[0]=-ctrl_angle_offset.y - except_A.y;
+	exp_angle[0]=ctrl_angle_offset.y + except_A.y;
 	if(mode.imu_use_mid_down)
 	#if EN_ATT_CAL_FC
   exp_angle[2]=-Yaw_fc_q;//(ctrl_angle_offset.z + except_A.z);	

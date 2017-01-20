@@ -21,13 +21,13 @@ void TIM3_IRQHandler(void)//     400Hz控制时内环中断
 	if(!init){
 	if(cnt_init++>10)
 	init=1;
-	inner_loop_time_time=0.0025;
+	inner_loop_time_time=0.005;
 	}
 	else{
 	#if EN_ATT_CAL_FC
 	MPU6050_Read(); 															//读取mpu6轴传感器
 	MPU6050_Data_Prepare( inner_loop_time_time );	//mpu6轴传感器数据处理
-	if(cnt++>=4){cnt=0;I2C_FastMode=0;ANO_AK8975_Read();I2C_FastMode=1;	}			  //获取电子罗盘数据	
+	if(cnt++>=2){cnt=0;ANO_AK8975_Read();	}			  //获取电子罗盘数据	
 	if(cnt1++>=4){cnt1=0;
 	MS5611_ThreadNew();}													//读取气压计
 	#endif		
@@ -62,7 +62,7 @@ void inner_task(void *pdata)
 	MPU6050_Read(); 															
 	MPU6050_Data_Prepare( inner_loop_time_time);			
 	if(cnt++>=2){cnt=0;ANO_AK8975_Read();}			
-	if(cnt1++>=2){cnt1=0;MS5611_ThreadNew();}	
+	if(cnt1++>=4){cnt1=0;MS5611_ThreadNew();}	
 	#endif
 	
 	#if !EN_TIM_INNER		
@@ -225,12 +225,13 @@ void nrf_task(void *pdata)
 		//mode.trig_flow_spd= KEY[7];//1
 		//mode.trig_h_spd=KEY[4];
 	 
-    mode.flow_f_use_ukfm=1;//KEY[7];
-		//mode.baro_f_use_ukfm=1;//
+    mode.baro_f_use_ukfm=KEY[7];//KEY[7];
+		mode.flow_f_use_ukfm=1;//
 		mode.en_eso_h_in=1;
-	  mode.flow_d_acc=KEY[7];//光流速度环加速度D
+		mode.yaw_use_eso=0;//KEY[7];
+	  mode.flow_d_acc=0;//KEY[7];//光流速度环加速度D
 		//mode.baro_lock=KEY[6];//气压侧飞锁定
-		mode.yaw_sel=!KEY[3];
+		mode.yaw_sel=0;//!KEY[3];
 		//mode.att_ident1=KEY[4];
 		//if(Rc_Get_PWM.AUX1>1500)
 		//mode.height_safe=1;//mode.en_sd_save=1;
@@ -334,7 +335,7 @@ void uart_task(void *pdata)
 							}			
 				
 				//To  IMU模块	
-				if(cnt[1]++>5){cnt[1]=0;	
+				if(cnt[1]++>2){cnt[1]=0;	
 				  #if EN_DMA_UART2 					
 					if(DMA_GetFlagStatus(DMA1_Stream6,DMA_FLAG_TCIF6)!=RESET)//等待DMA2_Steam7传输完成
 								{ 
@@ -428,9 +429,9 @@ void uart_task(void *pdata)
 											{
 											case 0://BMP UKF
 											data_per_uart1(
-											ALT_POS_SONAR2*100,baroAlt_fc/10,ALT_POS_BMP_UKF_OLDX*100,
+											baroAlt/10,baroAlt_fc/10,ALT_POS_BMP_UKF_OLDX*100,
 											ALT_VEL_BMP_UKF_OLDX*100,ALT_VEL_BMP_EKF*100,wz_speed/10,
-											0*100,ALT_VEL_BMP_UKF_OLDX*100,0,
+											ALT_POS_SONAR2*100,acc_est*100,ero.baro_ekf_cnt,
 											//-accz_bmp*100,baro_matlab_data[1]/10,0*100,
 											(int16_t)(Yaw_fc*10),(int16_t)(Pit_fc*10.0),(int16_t)(Rol_fc*10.0),thr_test,0,0/10,0);break;	
 											case 1://GPS UKF
@@ -625,11 +626,12 @@ void error_task(void *pdata)
 	LEDRGB();//LED显示
 	MEMS_CAL();//校准IMU模块传感器
 	Mode_FC();//飞控模式切换	
-		
+ 
 	if(!fly_ready&&Thr_Low)//未使用   失控保护判断
 	{ ero.ero_rst_att=ero.ero_rst_h=1; ero.ero_att=ero.ero_hight=0;}
   else	
 	{
+	
    att_ero_check();
    hight_ero_check();
 	}

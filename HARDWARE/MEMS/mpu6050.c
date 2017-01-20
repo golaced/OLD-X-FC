@@ -346,8 +346,8 @@ void Transform(float itx,float ity,float itz,float *it_x,float *it_y,float *it_z
 #define  IIR_ORDER     4      //使用IIR滤波器的阶数
 static double b_IIR[IIR_ORDER+1] ={0.0008f, 0.0032f, 0.0048f, 0.0032f, 0.0008f};  //系数b
 static double a_IIR[IIR_ORDER+1] ={1.0000f, -3.0176f, 3.5072f, -1.8476f, 0.3708f};//系数a
-static double InPut_IIR[3][IIR_ORDER+1] = {0};
-static double OutPut_IIR[3][IIR_ORDER+1] = {0};
+static double InPut_IIR[6][IIR_ORDER+1] = {0};
+static double OutPut_IIR[6][IIR_ORDER+1] = {0};
 static double b_IIR_gro[IIR_ORDER+1] ={0.0008f, 0.0032f, 0.0048f, 0.0032f, 0.0008f};  //系数b
 static double a_IIR_gro[IIR_ORDER+1] ={1.0000f, -3.0176f, 3.5072f, -1.8476f, 0.3708f};//系数a
 static double InPut_IIR_gro[3][IIR_ORDER+1] = {0};
@@ -453,12 +453,15 @@ void MPU6050_Data_Prepare(float T)
 	}
 #define EN_MPU_FILT 1
 #if EN_MPU_FILT	
-mpu_fil_tmp[A_X]= IIR_I_Filter( mpu6050_tmp[A_X], InPut_IIR[0], OutPut_IIR[0], b_IIR, IIR_ORDER+1, a_IIR, IIR_ORDER+1);
-mpu_fil_tmp[A_Y]= IIR_I_Filter( mpu6050_tmp[A_Y], InPut_IIR[1], OutPut_IIR[1], b_IIR, IIR_ORDER+1, a_IIR, IIR_ORDER+1);
-mpu_fil_tmp[A_Z]= IIR_I_Filter( mpu6050_tmp[A_Z], InPut_IIR[2], OutPut_IIR[2], b_IIR, IIR_ORDER+1, a_IIR, IIR_ORDER+1);
-mpu_fil_tmp[G_X] = (float)( FILT_TMP[G_X] )/(float)FILTER_NUM;
-mpu_fil_tmp[G_Y] = (float)( FILT_TMP[G_Y] )/(float)FILTER_NUM;
-mpu_fil_tmp[G_Z] = (float)( FILT_TMP[G_Z] )/(float)FILTER_NUM;
+mpu_fil_tmp[A_X]= IIR_I_Filter( mpu6050_tmp[A_X], InPut_IIR[A_X], OutPut_IIR[A_X], b_IIR, IIR_ORDER+1, a_IIR, IIR_ORDER+1);
+mpu_fil_tmp[A_Y]= IIR_I_Filter( mpu6050_tmp[A_Y], InPut_IIR[A_Y], OutPut_IIR[A_Y], b_IIR, IIR_ORDER+1, a_IIR, IIR_ORDER+1);
+mpu_fil_tmp[A_Z]= IIR_I_Filter( mpu6050_tmp[A_Z], InPut_IIR[A_X], OutPut_IIR[A_X], b_IIR, IIR_ORDER+1, a_IIR, IIR_ORDER+1);
+mpu_fil_tmp[G_X]= IIR_I_Filter( mpu6050_tmp[G_X], InPut_IIR[G_X], OutPut_IIR[G_X], b_IIR, IIR_ORDER+1, a_IIR, IIR_ORDER+1);
+mpu_fil_tmp[G_Y]= IIR_I_Filter( mpu6050_tmp[G_Y], InPut_IIR[G_Y], OutPut_IIR[G_Y], b_IIR, IIR_ORDER+1, a_IIR, IIR_ORDER+1);
+mpu_fil_tmp[G_Z]= IIR_I_Filter( mpu6050_tmp[G_Z], InPut_IIR[G_Z], OutPut_IIR[G_Z], b_IIR, IIR_ORDER+1, a_IIR, IIR_ORDER+1);
+//mpu_fil_tmp[G_X] = (float)( FILT_TMP[G_X] )/(float)FILTER_NUM;
+//mpu_fil_tmp[G_Y] = (float)( FILT_TMP[G_Y] )/(float)FILTER_NUM;
+//mpu_fil_tmp[G_Z] = (float)( FILT_TMP[G_Z] )/(float)FILTER_NUM;
 #else
 mpu_fil_tmp[A_X]= mpu6050_tmp[A_X];
 mpu_fil_tmp[A_Y]= mpu6050_tmp[A_Y];

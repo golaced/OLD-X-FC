@@ -33,18 +33,20 @@ void reset_nav_pos(u8 sel);
 //---------------------
  typedef struct
 {
- int x,y,z;
- int x_flp,y_flp;
- u8 check;
- u8 connect,lose_cnt;
- int control[2];
- u16 r;
- float control_k_miss,control_k;
-	float control_yaw;
-	float forward;
-	float forward_end_dj_pwm;
-	u8 dj_fly_line;
-	float pit,rol,yaw;
+int x,y,z;
+int spdx,spdy,spdz;
+int x_flp,y_flp;
+u8 check;
+u8 connect,lose_cnt;
+int control[2];
+u16 r;
+float control_k_miss,control_k;
+float control_yaw;
+float forward;
+float forward_end_dj_pwm;
+u8 dj_fly_line;
+float pit,rol,yaw;
+u8 use_spd;
 }CIRCLE;
 
 

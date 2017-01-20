@@ -53,13 +53,11 @@
 //#define SONAR_USE_SCL  
 //#define SONAR_USE_TIG
 #define SONAR_USE_UART    
-#define SONAR_HEIGHT 50   //超声波安装高度mm
+#define SONAR_HEIGHT 70   //超声波安装高度mm
 
 
 
 #define USE_PXY 0    //未使用勿修改
-
-
 //=======================数组宏定义==========
 #define A_X 0
 #define A_Y 1
@@ -113,13 +111,13 @@
 
 
 //================控制=====================
-#define MAX_CTRL_ANGLE			25.0f										//遥控能达到的最大角度
+#define MAX_CTRL_ANGLE			35.0f										//遥控能达到的最大角度
 #define ANGLE_TO_MAX_AS 		30.0f										//角度误差N时，期望角速度达到最大（可以通过调整CTRL_2的P值调整）
 #define CTRL_2_INT_LIMIT 		0.8f *MAX_CTRL_ANGLE		//外环积分幅度
 #define MAX_FIX_ANGLE 6
 
 #define MAX_CTRL_ASPEED 	 	300.0f									//ROL,PIT允许的最大控制角速度
-#define MAX_CTRL_YAW_SPEED 	60.0f									//YAW允许的最大控制角速度
+#define MAX_CTRL_YAW_SPEED 	80.0f									//YAW允许的最大控制角速度
 #define CTRL_1_INT_LIMIT 		0.8f *MAX_CTRL_ASPEED		//内环积分幅度//0.5
 
 //================矢量舵机控制=======================未使用现在
@@ -130,10 +128,10 @@ extern float off_yaw;//遥控方向
 
 //=================PWM========================
 //#define HOLD_THR_PWM  450
-#define HOLD_THR_PWM  386
-#define MAX_PWM				LIMIT(2*HOLD_THR_PWM,0,1000)///%	最大PWM输出为100%油门
-#define MAX_THR       LIMIT(2*HOLD_THR_PWM,0,1000)/10 			///%	油门通道最大占比80%，留20%给控制量
-#define READY_SPEED   20      ///%	解锁后电机转速20%油门
+#define HOLD_THR_PWM  LIMIT(370,0,500)
+#define MAX_PWM				LIMIT(2*HOLD_THR_PWM,0,1000)/10///%	最大PWM输出为100%油门
+#define MAX_THR       LIMIT(2*HOLD_THR_PWM*0.8,0,1000)/10 			///%	油门通道最大占比80%，留20%给控制量
+#define READY_SPEED   LIMIT(20*HOLD_THR_PWM/500,0,20)      ///%	解锁后电机转速20%油门
 //================系统设置===================
 #define USE_MINI_BOARD  1  //使用MINI OLD-X 飞控板
 #define USE_MINI_BOARD1 0
@@ -144,7 +142,7 @@ extern float off_yaw;//遥控方向
 #endif
 #define DRONE_330_ID 3145777//未使用勿修改
 #define DRONE_350_ID 4915281//未使用勿修改
-
+#define DEBUG_WITHOUT_SB 0	//调试时不需要手柄 上电2s后自动解锁
 #define USE_RC_GROUND 1  //使用NRF-G模块
 
 #define IMU_HML_ADD_500 1//新的磁力融合
@@ -156,12 +154,12 @@ extern float off_yaw;//遥控方向
 #define EN_TIM_INNER  0 //400Hz控制  有BUG请勿使用
 #define EN_ATT_CAL_FC 1 //由FC计算控制IMU数据
 #define EN_TIM_IMU  0     //未使用现在
-#define USE_RECIVER_MINE 1//使用自己的手柄 未使用现在
+#define USE_RECIVER_MINE 0//使用自己的手柄 未使用现在
 #define BLE_BAD 0        //未使用现在
 #define NEW_FLY_BOARD 0  //0—>PWM使用5678   未使用现在
 #define PLANE_IS_BIG  0  //			未使用现在 勿修改
 #define USE_CYCLE_HML_CAL  0//0->使用椭球拟合
-#define DEBUG_WITHOUT_SB 0	//调试时不需要手柄 上电2s后自动解锁
+
 #define USE_TOE_IN_UNLOCK 0 //   未使用现在 勿修改
 #define DRONE_X6 0  //6轴PWM输出模式  未使用现在 勿修改
 #define WIN8 0      //使用8寸桨  未使用现在 勿修改

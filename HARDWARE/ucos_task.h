@@ -18,13 +18,13 @@ void tmr3_callback(OS_TMR *ptmr,void *p_arg);
 //10->开始任务的优先级设置为最低
 #define MEMS_TASK_PRIO       			  1 //MEMS
 #define INNER_TASK_PRIO       			2 //内环
-#define EKF_TASK_PRIO       			  3 //EKF
-#define OUTER_TASK_PRIO       			4 //外环
-#define ROS_TASK_PRIO       			  5 //DJI
-#define IDENT_TASK_PRIO       		  6 //IDENT
+#define BARO_TASK_PRIO       			  3 //气压计融合
+#define EKF_TASK_PRIO       			  4 //EKF
+#define OUTER_TASK_PRIO       			5 //外环
+#define ROS_TASK_PRIO       			  6 //DJI
+#define IDENT_TASK_PRIO       		  7 //IDENT
 
 #define POS_TASK_PRIO       			  14 //位置
-#define BARO_TASK_PRIO       			  15 //气压计采集与UKF
 #define SONAR_TASK_PRIO       			16 //超声波采集
 #define NRF_TASK_PRIO       			  17 //射频通讯
 #define UART_TASK_PRIO       			  18 //串口通讯
@@ -44,10 +44,10 @@ void tmr3_callback(OS_TMR *ptmr,void *p_arg);
 	#define F_EKF 			10
 #endif
 #define F_POS 				20
-#define F_BARO 				10
+#define F_BARO 				20
 
-#define H_INNER				10
-#define H_OUTTER      20
+#define H_INNER				20
+#define H_OUTTER      40
 
 //-----------------------MEMS解算线程
 //设置任务堆栈大小
@@ -119,7 +119,7 @@ void nrf_task(void *pdata);
 
 //------------------------BARO线程
 //设置任务堆栈大小
-#define BARO_STK_SIZE  					64*8
+#define BARO_STK_SIZE  					64*10
 //任务堆栈	
 extern OS_STK BARO_TASK_STK[BARO_STK_SIZE];
 //任务函数

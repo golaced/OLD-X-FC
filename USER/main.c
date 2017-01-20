@@ -57,12 +57,12 @@ int main(void)
 		I2c_Soft_Init();					//初始化模拟I2C
 		Delay_ms(100);
 		MS5611_Init();						//气压计初始化
-		F_MPU6050=20;							//MPU6050滤波频率
+		F_MPU6050=MPU6050_DLPF_BW_42;							//MPU6050滤波频率
+		F_MPU6050=MPU6050_DLPF_BW_98;
+  	F_MPU6050=MPU6050_DLPF_BW_20;
 		MPU6050_Init(F_MPU6050);   
 		Delay_ms(100);		
-    I2C_FastMode=0; 	
-		HMC5883L_SetUp();
-    I2C_FastMode=1;	
+  	HMC5883L_SetUp();
 		Delay_ms(100);
 	#endif	
 //---------------------------------串口初始化 Init-------------------------------------
@@ -93,7 +93,8 @@ int main(void)
 //-------------------------flash始化------------------------------------	
 	Para_Init();				   //PID 参数初始化		
   #if !FLASH_USE_STM32	
-	W25QXX_Init();			
+	W25QXX_Init();		
+  if(mcuID[2]!=942880824)	
 	while(W25QXX_ReadID()!=W25Q32)								//检测不到flash
 	Delay_ms(100);
 	#endif
@@ -193,11 +194,11 @@ int main(void)
 //	Delay_ms(4);
 //	}
 	//----------------------初始化UCOSII--------------------------
-//	#if EN_TIM_INNER   //使用400Hz内环控制
-//	TIM3_Int_Init(25-1,8400-1);	//定时器时钟84M，分频系数8400，所以84M/8400=10Khz的计数频率，计数5000次为500ms 
+#if EN_TIM_INNER   //使用400Hz内环控制
+	 TIM3_Int_Init(50-1,8400-1);	//定时器时钟84M，分频系数8400，所以84M/8400=10Khz的计数频率，计数5000次为500ms 
 //	#else
 //	TIM3_Int_Init(250-1,8400-1);	//定时器时钟84M，分频系数8400，所以84M/8400=10Khz的计数频率，计数5000次为500ms 
-//  #endif	
+ #endif	
 	OSInit();  	 				
 	OSTaskCreate(start_task,(void *)0,(OS_STK *)&START_TASK_STK[START_STK_SIZE-1],START_TASK_PRIO );//创建起始任务
 	OSStart();	    

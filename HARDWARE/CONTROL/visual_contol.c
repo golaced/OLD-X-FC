@@ -87,11 +87,11 @@ void Positon_control(float T)//     光流定点
 		nav_pos_pid.dead=0.02;
 		
 		
-		nav_spd_pid.f_kp=0.2;
-		nav_spd_pid.kp=0.2;
+		nav_spd_pid.f_kp=0.15;
+		nav_spd_pid.kp=0.15;
 		nav_spd_pid.ki=0.01;
 		nav_spd_pid.kd=0.05;
-		nav_spd_pid.dead=20;
+		nav_spd_pid.dead=10;
 	}
 	if(NS==0)
 	Nav_pos_set_test(0,T);

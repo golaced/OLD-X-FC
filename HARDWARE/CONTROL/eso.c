@@ -190,7 +190,7 @@ float ATT_CONTRL_OUTER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 	eso_in->r1=0.5/pow(eso_in->h0,2);
 	eso_in->h1=eso_in->h0*5;
 	//----------模型增益
-	 eso_in->b0=18;		
+	 eso_in->b0=0;//18;		
 	}  
 	#if ESO_PARA_USE_REAL_TIME
 	    eso_in->h0=T;
@@ -248,7 +248,7 @@ float ATT_CONTRL_INNER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 	eso_in->r1=0.5/pow(eso_in->h0,2);
 	eso_in->h1=eso_in->h0*5;
 	//----------模型增益
-  eso_in->b0=0;//40;		
+  eso_in->b0=40;//40;		
 	}
 	//if(SPID.YD!=0)eso_in->b0=SPID.YD;
 	#if ESO_PARA_USE_REAL_TIME
@@ -273,7 +273,63 @@ float ATT_CONTRL_INNER_ESO_3(ESO *eso_in,float v,float y,float u,float T,float M
 	return eso_in->u;
 }
 
+//姿态内环
+float ATT_CONTRL_INNER_ESO_3_Y(ESO *eso_in,float v,float y,float u,float T,float MAX)
+{ if(!eso_in->init)
+	{
+  eso_in->init=1;
+	eso_in->level=1;//系统阶次	
+  eso_in->not_use_px4=1;
+ //-------------跟踪器
+	eso_in->use_td=0;		
+	eso_in->r0=4000;//跟踪速度
+  eso_in->h0=(float)F_INNER/1000;//滤波因子
+ //-------------观测器
+	eso_in->beta0=1/(eso_in->h0);
+	eso_in->beta1=1/(30*pow(eso_in->h0,2));
+	eso_in->beta2=1000;	
+  eso_in->eso_dead=1;
+	eso_in->auto_b0=0;
+ //-------------反馈----------------
+	eso_in->out_mode=1;	
+		//-------liner    0
+	eso_in->KP=ctrl_1.PID[PIDYAW].kp*10;
+	eso_in->KI=0;	
+	eso_in->KD=ctrl_1.PID[PIDYAW].kd;
+		//-------noliner  1
+	eso_in->alfa0=0.25;
+  eso_in->alfa1=0.75;
+	eso_in->alfa2=1.5;	
+  eso_in->tao=eso_in->h0*2;		
+	  //-------noliner  2 3
+	eso_in->c=0.5;//阻尼因子	
+	eso_in->r1=0.5/pow(eso_in->h0,2);
+	eso_in->h1=eso_in->h0*5;
+	//----------模型增益
+  eso_in->b0=50;//40;		
+	}
+	//if(SPID.YD!=0)eso_in->b0=SPID.YD;
+	#if ESO_PARA_USE_REAL_TIME
+	    eso_in->h0=T;
+			eso_in->beta0=1/(eso_in->h0+0.000001);
+   	  eso_in->beta1=1/(30*pow(eso_in->h0,2)+0.000001);
+			eso_in->tao=eso_in->h0*2;
+	#endif
+	if(mode.att_pid_tune&&mode.en_pid_sb_set){
+	//eso_in->KD=0.001*SPID.ID*4;
+	eso_in->KP=0.001*SPID.IP*10;
+	}
+	SMOOTH_IN_ESO(eso_in,v);
+	switch(eso_in->level){
+		case 1:ESO_2N(eso_in,v, y, u, T, MAX,0);break;
+		case 2:ESO_3N(eso_in,v, y, u, T, MAX);break;
+	}
 
+	eso_in->integer+=eso_in->KI*(v-y)*T;
+	eso_in->integer = LIMIT( eso_in->integer, -Thr_Weight *CTRL_2_INT_LIMIT,Thr_Weight *CTRL_2_INT_LIMIT );
+	ESO_CONTROL(eso_in,v, y, u, T, MAX,0);
+	return eso_in->u;
+}
 //-----------------------------HEIGHT-ESO--------------------------------
 //高度内环
 float ESO_CONTROL_HEIGH(ESO *eso_in,float v,float y,float u,float T,float MAX,float ero_px4)
@@ -323,7 +379,7 @@ float HIGH_CONTROL_SPD_ESO(ESO *eso_in,float v,float y,float u,float T,float MAX
 	eso_in->beta0=1/(eso_in->h0);
 	eso_in->beta1=1/(30*pow(eso_in->h0,2));
 	eso_in->beta2=1000;	
-	eso_in->eso_dead=25;	
+	eso_in->eso_dead=0;	
  //-------------反馈----------------
 	eso_in->out_mode=1;	
 		//-------liner    0
@@ -340,7 +396,7 @@ float HIGH_CONTROL_SPD_ESO(ESO *eso_in,float v,float y,float u,float T,float MAX
 	eso_in->r1=0.5/pow(eso_in->h0,2);
 	eso_in->h1=eso_in->h0*5;
 	//----------模型增益
-  eso_in->b0=35;		
+  eso_in->b0=10;		
 	}   
 	 #if ESO_PARA_USE_REAL_TIME
 	    eso_in->h0=T;

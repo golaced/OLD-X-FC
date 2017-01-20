@@ -10,7 +10,6 @@
       <TargetName>UCOSII-3</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pArmCC>5060183::V5.06 update 2 (build 183)::ARMCC</pArmCC>
       <pCCUsed>5060183::V5.06 update 2 (build 183)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
@@ -744,11 +743,6 @@
               <FilePath>..\HARDWARE\FUSHION\kf_oldx_yaw.lib</FilePath>
             </File>
             <File>
-              <FileName>kf_oldx.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\HARDWARE\UKF_BARO\kf_oldx.lib</FilePath>
-            </File>
-            <File>
               <FileName>baro_ekf_oldx.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\HARDWARE\EKF_BARO\baro_ekf_oldx.lib</FilePath>
@@ -762,6 +756,11 @@
               <FileName>alt_kf.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\FUSHION\alt_kf.c</FilePath>
+            </File>
+            <File>
+              <FileName>kf_oldx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\UKF_BARO\kf_oldx.c</FilePath>
             </File>
           </Files>
         </Group>

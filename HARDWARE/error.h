@@ -7,6 +7,7 @@
 typedef struct 
 {
  u8 ero_att,ero_hight,ero_rst_h,ero_rst_att;
+ u8 baro_ekf,baro_ekf_cnt;
 	
 }ERO;
 

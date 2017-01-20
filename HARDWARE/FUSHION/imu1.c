@@ -147,14 +147,24 @@ void IMUupdate(float half_T,float gx, float gy, float gz, float ax, float ay, fl
 	#endif
 	
 	#if IMU_HML_ADD_500
-		magTmp2[0]=hx;
+		magTmp2[0]=-hx;
 		magTmp2[1]=hy;
 		magTmp2[2]=hz;
-		euler[1]=Pit_fc/RAD_DEG  ;
-		euler[0]=Rol_fc/RAD_DEG  ;
+		euler[0]=Pit_fc/RAD_DEG  ;
+		euler[1]=Rol_fc/RAD_DEG  ;
+	 
     calMagY = magTmp2[0] * cos(euler[1]) + magTmp2[1] * sin(euler[1])* sin(euler[0])+magTmp2[2] * sin(euler[1]) * cos(euler[0]); 
     calMagX = magTmp2[1] * cos(euler[0]) + magTmp2[2] * sin(euler[0]);
-	if( dis_angle_lock||(fabs(Pit_fc)<12 && fabs(Rol_fc)<12))
+	
+	  magTmp2[0]=hx;
+		magTmp2[1]=hy;
+		magTmp2[2]=hz;
+	  euler[0]=-Pit_fc/RAD_DEG  ;
+		euler[1]=Rol_fc/RAD_DEG  ;
+	  calMagY =  magTmp2[0] * cos(euler[0])+magTmp2[1] * sin(euler[1])* sin(euler[0]) +magTmp2[2] * cos(euler[1]) * sin(euler[0]); 
+    calMagX = 														 magTmp2[1] * cos(euler[1]) 						  -magTmp2[2] * sin(euler[1]);
+	
+	if( dis_angle_lock||(fabs(Pit_fc)<12 && fabs(Rol_fc)<12)||0)
   yaw_mag_view[4]=To_180_degrees(fast_atan2(calMagX,calMagY)* RAD_DEG +180);
 	else
 	yaw_mag_view[4]=X_kf_yaw[0];

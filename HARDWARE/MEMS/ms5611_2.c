@@ -12,8 +12,8 @@ u8 baro_set;
 
 #undef ALTI_SPEED
 
-#define MS5611Press_OSR  MS561101BA_OSR_4096  //气压采样精度
-#define MS5611Temp_OSR   MS561101BA_OSR_4096  //温度采样精度
+#define MS5611Press_OSR  MS561101BA_OSR_2048  //气压采样精度
+#define MS5611Temp_OSR   MS561101BA_OSR_2048  //温度采样精度
 
 // 气压计状态机
 #define SCTemperature  0x01	  //开始 温度转换
@@ -260,11 +260,10 @@ float MS561101BA_get_altitude(void)
 	//计算相对于上电时的位置的高度值 。单位为m
 	Altitude = 4433000.0 * (1 - pow((MS5611_Pressure / Alt_offset_Pa), 0.1903))*0.01f;  
 	#if !DEBUG_WITHOUT_SB
-
 		#if USE_RECIVER_MINE
-		if(Rc_Get.THROTTLE<1200)		
+		if(Rc_Get.THROTTLE<1200&&NS==2)		
 		#else
-		if(Rc_Get_PWM.THROTTLE<1200)	
+		if(Rc_Get_PWM.THROTTLE<1111&&NS==2)	
 		#endif
 		Alt_Offset_m=Altitude;
 	#endif

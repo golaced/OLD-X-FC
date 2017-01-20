@@ -99,3 +99,4 @@
 ..\obj\alt_kf.o: ..\CORE\../HARDWARE/../HARDWARE/MATH/miniMatrix.h
 ..\obj\alt_kf.o: ..\CORE\../HARDWARE/../HARDWARE/DRIVER/pwm_out.h
 ..\obj\alt_kf.o: ..\CORE\../HARDWARE/define.h
+..\obj\alt_kf.o: ..\CORE\../HARDWARE/EKF_BARO/baro_ekf_oldx.h

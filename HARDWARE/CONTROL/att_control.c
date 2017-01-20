@@ -276,8 +276,9 @@ void CTRL_2(float T)//角度环
 	
 		
 	
-	cal_ero_outter_px4(); 
+	
   if(mode.use_px4_err){
+	cal_ero_outter_px4(); 
   ctrl_2.err.x =  my_deathzoom_2(ero_angle_px4[0],0.0);
 	ctrl_2.err.y =  my_deathzoom_2(ero_angle_px4[1],0.0);
 	#if EN_ATT_CAL_FC
@@ -286,14 +287,14 @@ void CTRL_2(float T)//角度环
 	ctrl_2.err.z =  my_deathzoom_2(LIMIT(To_180_degrees( ctrl_angle_offset.z + except_A.z - Yaw	 ),-YAW_ERO_MAX,YAW_ERO_MAX),0.5);//*LIMIT(ero_angle_px4[3],0.5,1);
 	#endif
 	}else{	
-	ctrl_2.err.x =  my_deathzoom_2(To_180_degrees( ctrl_angle_offset.x + except_A.x - Roll  ),0.1);
-	ctrl_2.err.y =  my_deathzoom_2(To_180_degrees( ctrl_angle_offset.y + except_A.y - Pitch ),0.1);}
+	ctrl_2.err.x =  my_deathzoom_2(To_180_degrees( ctrl_angle_offset.x + except_A.x - Rol_fc  ),0.1);
+	ctrl_2.err.y =  my_deathzoom_2(To_180_degrees( ctrl_angle_offset.y + except_A.y - Pit_fc ),0.1);}
 	#if EN_ATT_CAL_FC
 	ctrl_2.err.z =  my_deathzoom_2(LIMIT(To_180_degrees( ctrl_angle_offset.z + except_A.z - Yaw_fc	 ),-YAW_ERO_MAX,YAW_ERO_MAX),0.5);//*LIMIT(ero_angle_px4[3],0.5,1);
 	#else	
 	ctrl_2.err.z =  my_deathzoom_2(LIMIT(To_180_degrees( ctrl_angle_offset.z + except_A.z - Yaw	 ),-YAW_ERO_MAX,YAW_ERO_MAX),0.5);//*LIMIT(ero_angle_px4[3],0.5,1);
 	#endif	
-	}
+	}//normal 
 	else{	
 	cal_ero_outter_px4(); 
   /* 得到角度误差 */
@@ -306,8 +307,8 @@ void CTRL_2(float T)//角度环
 	ctrl_2.err.z =  my_deathzoom_2(LIMIT(To_180_degrees( ctrl_angle_offset.z + except_A.z - Yaw	 ),-YAW_ERO_MAX,YAW_ERO_MAX),0.5);//*LIMIT(ero_angle_px4[3],0.5,1);
 	#endif
 	}else{	
-	ctrl_2.err.x =  my_deathzoom_2(To_180_degrees( ctrl_angle_offset.x + except_A.x - Roll  ),0.1);
-	ctrl_2.err.y =  my_deathzoom_2(To_180_degrees( ctrl_angle_offset.y + except_A.y - Pitch ),0.1);}
+	ctrl_2.err.x =  my_deathzoom_2(To_180_degrees( ctrl_angle_offset.x + except_A.x - Rol_fc  ),0.1);
+	ctrl_2.err.y =  my_deathzoom_2(To_180_degrees( ctrl_angle_offset.y - except_A.y - Pit_fc ),0.1);}
 	#if EN_ATT_CAL_FC
 	ctrl_2.err.z =  my_deathzoom_2(LIMIT(To_180_degrees( ctrl_angle_offset.z + except_A.z - Yaw_fc	 ),-YAW_ERO_MAX,YAW_ERO_MAX),0.5);//*LIMIT(ero_angle_px4[3],0.5,1);
 	#else	
@@ -420,7 +421,7 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 {float ctrl_angle_out[3]={0},ctrl_angle_weight[3]={0};
 	xyz_f_t EXP_LPF_TMP;
 	
-  if(ctrl_2.PID->kp==0||KEY[7]==0||inner_set){
+  if(ctrl_2.PID->kp==0||inner_set){
   #if TUNING_X
 	if(fabs(Rol_fc)<40)
 	ctrl_angle_out[0]=except_A.x*k_rc_gyro_spd;
@@ -496,14 +497,14 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 	ctrl_1.err_i.y = LIMIT( ctrl_1.err_i.y, -ctrl_1.eliminate_I.y,ctrl_1.eliminate_I.y );
 	else
 	ctrl_1.err_i.y=0;
-	if(fabs(ctrl_1.err.z)<eso_att_inner_c[PITr].eso_dead||eso_att_inner_c[PITr].b0==0)
+	if((fabs(ctrl_1.err.z)<eso_att_inner_c[YAWr].eso_dead||eso_att_inner_c[YAWr].b0==0)&&mode.yaw_use_eso)
 	ctrl_1.err_i.z = LIMIT( ctrl_1.err_i.z, -ctrl_1.eliminate_I.z,ctrl_1.eliminate_I.z );
 	else
 	ctrl_1.err_i.z=0;
 	//-----------------------------------------ESO
 	ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[PITr],except_AS.y,-mpu6050.Gyro_deg.y,eso_att_inner_c[PITr].u,T,200);
 	ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[ROLr],except_AS.x,mpu6050.Gyro_deg.x,eso_att_inner_c[ROLr].u,T,200);
-	ATT_CONTRL_INNER_ESO_3(&eso_att_inner_c[YAWr],except_AS.z,mpu6050.Gyro_deg.z,eso_att_inner_c[YAWr].u,T,200);
+	ATT_CONTRL_INNER_ESO_3_Y(&eso_att_inner_c[YAWr],except_AS.z,mpu6050.Gyro_deg.z,eso_att_inner_c[YAWr].u,T,200);
 	float inf_out;
 	
 	AUTO_B0(&eso_att_inner_c[PITr],0,0,0,0,0);
@@ -514,14 +515,16 @@ void CTRL_1(float T)  //x roll,y pitch,z yaw 角速度  内环  2ms
 	ctrl_1.out.x = inf_out;
 	}	
 	else if(eso_att_inner_c[PITr].b0!=0){
-		ctrl_1.FB=0;
+		ctrl_1.FB=0.2;
 	//ctrl_1.err_i.x=ctrl_1.err_i.y=ctrl_1.err_i.z=0;
 	ctrl_1.out.x = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.x),0,1)*except_AS.x+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDPITCH].kp *( ctrl_1.err_d.x + ctrl_1.err_i.x)) 
 								+( 1 - ctrl_1.FB ) *eso_att_inner_c[ROLr].u;
 	ctrl_1.out.y = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.y),0,1)*except_AS.y+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDPITCH].kp *( ctrl_1.err_d.y + ctrl_1.err_i.y))
 								+( 1 - ctrl_1.FB ) *eso_att_inner_c[PITr].u;
-	//ctrl_1.out.z = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.z),0,1)*except_AS.z+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDYAW].kp *(  ctrl_1.err_i.z  + ctrl_1.err_i.z) )+( 1 - ctrl_1.FB ) *eso_att_inner_c[PITr].u;
-	ctrl_1.out.z = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.z),0,1)*except_AS.z + ( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDYAW].kp   *( ctrl_1.err.z + ctrl_1.err_d.z + ctrl_1.err_i.z ) );
+	if(mode.yaw_use_eso)
+	ctrl_1.out.z = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.z),0,1)*except_AS.z+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDYAW].kp   *(  ctrl_1.err_d.z  + ctrl_1.err_i.z) )+( 1 - ctrl_1.FB ) *eso_att_inner_c[PITr].u;
+	else
+	ctrl_1.out.z = 3 *( ctrl_1.FB *LIMIT((0.45f + 0.55f*ctrl_2.err_weight.z),0,1)*except_AS.z+( 1 - ctrl_1.FB ) *ctrl_1.PID[PIDYAW].kp  *( ctrl_1.err.z + ctrl_1.err_d.z + ctrl_1.err_i.z ) );
 
 	}else{	
 		ctrl_1.FB=0.2;
@@ -573,7 +576,7 @@ float thr_value;
 u8 Thr_Low,force_Thr_low=0;
 float Thr_Weight,Thr_Weight_ATT;
 float thr_test;
-float k_thr_att=1.321;
+float k_thr_att=1.4521;
 void Thr_Ctrl(float T)
 {	float delta_thr;
 	static float thr;
@@ -586,7 +589,7 @@ void Thr_Ctrl(float T)
 //----------Drop protector-----------------
 	if(!fly_ready&&500 + CH_filter[THRr]<100)
 	force_Thr_low=0;
-	if((fabs(Pit_fc)>60||fabs(Rol_fc)>60)&&fly_ready)
+	if((fabs(Pit_fc)>60||fabs(Rol_fc)>60)&&fly_ready&&!mode.att_pid_tune)
 		force_Thr_low=1;
 //protect flag init	
 	if(fly_ready_r==0&&fly_ready==1&&500 + CH_filter[THRr]>100)
@@ -702,12 +705,12 @@ void All_Out(float out_roll,float out_pitch,float out_yaw)
 
 	int date_throttle;
 	if(!mode.att_pid_tune){//add by gol 16.3.28 (WT)  油门补偿
-		thr_value_fix=LIMIT((thr_value/cos(LIMIT(my_deathzoom_2(Pitch,5),-MAX_THR_FIX_ANGLE,MAX_THR_FIX_ANGLE)/57)/
-							      cos(LIMIT(my_deathzoom_2(Roll,5),-MAX_THR_FIX_ANGLE,MAX_THR_FIX_ANGLE)/57)-thr_value),0,200)*scale_thr_fix;
+		thr_value_fix=LIMIT((thr_value/cos(LIMIT(my_deathzoom_2(Pit_fc,5),-MAX_THR_FIX_ANGLE,MAX_THR_FIX_ANGLE)/57)/
+							      cos(LIMIT(my_deathzoom_2(Rol_fc,5),-MAX_THR_FIX_ANGLE,MAX_THR_FIX_ANGLE)/57)-thr_value),0,200)*scale_thr_fix;
 		date_throttle=thr_value+thr_value_fix;
 	}
 		else{
-		date_throttle	= thr_value;
+		date_throttle=thr_value;
 	}
 	
 	date_throttle	= thr_value;
@@ -757,8 +760,11 @@ void All_Out(float out_roll,float out_pitch,float out_yaw)
 	}
 
 	for(i=0;i<MAXMOTORS;i++)
+	#if DEBUG_WITHOUT_SB
+	 motor_out[i]=0;
+	#else
   motor_out[i] = (s16)(motor[i]);  
-
+  #endif
 	SetPwm(motor_out,0,1000); //
 }
 //

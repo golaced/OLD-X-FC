@@ -264,6 +264,7 @@ u8 dj_lock;
 u8 en_eso;
 u8 en_eso_h_out;
 u8 en_eso_h_in;
+u8 yaw_use_eso;
 u8 flow_d_acc;
 u8 en_hinf_height_spd;
 u8 en_circle_control;

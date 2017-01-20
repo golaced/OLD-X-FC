@@ -412,44 +412,50 @@ void Send_IMU_TO_FLOW(void)
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
 	
+	#if USE_RECIVER_MINE
+	_temp =  NS==0||Rc_Get_PWM.THROTTLE>1250||((Rc_Get.THROTTLE>1050))||fly_ready;
+	#else
+	_temp =  NS==0||Rc_Get_PWM.THROTTLE>1250||(mode.use_dji&&(Rc_Get.THROTTLE>1050));
+	#endif//
+	data_to_send[_cnt++]=BYTE0(_temp);	
+	
 	_temp =(vs16)( circle.check&&circle.connect);//ultra_distance;
-	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
- 	_temp = (vs16)( circle.x);//ultra_distance;
+ 	_temp = (vs16)(circle.x);//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
 	_temp = (vs16)(circle.y);//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-
-
-	
 	_temp = (vs16)(circle.z);//q_nav[0]*1000;//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
+	
  	_temp = (vs16)(circle.pit);//q_nav[1]*1000;//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
 	_temp = (vs16)(circle.rol);// q_nav[2]*1000;//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	
 	_temp = (vs16)(circle.yaw);//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
- 	_temp = (vs16)(ak8975.Mag_Val.y);//ultra_distance;
+	
+ 	_temp = (vs16)(circle.spdx);//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = (vs16)(ak8975.Mag_Val.z);//mode.save_video;//ultra_distance;
+	_temp = (vs16)(circle.spdy);//mode.save_video;//ultra_distance;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	#if USE_RECIVER_MINE
-	_temp =  NS==0||Rc_Get_PWM.THROTTLE>1250||((Rc_Get.THROTTLE>1050))||fly_ready;
-	#else
-	_temp =  NS==0||Rc_Get_PWM.THROTTLE>1250||(mode.use_dji&&(Rc_Get.THROTTLE>1050));
-	#endif//
-	data_to_send[_cnt++]=BYTE1(_temp);
-	data_to_send[_cnt++]=BYTE0(_temp);	
+	
+  _temp =(vs16)( circle.use_spd);//ultra_distance;
+	data_to_send[_cnt++]=BYTE0(_temp);
+	
+	
+	
+	
+	
+	
 //	_temp =  mode.save_video;
 //	data_to_send[_cnt++]=BYTE0(_temp);	
 	data_to_send[3] = _cnt-4;
@@ -814,7 +820,8 @@ void Data_Receive_Anl5(u8 *data_buf,u8 num)
 	circle.pit=(int16_t)((*(data_buf+11)<<8)|*(data_buf+12));
 	circle.rol=(int16_t)((*(data_buf+13)<<8)|*(data_buf+14));
 	circle.yaw=To_180_degrees((int16_t)((*(data_buf+15)<<8)|*(data_buf+16))-180);	
-		
+	circle.spdx=(int16_t)((*(data_buf+21)<<8)|*(data_buf+22));
+	circle.spdy=(int16_t)((*(data_buf+23)<<8)|*(data_buf+24));
 	}	
 }
 u8 TxBuffer5[256];
@@ -2035,13 +2042,13 @@ void Send_IMU_SD(void)
 	data_to_send[_cnt++]=0xAF;
 	data_to_send[_cnt++]=0x05;//功能字
 	data_to_send[_cnt++]=0;//数据量
-	_temp = Roll*10;
+	_temp = Rol_fc*10;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = Pitch*10;
+	_temp = Pit_fc*10;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-	_temp = Yaw*10	;
+	_temp = Yaw_fc*10	;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
 	_temp=mpu6050.Gyro_I16.x;
@@ -2077,7 +2084,7 @@ void Send_IMU_SD(void)
 	_temp=ref_q[3]*1000;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-		_temp=ak8975_fc.Mag_Adc.x;
+	_temp=ak8975_fc.Mag_Adc.x;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
 	_temp=ak8975_fc.Mag_Adc.y;
@@ -2089,14 +2096,14 @@ void Send_IMU_SD(void)
 	_temp=ak8975_fc.Mag_Val.x;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-		_temp=ak8975_fc.Mag_Val.y;
+	_temp=ak8975_fc.Mag_Val.y;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
-		_temp=ak8975_fc.Mag_Val.z;
+	_temp=ak8975_fc.Mag_Val.z;
 	data_to_send[_cnt++]=BYTE1(_temp);
 	data_to_send[_cnt++]=BYTE0(_temp);
 
-data_to_send[3] = _cnt-4;
+  data_to_send[3] = _cnt-4;
 	for( i=0;i<_cnt;i++)
 		sum += data_to_send[i];
 	data_to_send[_cnt++] = sum;
